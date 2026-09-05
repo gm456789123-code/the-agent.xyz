@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS orders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  product_id VARCHAR(64) NOT NULL,
+  product_title VARCHAR(255) NOT NULL,
+  price_cents INT NOT NULL,
+  customer_contact VARCHAR(255) NOT NULL,
+  status ENUM('pending', 'paid', 'failed') NOT NULL DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

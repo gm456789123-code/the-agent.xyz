@@ -9,6 +9,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 5s
@@ -30,6 +31,7 @@ services:
       - "${WORDPRESS_PORT}:80"
     volumes:
       - wordpress-data:/var/www/html
+      - ./wp-content/mu-plugins:/var/www/html/wp-content/mu-plugins
 
   phpmyadmin:
     image: phpmyadmin:latest
