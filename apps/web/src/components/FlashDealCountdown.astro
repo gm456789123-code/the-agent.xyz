@@ -1,0 +1,42 @@
+---
+interface Props {
+  endsAt: string;
+  percentOff: number;
+}
+
+const { endsAt, percentOff } = Astro.props;
+---
+
+<div class="bg-surface rounded-lg p-5 neon-border-purple" data-flash-deal data-ends-at={endsAt}>
+  <div class="text-xs tracking-widest text-white/50 mb-2">FLASH DEAL</div>
+  <div class="font-display font-black text-3xl text-neon-purple">-{percentOff}%</div>
+  <div class="text-xs text-white/50 mt-2">ENDS IN</div>
+  <div class="font-display font-bold text-xl" data-countdown-display>--:--:--</div>
+</div>
+
+<script>
+  function pad(n: number) {
+    return String(Math.max(n, 0)).padStart(2, "0");
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-flash-deal]").forEach((el) => {
+    const endsAt = new Date(el.dataset.endsAt ?? "").getTime();
+    const display = el.querySelector<HTMLElement>("[data-countdown-display]");
+    if (!display) return;
+
+    const tick = () => {
+      const diff = endsAt - Date.now();
+      if (diff <= 0) {
+        display.textContent = "00:00:00";
+        return;
+      }
+      const hours = Math.floor(diff / 3_600_000);
+      const minutes = Math.floor((diff % 3_600_000) / 60_000);
+      const seconds = Math.floor((diff % 60_000) / 1000);
+      display.textContent = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+    };
+
+    tick();
+    setInterval(tick, 1000);
+  });
+</script>

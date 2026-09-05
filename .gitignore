@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.astro/
+*.env
+!.env.example
+
+# Docker volumes
+docker/mysql-data/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+npm-debug.log*

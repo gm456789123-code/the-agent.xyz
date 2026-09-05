@@ -1,0 +1,26 @@
+---
+const navItems = [
+  { en: "STORE", th: "ร้านค้า" },
+  { en: "TOP-UP", th: "เติมเงิน" },
+  { en: "SERVICES", th: "บริการ" },
+  { en: "SUPPORT", th: "ช่วยเหลือ" },
+];
+---
+
+<header class="flex items-center justify-between px-8 py-6 border-b border-white/5">
+  <div class="font-display font-bold text-2xl tracking-wider">
+    NEXUS<span class="neon-text-green">X</span>
+    <div class="text-xs font-normal tracking-[0.3em] text-white/60">ARCADE</div>
+  </div>
+
+  <nav class="hidden md:flex gap-10">
+    {
+      navItems.map((item) => (
+        <a href="#" class="text-center font-display font-semibold tracking-wide hover:text-neon-green transition-colors">
+          <div>{item.en}</div>
+          <div class="text-xs font-normal text-white/50">{item.th}</div>
+        </a>
+      ))
+    }
+  </nav>
+</header>

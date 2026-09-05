@@ -1,0 +1,37 @@
+---
+import type { ProductTile } from "../data/mock";
+
+interface Props {
+  products: ProductTile[];
+}
+
+const { products } = Astro.props;
+
+const sizeClasses: Record<ProductTile["size"], string> = {
+  large: "md:col-span-2 md:row-span-2 aspect-square md:aspect-auto",
+  medium: "md:col-span-1 md:row-span-2 aspect-square",
+  small: "aspect-square",
+};
+---
+
+<section class="px-8 py-12">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[minmax(0,1fr)]">
+    {
+      products.map((product) => (
+        <div
+          class:list={[
+            "rounded-lg bg-surface p-5 flex flex-col justify-end",
+            sizeClasses[product.size],
+            product.accent === "green" ? "neon-border-green" : "neon-border-purple",
+          ]}
+        >
+          <div class="text-xs text-white/50 mb-1">{product.subtitle}</div>
+          <div class="font-display font-bold leading-tight">{product.title}</div>
+          <div class={product.accent === "green" ? "neon-text-green mt-2 font-semibold" : "text-neon-purple mt-2 font-semibold"}>
+            {product.price}
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</section>

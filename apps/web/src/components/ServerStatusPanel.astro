@@ -1,0 +1,30 @@
+---
+import type { ServerStatus } from "../data/mock";
+
+interface Props {
+  servers: ServerStatus[];
+}
+
+const { servers } = Astro.props;
+
+const statusColor: Record<ServerStatus["status"], string> = {
+  ONLINE: "bg-neon-green",
+  OFFLINE: "bg-red-500",
+  DEGRADED: "bg-yellow-400",
+};
+---
+
+<div class="bg-surface rounded-lg p-5 neon-border-green">
+  <div class="text-xs tracking-widest text-white/50 mb-3">SERVER STATUS</div>
+  <ul class="space-y-2">
+    {
+      servers.map((server) => (
+        <li class="flex items-center gap-2 text-sm">
+          <span class={`w-2 h-2 rounded-full ${statusColor[server.status]}`} />
+          <span class="text-white/70">{server.region}:</span>
+          <span class="font-semibold neon-text-green">{server.status}</span>
+        </li>
+      ))
+    }
+  </ul>
+</div>
