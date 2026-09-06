@@ -8,30 +8,30 @@ interface Props {
 const { products = [] } = Astro.props;
 ---
 
-<div id="products" class="w-full space-y-6">
+<div id="products" class="w-full space-y-8">
   
-  <!-- Section Title & Filter Pills -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+  <!-- Section Title & Filter Pills (Enlarged Header) -->
+  <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5 border-b border-white/10 pb-6">
     <div>
-      <h2 class="font-display font-black text-2xl sm:text-3xl text-white flex items-center gap-2">
+      <h2 class="font-display font-black text-3xl sm:text-4xl lg:text-5xl text-white flex items-center gap-3 flex-wrap">
         <span>ดีลสินค้า & บริการออนไลน์ทั้งหมด</span>
-        <span class="text-xs sm:text-sm font-bold px-3 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-400/40 shadow-[0_0_12px_rgba(244,114,182,0.3)]">
+        <span class="text-sm sm:text-base font-black px-4 py-1 rounded-full bg-pink-500/20 text-pink-300 border border-pink-400/40 shadow-[0_0_15px_rgba(244,114,182,0.4)]">
           {products.length} ดีลแนะนำ
         </span>
       </h2>
-      <p class="text-xs sm:text-sm text-slate-300 mt-1 font-medium">รวมสินค้าและบริการจากร้านค้าพันธมิตรที่ผ่านการคัดสรร ตรวจสอบได้ทุกออโต้</p>
+      <p class="text-sm sm:text-base lg:text-lg text-slate-300 mt-2 font-medium">รวมสินค้าและบริการจากร้านค้าพันธมิตรที่ผ่านการคัดสรร ตรวจสอบได้ทุกออโต้ 24 ชั่วโมง</p>
     </div>
 
-    <!-- Category Filter Tabs (Aurora Active Pill) -->
-    <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+    <!-- Category Filter Tabs (Enlarged Pills) -->
+    <div class="flex items-center gap-2.5 overflow-x-auto pb-2 lg:pb-0 scrollbar-none">
       {
         mockCategories.map((cat, idx) => (
           <button
             type="button"
             class:list={[
-              "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all",
+              "px-5 py-3 rounded-2xl text-sm sm:text-base font-bold whitespace-nowrap transition-all",
               idx === 0
-                ? "aurora-btn-gradient text-slate-950 shadow-glow"
+                ? "aurora-btn-gradient text-slate-950 shadow-glow scale-105"
                 : "aurora-glass hover:bg-pink-500/15 hover:border-pink-400/50 text-slate-200 hover:text-pink-300",
             ]}
           >
@@ -42,84 +42,86 @@ const { products = [] } = Astro.props;
     </div>
   </div>
 
-  <!-- Products Grid: Aurora Glass Pop-Out Cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 gap-4 lg:gap-6">
+  <!-- Products Grid: Extra Large Pop-Out Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
     {
       products.map((item) => (
-        <div class="group relative rounded-3xl aurora-glass aurora-glass-hover p-5 flex flex-col justify-between overflow-hidden">
+        <div class="group relative rounded-3xl aurora-glass aurora-glass-hover p-6 sm:p-7 flex flex-col justify-between overflow-hidden border border-white/15">
           
           <!-- Card Top: Image & Badges -->
           <div>
-            <div class="relative w-full aspect-[16/9] rounded-2xl overflow-hidden bg-slate-950 mb-4 border border-white/15 shadow-inner">
+            <!-- Extra Tall Image Frame -->
+            <div class="relative w-full h-60 sm:h-64 lg:h-72 rounded-2xl overflow-hidden bg-slate-950 mb-5 border border-white/15 shadow-inner">
               <img
                 src={item.image}
                 alt={item.title}
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 loading="lazy"
               />
-              <div class="absolute inset-0 bg-gradient-to-t from-[#120F2B] via-transparent to-black/30"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-[#0A1124] via-transparent to-black/40"></div>
 
-              <!-- Top Badges (Pastel Pink & Purple Badges) -->
-              <div class="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none">
+              <!-- Top Badges (Enlarged) -->
+              <div class="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
                 {item.badge && (
                   <span class:list={[
-                    "px-3 py-1 rounded-lg text-xs font-black tracking-wide shadow-md backdrop-blur-md border border-white/20",
+                    "px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-black tracking-wide shadow-lg backdrop-blur-md border border-white/20",
                     item.badgeType === "sale"
-                      ? "bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-[0_0_12px_rgba(244,114,182,0.5)]"
+                      ? "bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-[0_0_15px_rgba(244,114,182,0.6)]"
                       : item.badgeType === "hot"
-                      ? "bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-[0_0_12px_rgba(168,85,247,0.5)]"
+                      ? "bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-[0_0_15px_rgba(168,85,247,0.6)]"
                       : "bg-gradient-to-r from-pink-400 to-purple-500 text-white font-bold",
                   ]}>
                     {item.badge}
                   </span>
                 )}
-                <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-950/85 backdrop-blur-md text-pink-300 ml-auto border border-pink-400/40 shadow-sm">
+                <span class="text-xs sm:text-sm font-black px-3 py-1.5 rounded-xl bg-slate-950/90 backdrop-blur-md text-pink-300 ml-auto border border-pink-400/50 shadow-md">
                   ⚡ {item.deliverySpeed}
                 </span>
               </div>
             </div>
 
             <!-- Partner Store Info & Category -->
-            <div class="flex items-center justify-between text-xs sm:text-sm font-medium mb-1.5">
-              <span class="text-pink-300 font-bold uppercase tracking-wider">{item.categoryLabel}</span>
-              <span class="text-amber-300 flex items-center gap-1 font-bold">
+            <div class="flex items-center justify-between text-sm sm:text-base font-bold mb-2">
+              <span class="text-pink-300 font-extrabold uppercase tracking-wider">{item.categoryLabel}</span>
+              <span class="text-amber-300 flex items-center gap-1 font-black text-base sm:text-lg">
                 ★ {item.storeRating}
               </span>
             </div>
 
-            <h3 class="font-display font-black text-lg sm:text-xl text-white group-hover:text-pink-300 transition-colors leading-snug drop-shadow-sm">
+            <!-- Main Title (Enlarged) -->
+            <h3 class="font-display font-black text-xl sm:text-2xl lg:text-3xl text-white group-hover:text-pink-300 transition-colors leading-tight drop-shadow-sm">
               {item.title}
             </h3>
 
-            <!-- Store Partner Tag -->
-            <div class="text-xs sm:text-sm text-slate-300 mt-1.5 flex items-center gap-1.5 font-medium">
-              <span class="text-purple-300/80">ร้านค้า:</span>
-              <span class="text-white font-bold">{item.storeName}</span>
+            <!-- Store Partner Tag & Detail -->
+            <div class="text-sm sm:text-base text-slate-200 mt-2.5 flex items-center gap-2 font-medium">
+              <span class="text-purple-300 font-bold">ร้านค้าพันธมิตร:</span>
+              <span class="text-white font-black bg-purple-500/20 px-2.5 py-0.5 rounded-lg border border-purple-400/30">{item.storeName}</span>
             </div>
-            <div class="text-xs text-slate-300 mt-1">
-              รายละเอียด: {item.unit}
+            <div class="text-xs sm:text-sm text-slate-300 mt-1.5 font-medium">
+              เงื่อนไขบริการ: {item.unit}
             </div>
           </div>
 
-          <!-- Card Bottom: Pricing & Buy Button -->
-          <div class="mt-5 pt-3.5 border-t border-white/10 flex items-center justify-between">
+          <!-- Card Bottom: Pricing & Buy Button (Enlarged) -->
+          <div class="mt-6 pt-4 border-t border-white/10 flex items-center justify-between gap-3">
             <div>
               {item.originalPrice && (
-                <div class="text-xs line-through text-slate-400 font-medium">
+                <div class="text-xs sm:text-sm line-through text-slate-400 font-bold">
                   {item.originalPrice}
                 </div>
               )}
-              <div class="font-display font-black text-xl sm:text-2xl text-pink-300 drop-shadow-[0_0_10px_rgba(244,114,182,0.4)]">
+              <div class="font-display font-black text-2xl sm:text-3xl lg:text-4xl text-pink-300 drop-shadow-[0_0_15px_rgba(244,114,182,0.5)]">
                 {item.price}
               </div>
             </div>
 
             <a
               href={`#order-${item.id}`}
-              class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-surface-card group-hover:aurora-btn-gradient text-white group-hover:text-slate-950 border border-white/15 group-hover:border-pink-400 transition-all flex items-center gap-1.5 group-hover:shadow-[0_0_20px_rgba(244,114,182,0.5)]"
+              class="px-5 sm:px-6 py-3 sm:py-3.5 rounded-2xl text-sm sm:text-base font-black bg-surface-card group-hover:aurora-btn-gradient text-white group-hover:text-slate-950 border border-white/15 group-hover:border-pink-400 transition-all flex items-center gap-2 group-hover:shadow-[0_0_25px_rgba(244,114,182,0.6)] group-hover:scale-105"
             >
-              <span>สั่งซื้อผ่านนายหน้า</span>
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <span>สั่งซื้อดีลนี้</span>
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
               </svg>
             </a>

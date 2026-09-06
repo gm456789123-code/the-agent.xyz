@@ -9,50 +9,50 @@ const navLinks = [
 
 <header class="w-full border-b border-white/10 bg-background/80 backdrop-blur-2xl sticky top-0 z-50 shadow-glass">
   <div class="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-14">
-    <div class="flex items-center justify-between h-16 sm:h-18 gap-3">
+    <div class="flex items-center justify-between h-20 sm:h-22 gap-4">
       
-      <!-- Brand Logo: Tri-Color Pastel Aurora Badge -->
-      <a href="/" class="flex items-center gap-2.5 flex-shrink-0 group">
-        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-tr from-pink-400 via-purple-400 to-sky-300 flex items-center justify-center font-display font-black text-slate-950 text-xl shadow-[0_0_22px_rgba(244,114,182,0.6)] group-hover:scale-105 transition-transform duration-300">
+      <!-- Brand Logo: Tri-Color Pastel Aurora Badge (Enlarged) -->
+      <a href="/" class="flex items-center gap-3 flex-shrink-0 group">
+        <div class="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl bg-gradient-to-tr from-pink-400 via-purple-400 to-sky-300 flex items-center justify-center font-display font-black text-slate-950 text-2xl shadow-[0_0_25px_rgba(244,114,182,0.6)] group-hover:scale-105 transition-transform duration-300">
           N
         </div>
         <div class="flex flex-col">
-          <div class="font-display font-black text-lg sm:text-xl tracking-wider text-white group-hover:text-pink-300 transition-colors">
+          <div class="font-display font-black text-xl sm:text-2xl lg:text-3xl tracking-wider text-white group-hover:text-pink-300 transition-colors">
             NEXUS<span class="aurora-text">.DEALS</span>
           </div>
-          <div class="text-[10px] sm:text-[11px] font-bold tracking-widest text-purple-300/90 -mt-1 uppercase flex items-center gap-1">
+          <div class="text-xs sm:text-sm font-black tracking-widest text-purple-300 -mt-0.5 uppercase flex items-center gap-1.5">
             <span>Multi-Store Broker Hub</span>
-            <span class="px-1.5 py-0.2 rounded bg-pink-500/20 text-pink-300 text-[9px] border border-pink-400/30">VIP</span>
+            <span class="px-2 py-0.2 rounded-md bg-pink-500/25 text-pink-200 text-xs border border-pink-400/40">VIP</span>
           </div>
         </div>
       </a>
 
-      <!-- Quick Search Bar (Desktop Wide) -->
+      <!-- Quick Search Bar (Desktop Wide - Enlarged) -->
       <div class="hidden md:flex flex-1 max-w-xl lg:max-w-2xl mx-6">
         <div class="relative w-full">
-          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-pink-300/80">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-pink-300">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
           <input
             type="text"
             placeholder="ค้นหาดีล, สตรีมมิ่ง, เติมเกม หรือซอฟต์แวร์..."
-            class="w-full pl-10 pr-12 py-2.5 text-sm sm:text-base bg-surface-card border border-pink-400/25 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all shadow-inner font-medium"
+            class="w-full pl-11 pr-14 py-3 text-base sm:text-lg bg-surface-card border border-pink-400/30 rounded-2xl text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all shadow-inner font-bold"
           />
-          <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-            <kbd class="hidden sm:inline-block px-2 py-0.5 text-xs font-mono text-pink-300/90 bg-pink-500/15 border border-pink-500/30 rounded">⌘K</kbd>
+          <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center">
+            <kbd class="hidden sm:inline-block px-2.5 py-1 text-xs font-mono text-pink-300 font-bold bg-pink-500/20 border border-pink-500/40 rounded-lg">⌘K</kbd>
           </div>
         </div>
       </div>
 
-      <!-- Desktop Navigation Links -->
-      <nav class="hidden lg:flex items-center gap-7">
+      <!-- Desktop Navigation Links (Enlarged) -->
+      <nav class="hidden lg:flex items-center gap-8">
         {
           navLinks.map((link) => (
             <a
               href={link.href}
-              class="text-base font-semibold text-slate-200 hover:text-pink-300 hover:drop-shadow-[0_0_12px_rgba(244,114,182,0.8)] transition-all"
+              class="text-lg font-bold text-slate-200 hover:text-pink-300 hover:drop-shadow-[0_0_15px_rgba(244,114,182,0.8)] transition-all"
             >
               {link.label}
             </a>
@@ -60,29 +60,29 @@ const navLinks = [
         }
       </nav>
 
-      <!-- Right Actions: Status & Member -->
-      <div class="flex items-center gap-2.5 sm:gap-3.5">
+      <!-- Right Actions: Status & Member (Enlarged) -->
+      <div class="flex items-center gap-3 sm:gap-4">
         <!-- Live Agent Status Pill (Desktop & Mobile Tablet) -->
-        <div class="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-card border border-emerald-500/35 text-emerald-300 text-xs sm:text-sm font-bold shadow-[0_0_15px_rgba(52,211,153,0.2)]">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 live-dot"></span>
+        <div class="hidden sm:flex items-center gap-2.5 px-4 py-2 rounded-full bg-surface-card border border-emerald-500/40 text-emerald-300 text-sm sm:text-base font-black shadow-[0_0_18px_rgba(52,211,153,0.25)]">
+          <span class="w-3 h-3 rounded-full bg-emerald-400 live-dot"></span>
           <span>Agent ออนไลน์: <strong class="text-white font-black">8/10</strong></span>
         </div>
 
         <!-- Order Track Button (Desktop) -->
         <a
           href="#track"
-          class="hidden md:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-surface-card border border-white/15 text-white hover:border-purple-400/50 hover:text-purple-300 transition-all shadow-subtle"
+          class="hidden md:inline-flex items-center gap-2 px-5 py-3 rounded-2xl text-sm sm:text-base font-black bg-surface-card border border-white/15 text-white hover:border-pink-400/50 hover:text-pink-300 transition-all shadow-subtle"
         >
-          <svg class="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg class="w-5 h-5 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span>เช็คสลิป</span>
         </a>
 
-        <!-- Login Button -->
+        <!-- Login Button (Enlarged) -->
         <a
           href="#login"
-          class="px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow flex items-center gap-1.5"
+          class="px-5 sm:px-6 py-3 rounded-2xl text-sm sm:text-base font-black aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow flex items-center gap-2 hover:scale-105"
         >
           <span>เข้าสู่ระบบ</span>
         </a>

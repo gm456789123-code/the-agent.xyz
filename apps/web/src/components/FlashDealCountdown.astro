@@ -7,51 +7,51 @@ interface Props {
 const { endsAt, percentOff } = Astro.props;
 ---
 
-<div class="relative rounded-3xl aurora-glass p-5 shadow-pop overflow-hidden group hover:border-purple-400/60 transition-all duration-500" data-flash-deal data-ends-at={endsAt}>
+<div class="relative rounded-3xl aurora-glass p-6 sm:p-7 shadow-pop overflow-hidden group hover:border-pink-400/60 transition-all duration-500 border border-white/15" data-flash-deal data-ends-at={endsAt}>
   
   <!-- Multi-Tone Aurora Backdrop Glow inside Card -->
-  <div class="absolute top-0 right-0 w-36 h-36 bg-gradient-to-bl from-pink-500/20 via-purple-500/15 to-transparent rounded-full blur-2xl pointer-events-none"></div>
+  <div class="absolute top-0 right-0 w-44 h-44 bg-gradient-to-bl from-pink-500/25 via-purple-500/20 to-transparent rounded-full blur-2xl pointer-events-none"></div>
 
   <!-- Header -->
-  <div class="flex items-center justify-between mb-3">
-    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-purple-500/25 to-pink-500/20 text-pink-300 border border-purple-400/40 text-xs font-bold shadow-[0_0_12px_rgba(244,114,182,0.3)]">
+  <div class="flex items-center justify-between mb-4">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-purple-500/25 to-pink-500/20 text-pink-300 border border-purple-400/40 text-xs sm:text-sm font-black shadow-[0_0_15px_rgba(244,114,182,0.4)]">
       <span>⚡ FLASH SALE</span>
     </div>
-    <span class="font-display font-black text-2xl aurora-text drop-shadow-sm">-{percentOff}%</span>
+    <span class="font-display font-black text-3xl sm:text-4xl aurora-text drop-shadow-sm">-{percentOff}%</span>
   </div>
 
-  <h4 class="font-display font-bold text-sm text-white leading-tight drop-shadow-sm">
+  <h4 class="font-display font-black text-base sm:text-xl text-white leading-tight drop-shadow-sm">
     โค้ดส่วนลดเติมเกมประจำสัปดาห์
   </h4>
-  <p class="text-xs text-slate-300 mt-1 font-medium">
-    ใช้โค้ด <span class="font-mono text-purple-300 font-bold bg-slate-950/80 px-2 py-0.5 rounded-lg border border-purple-400/40 shadow-inner">NEXUS25</span> ก่อนหมดเวลา
+  <p class="text-xs sm:text-sm text-slate-300 mt-2 font-medium">
+    ใช้โค้ด <span class="font-mono text-pink-300 font-black bg-slate-950/90 px-2.5 py-1 rounded-lg border border-pink-400/50 shadow-inner text-sm sm:text-base">NEXUS25</span> ก่อนหมดเวลา
   </p>
 
-  <!-- Countdown Timer Blocks -->
-  <div class="mt-4 pt-3 border-t border-white/10">
-    <div class="text-[11px] text-purple-300/90 mb-2 font-bold">เวลานับถอยหลัง:</div>
-    <div class="flex items-center gap-2 text-center" data-countdown-container>
-      <div class="flex-1 bg-slate-950/80 py-2.5 rounded-xl border border-white/15 shadow-inner">
-        <div class="font-mono font-black text-xl text-white leading-tight" data-cd-hours>04</div>
-        <div class="text-[10px] text-slate-400 font-medium">ชม.</div>
+  <!-- Countdown Timer Blocks (Enlarged Digits) -->
+  <div class="mt-5 pt-4 border-t border-white/10">
+    <div class="text-xs sm:text-sm text-pink-300/90 mb-2.5 font-bold">เวลานับถอยหลัง:</div>
+    <div class="flex items-center gap-2.5 text-center" data-countdown-container>
+      <div class="flex-1 bg-slate-950/90 py-3 sm:py-3.5 rounded-2xl border border-white/15 shadow-inner">
+        <div class="font-mono font-black text-2xl sm:text-3xl text-white leading-tight" data-cd-hours>04</div>
+        <div class="text-xs text-slate-400 font-bold">ชม.</div>
       </div>
-      <span class="text-purple-300 font-black text-lg">:</span>
-      <div class="flex-1 bg-slate-950/80 py-2.5 rounded-xl border border-white/15 shadow-inner">
-        <div class="font-mono font-black text-xl text-white leading-tight" data-cd-minutes>35</div>
-        <div class="text-[10px] text-slate-400 font-medium">นาที</div>
+      <span class="text-pink-300 font-black text-xl sm:text-2xl">:</span>
+      <div class="flex-1 bg-slate-950/90 py-3 sm:py-3.5 rounded-2xl border border-white/15 shadow-inner">
+        <div class="font-mono font-black text-2xl sm:text-3xl text-white leading-tight" data-cd-minutes>35</div>
+        <div class="text-xs text-slate-400 font-bold">นาที</div>
       </div>
-      <span class="text-purple-300 font-black text-lg">:</span>
-      <div class="flex-1 bg-slate-950/80 py-2.5 rounded-xl border border-white/15 shadow-inner">
-        <div class="font-mono font-black text-xl text-emerald-400 leading-tight" data-cd-seconds>12</div>
-        <div class="text-[10px] text-slate-400 font-medium">วินาที</div>
+      <span class="text-pink-300 font-black text-xl sm:text-2xl">:</span>
+      <div class="flex-1 bg-slate-950/90 py-3 sm:py-3.5 rounded-2xl border border-white/15 shadow-inner">
+        <div class="font-mono font-black text-2xl sm:text-3xl text-emerald-400 leading-tight" data-cd-seconds>12</div>
+        <div class="text-xs text-slate-400 font-bold">วินาที</div>
       </div>
     </div>
   </div>
 
-  <!-- Action Button -->
+  <!-- Action Button (Enlarged) -->
   <a
     href="#products"
-    class="mt-4 w-full py-3 rounded-xl text-xs font-black aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-aurora flex items-center justify-center gap-1.5 hover:scale-[1.02]"
+    class="mt-5 w-full py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-black aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-aurora flex items-center justify-center gap-2 hover:scale-[1.02]"
   >
     <span>ใช้ส่วนลดตอนนี้</span>
   </a>
