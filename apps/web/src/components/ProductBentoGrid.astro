@@ -42,8 +42,8 @@ const { products = [] } = Astro.props;
     </div>
   </div>
 
-  <!-- Products Grid: Responsive Cards (1 Column on Mobile, 2 on Tablet, 3 on Desktop) -->
-  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-8">
+  <!-- Products Grid: Responsive Cards (1 Column on Mobile, 2 on Tablet, 3 on Laptop, 4 on 1920px Ultra-Wide Desktop) -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
     {
       products.map((item) => (
         <div class="group relative rounded-2xl sm:rounded-3xl aurora-glass aurora-glass-hover p-4 sm:p-7 flex flex-col justify-between overflow-hidden border border-white/15">
