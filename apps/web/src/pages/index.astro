@@ -50,32 +50,32 @@ const products = await getProducts();
     </section>
 
     <!-- Main Content: Product Catalog + Aside Widgets -->
-    <section class="grid lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 items-start">
+    <section class="grid lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 items-start w-full max-w-full min-w-0">
       
       <!-- Catalog (8 Columns on Desktop, 9 Columns on Ultra-Wide 1920px) -->
-      <div class="lg:col-span-8 2xl:col-span-9">
+      <div class="lg:col-span-8 2xl:col-span-9 w-full max-w-full min-w-0">
         <ProductBentoGrid products={products} />
       </div>
 
       <!-- Right Sidebar: Flash Deal & System Health (4 Columns on Desktop, 3 Columns on Ultra-Wide 1920px) -->
-      <aside class="lg:col-span-4 2xl:col-span-3 space-y-5 sm:space-y-8">
+      <aside class="lg:col-span-4 2xl:col-span-3 space-y-5 sm:space-y-8 w-full max-w-full min-w-0">
         <FlashDealCountdown endsAt={flashDealEndsAt} percentOff={flashDealPercentOff} />
         <ServerStatusPanel />
 
         <!-- 24/7 VIP Support Box -->
-        <div class="rounded-2xl sm:rounded-3xl aurora-glass p-5 sm:p-7 shadow-pop border border-pink-400/30">
+        <div class="rounded-2xl sm:rounded-3xl aurora-glass p-5 sm:p-7 shadow-pop border border-pink-400/30 w-full max-w-full min-w-0">
           <div class="flex items-center gap-3 sm:gap-4">
             <div class="w-11 h-11 sm:w-13 sm:h-13 rounded-xl sm:rounded-2xl bg-pink-500/20 border border-pink-400/40 flex items-center justify-center text-pink-300 shadow-[0_0_20px_rgba(244,114,182,0.4)] flex-shrink-0">
               <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
             </div>
-            <div>
-              <div class="font-display font-black text-sm sm:text-lg text-white">ต้องการดีลพิเศษ / สนใจเป็นพาร์ทเนอร์ร้านค้า?</div>
+            <div class="min-w-0 flex-1">
+              <div class="font-display font-black text-sm sm:text-lg text-white break-words">ต้องการดีลพิเศษ / สนใจเป็นพาร์ทเนอร์ร้านค้า?</div>
               <div class="text-xs sm:text-sm font-bold text-pink-300">ทีมงานนายหน้าดูแลบริการ 24/7</div>
             </div>
           </div>
-          <p class="text-xs sm:text-base text-slate-300 mt-3 sm:mt-4 leading-relaxed font-medium">
+          <p class="text-xs sm:text-base text-slate-300 mt-3 sm:mt-4 leading-relaxed font-medium break-words">
             หากคุณเป็นร้านค้าที่ต้องการลงขายสินค้า หรือผู้ซื้อที่ติดปัญหาออเดอร์ สามารถทักแอดมินเพื่อขอความช่วยเหลือได้ทันที
           </p>
           <a
@@ -91,7 +91,7 @@ const products = await getProducts();
     </section>
 
     <!-- How It Works (3 Steps for Middleman Broker) -->
-    <section id="how-it-works" class="border-t border-white/10 pt-10 sm:pt-20">
+    <section id="how-it-works" class="border-t border-white/10 pt-10 sm:pt-20 w-full max-w-full min-w-0">
       <div class="text-center max-w-3xl mx-auto mb-8 sm:mb-16">
         <h2 class="font-display font-black text-2xl sm:text-5xl lg:text-6xl text-white">
           ขั้นตอนสั่งซื้อผ่านนายหน้าออโต้ ใน <span class="aurora-text">3 สเต็ป</span>
@@ -101,36 +101,36 @@ const products = await getProducts();
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-10">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-10 w-full max-w-full min-w-0">
         <!-- Step 01: Pastel Violet -->
-        <div class="relative rounded-2xl sm:rounded-3xl aurora-glass aurora-glass-hover p-5 sm:p-9 shadow-pop border border-purple-400/30">
+        <div class="relative rounded-2xl sm:rounded-3xl aurora-glass aurora-glass-hover p-5 sm:p-9 shadow-pop border border-purple-400/30 w-full max-w-full min-w-0">
           <div class="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-purple-500/20 border border-purple-400/40 text-purple-300 font-display font-black text-lg sm:text-3xl flex items-center justify-center mb-4 sm:mb-6 shadow-[0_0_20px_rgba(196,181,253,0.4)]">
             01
           </div>
-          <h3 class="font-display font-black text-lg sm:text-2xl text-white mb-2 sm:mb-3">เลือกดีล & ร้านค้าที่ต้องการ</h3>
-          <p class="text-xs sm:text-base lg:text-lg text-slate-300 leading-relaxed font-medium">
+          <h3 class="font-display font-black text-lg sm:text-2xl text-white mb-2 sm:mb-3 break-words">เลือกดีล & ร้านค้าที่ต้องการ</h3>
+          <p class="text-xs sm:text-base lg:text-lg text-slate-300 leading-relaxed font-medium break-words">
             เลือกระหว่างแอปสตรีมมิ่ง เติมเกม ซอฟต์แวร์ หรือบริการออนไลน์ จากร้านค้าพันธมิตรที่ผ่านการยืนยัน
           </p>
         </div>
 
         <!-- Step 02: Pastel Purple -->
-        <div class="relative rounded-2xl sm:rounded-3xl aurora-glass aurora-glass-hover p-5 sm:p-9 shadow-pop border border-purple-400/30">
+        <div class="relative rounded-2xl sm:rounded-3xl aurora-glass aurora-glass-hover p-5 sm:p-9 shadow-pop border border-purple-400/30 w-full max-w-full min-w-0">
           <div class="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-purple-500/20 border border-purple-400/40 text-purple-300 font-display font-black text-lg sm:text-3xl flex items-center justify-center mb-4 sm:mb-6 shadow-[0_0_20px_rgba(168,85,247,0.4)]">
             02
           </div>
-          <h3 class="font-display font-black text-lg sm:text-2xl text-white mb-2 sm:mb-3">สแกนจ่าย QR Code ผ่านนายหน้า</h3>
-          <p class="text-xs sm:text-base lg:text-lg text-slate-300 leading-relaxed font-medium">
+          <h3 class="font-display font-black text-lg sm:text-2xl text-white mb-2 sm:mb-3 break-words">สแกนจ่าย QR Code ผ่านนายหน้า</h3>
+          <p class="text-xs sm:text-base lg:text-lg text-slate-300 leading-relaxed font-medium break-words">
             ชำระเงินตรงผ่านระบบตรวจสลิปอัจฉริยะ ปลอดภัย 100% ด้วยการถือยอดคนกลางโดย NEXUS
           </p>
         </div>
 
         <!-- Step 03: Pastel Pink -->
-        <div class="relative rounded-2xl sm:rounded-3xl aurora-glass aurora-glass-hover p-5 sm:p-9 shadow-pop border border-pink-400/30">
+        <div class="relative rounded-2xl sm:rounded-3xl aurora-glass aurora-glass-hover p-5 sm:p-9 shadow-pop border border-pink-400/30 w-full max-w-full min-w-0">
           <div class="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-pink-500/20 border border-pink-400/40 text-pink-300 font-display font-black text-lg sm:text-3xl flex items-center justify-center mb-4 sm:mb-6 shadow-[0_0_20px_rgba(244,114,182,0.4)]">
             03
           </div>
-          <h3 class="font-display font-black text-lg sm:text-2xl text-white mb-2 sm:mb-3">รับรหัส / คำเชิญบริการทันที</h3>
-          <p class="text-xs sm:text-base lg:text-lg text-slate-300 leading-relaxed font-medium">
+          <h3 class="font-display font-black text-lg sm:text-2xl text-white mb-2 sm:mb-3 break-words">รับรหัส / คำเชิญบริการทันที</h3>
+          <p class="text-xs sm:text-base lg:text-lg text-slate-300 leading-relaxed font-medium break-words">
             ระบบส่งมอบรหัส เข้ากลุ่มครอบครัวสตรีมมิ่ง หรือเติมตรงเข้าบัญชีทันใจใน 15-30 วินาที
           </p>
         </div>
@@ -138,24 +138,24 @@ const products = await getProducts();
     </section>
 
     <!-- Quick Order Tracking Section (Aurora Container Glass - Mobile Padding Fix) -->
-    <section id="track" class="rounded-2xl sm:rounded-3xl aurora-glass p-6 sm:p-16 shadow-aurora relative overflow-hidden border border-pink-400/40">
-      <div class="max-w-3xl mx-auto text-center relative z-10">
-        <h2 class="font-display font-black text-2xl sm:text-5xl lg:text-6xl text-white">
+    <section id="track" class="rounded-2xl sm:rounded-3xl aurora-glass p-6 sm:p-16 shadow-aurora relative overflow-hidden border border-pink-400/40 w-full max-w-full min-w-0">
+      <div class="max-w-3xl mx-auto text-center relative z-10 w-full max-w-full min-w-0">
+        <h2 class="font-display font-black text-2xl sm:text-5xl lg:text-6xl text-white break-words">
           ตรวจสอบสถานะคำสั่งซื้อ & <span class="aurora-text">สลิปคนกลาง</span>
         </h2>
-        <p class="text-xs sm:text-xl text-slate-300 mt-2 sm:mt-4 mb-6 sm:mb-10 font-medium">
+        <p class="text-xs sm:text-xl text-slate-300 mt-2 sm:mt-4 mb-6 sm:mb-10 font-medium break-words">
           หากคุณชำระเงินแล้ว สามารถใส่เบอร์โทรศัพท์ หรือเลขที่ออเดอร์ เพื่อติดตามสถานะส่งมอบจากร้านค้า
         </p>
 
-        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-xl mx-auto">
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-xl mx-auto w-full max-w-full min-w-0">
           <input
             type="text"
             placeholder="กรอกเบอร์โทร หรือ Order ID..."
-            class="flex-1 px-4 py-3 sm:px-6 sm:py-4 text-sm sm:text-xl bg-surface-card border border-pink-400/35 rounded-xl sm:rounded-2xl text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all shadow-inner font-bold"
+            class="flex-1 w-full min-w-0 px-4 py-3 sm:px-6 sm:py-4 text-sm sm:text-xl bg-surface-card border border-pink-400/35 rounded-xl sm:rounded-2xl text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all shadow-inner font-bold"
           />
           <button
             type="button"
-            class="px-6 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl font-display font-black text-sm sm:text-xl aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow flex items-center justify-center gap-2 hover:scale-105"
+            class="px-6 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl font-display font-black text-sm sm:text-xl aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow flex items-center justify-center gap-2 hover:scale-105 flex-shrink-0 whitespace-nowrap"
           >
             <span>ค้นหาออเดอร์</span>
           </button>

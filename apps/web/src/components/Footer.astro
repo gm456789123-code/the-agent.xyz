@@ -1,33 +1,33 @@
 ---
 ---
 
-<footer class="w-full border-t border-white/10 bg-background/90 mt-16 text-slate-300">
+<footer class="w-full max-w-full overflow-hidden border-t border-white/10 bg-background/90 mt-16 text-slate-300">
   
   <!-- Supported Payments & Trust Banner -->
-  <div class="border-b border-white/10 py-8 bg-surface-card/40 backdrop-blur-xl">
-    <div class="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-14 flex flex-col md:flex-row items-center justify-between gap-6">
-      <div>
+  <div class="border-b border-white/10 py-8 bg-surface-card/40 backdrop-blur-xl w-full max-w-full min-w-0">
+    <div class="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-14 flex flex-col md:flex-row items-center justify-between gap-6 min-w-0">
+      <div class="min-w-0 flex-1">
         <div class="font-display font-bold text-sm text-white flex items-center gap-2">
-          <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg class="w-4 h-4 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
           </svg>
-          <span>ช่องทางชำระเงินผ่านนายหน้า (สลิปออโต้ 24 ชม.)</span>
+          <span class="break-words">ช่องทางชำระเงินผ่านนายหน้า (สลิปออโต้ 24 ชม.)</span>
         </div>
-        <p class="text-xs text-slate-400 mt-0.5 font-medium">ระบบตรวจสอบยอดเงินเข้าทันที การันตีคนกลางโดย NEXUS.DEALS</p>
+        <p class="text-xs text-slate-400 mt-0.5 font-medium break-words">ระบบตรวจสอบยอดเงินเข้าทันที การันตีคนกลางโดย NEXUS.DEALS</p>
       </div>
 
       <!-- Payment Badges: Frosted Glass -->
-      <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs font-bold text-white">
-        <span class="px-3.5 py-2 rounded-xl aurora-glass flex items-center gap-2 shadow-subtle">
+      <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs font-bold text-white max-w-full min-w-0">
+        <span class="px-3.5 py-2 rounded-xl aurora-glass flex items-center gap-2 shadow-subtle flex-shrink-0">
           <span class="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-[0_0_8px_#38BDF8]"></span> PromptPay
         </span>
-        <span class="px-3.5 py-2 rounded-xl aurora-glass flex items-center gap-2 shadow-subtle">
+        <span class="px-3.5 py-2 rounded-xl aurora-glass flex items-center gap-2 shadow-subtle flex-shrink-0">
           <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_#FBBF24]"></span> TrueMoney Wallet
         </span>
-        <span class="px-3.5 py-2 rounded-xl aurora-glass flex items-center gap-2 shadow-subtle">
+        <span class="px-3.5 py-2 rounded-xl aurora-glass flex items-center gap-2 shadow-subtle flex-shrink-0">
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34D399]"></span> Mobile Banking (KBANK / SCB)
         </span>
-        <span class="px-3.5 py-2 rounded-xl aurora-glass flex items-center gap-2 shadow-subtle">
+        <span class="px-3.5 py-2 rounded-xl aurora-glass flex items-center gap-2 shadow-subtle flex-shrink-0">
           <span class="w-2.5 h-2.5 rounded-full bg-purple-400 shadow-[0_0_8px_#C4B5FD]"></span> Visa / Mastercard
         </span>
       </div>
