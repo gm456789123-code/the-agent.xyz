@@ -50,15 +50,23 @@ const { products = [] } = Astro.props;
           
           <!-- Card Top: Image & Badges -->
           <div>
-            <!-- Proportional Image Frame (176px on Mobile, 256px on PC) -->
-            <div class="relative w-full h-44 sm:h-64 lg:h-72 rounded-xl sm:rounded-2xl overflow-hidden bg-slate-950 mb-3.5 sm:mb-5 border border-white/15 shadow-inner">
+            <!-- Proportional Image Frame (100% Full Uncropped Image Display) -->
+            <div class="relative w-full h-44 sm:h-64 lg:h-72 rounded-xl sm:rounded-2xl overflow-hidden bg-slate-950/90 mb-3.5 sm:mb-5 border border-white/15 shadow-inner flex items-center justify-center p-1.5 sm:p-2">
+              <!-- Ambient Blurred Backdrop -->
+              <img
+                src={item.image}
+                alt=""
+                aria-hidden="true"
+                class="absolute inset-0 w-full h-full object-cover blur-xl opacity-35 scale-110 pointer-events-none"
+              />
+              <!-- Full Clear Uncropped Main Image -->
               <img
                 src={item.image}
                 alt={item.title}
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                class="relative z-10 max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500 rounded-lg drop-shadow-md"
                 loading="lazy"
               />
-              <div class="absolute inset-0 bg-gradient-to-t from-[#0A1124] via-transparent to-black/40"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-[#0A1124]/90 via-transparent to-black/20 pointer-events-none z-10"></div>
 
               <!-- Top Badges -->
               <div class="absolute top-2.5 left-2.5 right-2.5 sm:top-3 sm:left-3 sm:right-3 flex items-center justify-between pointer-events-none">

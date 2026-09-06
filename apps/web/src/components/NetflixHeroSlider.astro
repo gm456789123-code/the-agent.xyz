@@ -91,11 +91,19 @@ const slides = [
         slides.map((slide, idx) => (
           <div class="netflix-slide min-w-full w-full h-full relative flex items-center overflow-hidden">
             
-            <!-- Panoramic Horizontal Widescreen Background Banner Image -->
+            <!-- Panoramic Horizontal Widescreen Background Banner Image (100% Full Uncropped Display) -->
+            <!-- 1. Ambient Blurred Fill Layer -->
+            <img
+              src={slide.image}
+              alt=""
+              aria-hidden="true"
+              class="absolute inset-0 w-full h-full object-cover blur-2xl opacity-40 scale-110 pointer-events-none"
+            />
+            <!-- 2. Full Clear Uncropped Main Banner Image -->
             <img
               src={slide.image}
               alt={slide.title}
-              class="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-1000"
+              class="absolute right-0 top-0 bottom-0 w-full md:w-4/5 h-full object-contain object-right group-hover:scale-[1.02] transition-transform duration-1000 z-0 opacity-85"
               loading={idx === 0 ? "eager" : "lazy"}
             />
 
