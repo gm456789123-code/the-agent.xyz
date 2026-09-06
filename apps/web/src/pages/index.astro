@@ -16,15 +16,15 @@ const products = await getProducts();
 <BaseLayout title="NEXUS.DEALS — ศูนย์รวมดีลสินค้า & บริการออนไลน์ นายหน้าปลอดภัย 24 ชม.">
   <Header />
 
-  <main class="w-full max-w-[1920px] mx-auto px-3.5 sm:px-6 lg:px-10 xl:px-14 space-y-8 sm:space-y-16 py-3 sm:py-8 pb-28 lg:pb-14">
+  <main class="w-full max-w-[1920px] mx-auto px-3.5 sm:px-6 lg:px-10 xl:px-14 space-y-8 sm:space-y-16 py-3 sm:py-8 pb-28 lg:pb-14 overflow-hidden">
     
-    <!-- Giant Widescreen Panoramic Horizontal Hero Banner Section (100% Edge-to-Edge Full Width) -->
-    <section class="w-full -mx-3.5 sm:mx-0">
+    <!-- Giant Widescreen Panoramic Horizontal Hero Banner Section -->
+    <section class="w-full max-w-full overflow-hidden">
       <NetflixHeroSlider />
     </section>
 
     <!-- Real-time Live Orders Ticker (Responsive Mobile Padding) -->
-    <section class="w-full aurora-glass rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow-glass flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-5 overflow-hidden border border-pink-400/30">
+    <section class="w-full max-w-full aurora-glass rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow-glass flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-5 overflow-hidden border border-pink-400/30">
       <div class="flex items-center gap-2 flex-shrink-0">
         <span class="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 rounded-full bg-pink-400 live-dot"></span>
         <span class="font-display font-black text-xs sm:text-base text-pink-300 uppercase tracking-wider">
