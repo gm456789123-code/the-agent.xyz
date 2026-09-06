@@ -105,43 +105,43 @@ const slides = [
             <div class={`absolute -left-20 -top-20 w-[500px] h-[500px] bg-gradient-to-br ${slide.gradientColor} blur-3xl rounded-full pointer-events-none z-10`}></div>
 
             <!-- Content Area Over Vignette -->
-            <div class="relative z-20 max-w-2xl px-6 sm:px-10 lg:px-12 py-5 flex flex-col justify-center h-full">
+            <div class="relative z-20 max-w-2xl px-5 sm:px-10 lg:px-12 py-4 sm:py-5 flex flex-col justify-center h-full">
               
               <!-- Store & Partner Badge Pill -->
-              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-950/80 border border-sky-400/40 text-sky-300 text-[11px] font-bold w-fit mb-2 shadow-md backdrop-blur-md">
+              <div class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-slate-950/80 border border-sky-400/40 text-sky-300 text-[10px] sm:text-[11px] font-bold w-fit mb-1.5 sm:mb-2 shadow-md backdrop-blur-md">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-dot"></span>
-                <span>{slide.badge}</span>
+                <span class="truncate max-w-[240px] sm:max-w-none">{slide.badge}</span>
               </div>
 
               <!-- Main Title (Compact Wide Panoramic Size) -->
-              <h1 class="font-display font-black text-2xl sm:text-4xl lg:text-4xl text-white tracking-tight leading-tight drop-shadow-lg">
+              <h1 class="font-display font-black text-xl sm:text-4xl lg:text-4xl text-white tracking-tight leading-tight drop-shadow-lg">
                 {slide.title}
               </h1>
 
               <!-- Subtitle Description -->
-              <p class="mt-2 text-xs sm:text-sm text-slate-300 font-medium leading-relaxed max-w-lg line-clamp-2">
+              <p class="mt-1.5 sm:mt-2 text-[11px] sm:text-sm text-slate-300 font-medium leading-relaxed max-w-lg line-clamp-2">
                 {slide.subtitle}
               </p>
 
               <!-- Price Callout & Discount Pill -->
-              <div class="mt-3.5 flex items-baseline gap-2.5">
-                <span class="font-display font-black text-2xl sm:text-3xl text-emerald-300 drop-shadow-md">
+              <div class="mt-2.5 sm:mt-3.5 flex items-baseline gap-2">
+                <span class="font-display font-black text-xl sm:text-3xl text-emerald-300 drop-shadow-md">
                   {slide.price}
                 </span>
-                <span class="text-xs text-slate-400 font-medium">{slide.unit}</span>
-                <span class="text-xs line-through text-slate-400">{slide.originalPrice}</span>
-                <span class="text-[10px] font-black px-2 py-0.5 rounded bg-rose-500 text-white shadow-md border border-white/20">
+                <span class="text-[11px] sm:text-xs text-slate-400 font-medium">{slide.unit}</span>
+                <span class="text-[11px] sm:text-xs line-through text-slate-400">{slide.originalPrice}</span>
+                <span class="text-[9px] sm:text-[10px] font-black px-1.5 sm:px-2 py-0.5 rounded bg-rose-500 text-white shadow-md border border-white/20">
                   {slide.discountBadge}
                 </span>
               </div>
 
-              <!-- Action Buttons (Panoramic Compact CTAs) -->
-              <div class="mt-4 flex flex-wrap items-center gap-3">
+              <!-- Action Buttons (Mobile Responsive CTAs) -->
+              <div class="mt-3 sm:mt-4 flex flex-wrap items-center gap-2 sm:gap-3">
                 <a
                   href={slide.href}
-                  class="px-5 py-2.5 rounded-xl font-display font-black text-xs sm:text-sm aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-aurora flex items-center gap-2 hover:scale-105 group/btn"
+                  class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-display font-black text-xs sm:text-sm aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-aurora flex items-center gap-1.5 sm:gap-2 hover:scale-105 group/btn"
                 >
-                  <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                  <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                   </svg>
                   <span>{slide.ctaPrimary}</span>
@@ -149,9 +149,9 @@ const slides = [
 
                 <a
                   href="#products"
-                  class="px-4 py-2.5 rounded-xl font-display font-semibold text-xs text-white aurora-glass hover:bg-white/10 hover:border-purple-400/50 transition-all flex items-center gap-1.5"
+                  class="hidden xs:inline-flex px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-display font-semibold text-xs text-white aurora-glass hover:bg-white/10 hover:border-purple-400/50 transition-all items-center gap-1.5"
                 >
-                  <svg class="w-4 h-4 text-sky-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <span>{slide.ctaSecondary}</span>
@@ -170,7 +170,7 @@ const slides = [
       id="netflix-prev"
       type="button"
       aria-label="Previous Slide"
-      class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-slate-950/70 border border-white/20 text-white hover:bg-sky-500 hover:text-slate-950 hover:border-sky-300 transition-all flex items-center justify-center backdrop-blur-md opacity-0 group-hover:opacity-100 shadow-xl z-30 cursor-pointer"
+      class="hidden sm:flex absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-slate-950/70 border border-white/20 text-white hover:bg-sky-500 hover:text-slate-950 hover:border-sky-300 transition-all items-center justify-center backdrop-blur-md opacity-0 group-hover:opacity-100 shadow-xl z-30 cursor-pointer"
     >
       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
@@ -180,7 +180,7 @@ const slides = [
       id="netflix-next"
       type="button"
       aria-label="Next Slide"
-      class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-slate-950/70 border border-white/20 text-white hover:bg-sky-500 hover:text-slate-950 hover:border-sky-300 transition-all flex items-center justify-center backdrop-blur-md opacity-0 group-hover:opacity-100 shadow-xl z-30 cursor-pointer"
+      class="hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-slate-950/70 border border-white/20 text-white hover:bg-sky-500 hover:text-slate-950 hover:border-sky-300 transition-all items-center justify-center backdrop-blur-md opacity-0 group-hover:opacity-100 shadow-xl z-30 cursor-pointer"
     >
       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
@@ -188,8 +188,8 @@ const slides = [
     </button>
 
     <!-- Bottom Controls Bar (Slide Counter + Indicator Dots) -->
-    <div class="absolute bottom-4 right-5 sm:right-8 flex items-center gap-3.5 z-30 bg-slate-950/75 px-3.5 py-1.5 rounded-full border border-white/15 backdrop-blur-md">
-      <span id="netflix-counter" class="text-[11px] font-mono font-bold text-sky-300 tracking-wider">
+    <div class="absolute bottom-3 sm:bottom-4 right-3 sm:right-8 flex items-center gap-2.5 sm:gap-3.5 z-30 bg-slate-950/75 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full border border-white/15 backdrop-blur-md">
+      <span id="netflix-counter" class="text-[10px] sm:text-[11px] font-mono font-bold text-sky-300 tracking-wider">
         01 / 05
       </span>
       <div class="flex items-center gap-1.5">
@@ -202,8 +202,8 @@ const slides = [
               class:list={[
                 "netflix-dot h-1.5 rounded-full transition-all duration-300 cursor-pointer",
                 idx === 0
-                  ? "w-7 bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]"
-                  : "w-2 bg-white/30 hover:bg-white/60",
+                  ? "w-6 sm:w-7 bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]"
+                  : "w-1.5 sm:w-2 bg-white/30 hover:bg-white/60",
               ]}
             />
           ))
@@ -214,7 +214,7 @@ const slides = [
   </div>
 </div>
 
-<!-- Inline JavaScript for Netflix Auto-Slide Behavior -->
+<!-- Inline JavaScript for Netflix Auto-Slide Behavior & Mobile Touch Swipe -->
 <script>
   function initNetflixSlider() {
     const track = document.getElementById("netflix-track");
@@ -243,11 +243,11 @@ const slides = [
       // Update dots
       dots.forEach((dot, idx) => {
         if (idx === index) {
-          dot.classList.remove("w-2", "bg-white/30");
-          dot.classList.add("w-7", "bg-emerald-400", "shadow-[0_0_10px_rgba(52,211,153,0.8)]");
+          dot.classList.remove("w-1.5", "w-2", "bg-white/30");
+          dot.classList.add("w-6", "sm:w-7", "bg-emerald-400", "shadow-[0_0_10px_rgba(52,211,153,0.8)]");
         } else {
-          dot.classList.remove("w-7", "bg-emerald-400", "shadow-[0_0_10px_rgba(52,211,153,0.8)]");
-          dot.classList.add("w-2", "bg-white/30");
+          dot.classList.remove("w-6", "sm:w-7", "bg-emerald-400", "shadow-[0_0_10px_rgba(52,211,153,0.8)]");
+          dot.classList.add("w-1.5", "sm:w-2", "bg-white/30");
         }
       });
     }
@@ -287,6 +287,26 @@ const slides = [
         startTimer();
       });
     });
+
+    // Touch Swipe Gesture Support for Mobile Devices
+    let startX = 0;
+    container?.addEventListener("touchstart", (e: TouchEvent) => {
+      startX = e.touches[0].clientX;
+      stopTimer();
+    }, { passive: true });
+
+    container?.addEventListener("touchend", (e: TouchEvent) => {
+      const endX = e.changedTouches[0].clientX;
+      const diffX = startX - endX;
+      if (Math.abs(diffX) > 35) {
+        if (diffX > 0) {
+          renderSlide(index + 1); // Swipe left -> next
+        } else {
+          renderSlide(index - 1); // Swipe right -> prev
+        }
+      }
+      startTimer();
+    }, { passive: true });
 
     container?.addEventListener("mouseenter", stopTimer);
     container?.addEventListener("mouseleave", startTimer);

@@ -7,27 +7,27 @@ const navLinks = [
 ];
 ---
 
-<header class="w-full border-b border-white/10 bg-background/70 backdrop-blur-2xl sticky top-0 z-50 shadow-glass">
+<header class="w-full border-b border-white/10 bg-background/80 backdrop-blur-2xl sticky top-0 z-50 shadow-glass">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16 gap-4">
+    <div class="flex items-center justify-between h-16 gap-3">
       
       <!-- Brand Logo: Tri-Color Pastel Aurora Badge -->
-      <a href="/" class="flex items-center gap-2.5 flex-shrink-0 group">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-400 via-purple-400 to-pink-400 flex items-center justify-center font-display font-black text-slate-950 text-lg shadow-[0_0_20px_rgba(167,139,250,0.5)] group-hover:scale-105 transition-transform duration-300">
+      <a href="/" class="flex items-center gap-2 flex-shrink-0 group">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-sky-400 via-purple-400 to-pink-400 flex items-center justify-center font-display font-black text-slate-950 text-lg shadow-[0_0_20px_rgba(167,139,250,0.5)] group-hover:scale-105 transition-transform duration-300">
           N
         </div>
         <div class="flex flex-col">
-          <div class="font-display font-black text-lg tracking-wider text-white group-hover:text-aurora-purple transition-colors">
+          <div class="font-display font-black text-base sm:text-lg tracking-wider text-white group-hover:text-sky-300 transition-colors">
             NEXUS<span class="aurora-text">.DEALS</span>
           </div>
-          <div class="text-[10px] font-semibold tracking-widest text-sky-300/80 -mt-1 uppercase">
+          <div class="text-[9px] sm:text-[10px] font-semibold tracking-widest text-sky-300/80 -mt-1 uppercase">
             Multi-Store Broker Hub
           </div>
         </div>
       </a>
 
       <!-- Quick Search Bar (Desktop) -->
-      <div class="hidden md:flex flex-1 max-w-md mx-6">
+      <div class="hidden md:flex flex-1 max-w-md mx-4">
         <div class="relative w-full">
           <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-purple-300/70">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -37,7 +37,7 @@ const navLinks = [
           <input
             type="text"
             placeholder="ค้นหาดีล, สตรีมมิ่ง, เติมเกม หรือซอฟต์แวร์..."
-            class="w-full pl-10 pr-12 py-2 text-sm bg-surface-card border border-white/15 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-500/25 transition-all shadow-inner"
+            class="w-full pl-10 pr-12 py-2 text-xs sm:text-sm bg-surface-card border border-white/15 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-500/25 transition-all shadow-inner"
           />
           <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
             <kbd class="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono text-purple-300/90 bg-purple-500/15 border border-purple-500/30 rounded">⌘K</kbd>
@@ -45,7 +45,7 @@ const navLinks = [
         </div>
       </div>
 
-      <!-- Navigation Links -->
+      <!-- Desktop Navigation Links -->
       <nav class="hidden lg:flex items-center gap-6">
         {
           navLinks.map((link) => (
@@ -60,16 +60,17 @@ const navLinks = [
       </nav>
 
       <!-- Right Actions: Status & Member -->
-      <div class="flex items-center gap-3">
-        <!-- Live Agent / Admin Online Status Pill -->
-        <div class="hidden sm:flex items-center gap-2 px-3.5 py-1 rounded-full bg-surface-card border border-emerald-500/35 text-emerald-300 text-xs font-semibold shadow-[0_0_15px_rgba(52,211,153,0.2)]">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Live Agent Status Pill (Desktop & Mobile Tablet) -->
+        <div class="hidden sm:flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1 rounded-full bg-surface-card border border-emerald-500/35 text-emerald-300 text-[11px] sm:text-xs font-semibold shadow-[0_0_15px_rgba(52,211,153,0.2)]">
           <span class="w-2 h-2 rounded-full bg-emerald-400 live-dot"></span>
           <span>Agent ออนไลน์: <strong class="text-white font-black">8/10</strong></span>
         </div>
 
+        <!-- Order Track Button (Desktop) -->
         <a
           href="#track"
-          class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-surface-card border border-white/15 text-white hover:border-purple-400/50 hover:text-purple-300 transition-all shadow-subtle"
+          class="hidden md:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-surface-card border border-white/15 text-white hover:border-purple-400/50 hover:text-purple-300 transition-all shadow-subtle"
         >
           <svg class="w-3.5 h-3.5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -77,15 +78,136 @@ const navLinks = [
           <span>เช็คสลิป</span>
         </a>
 
-        <!-- Login Button: Aurora Tri-Blend Gradient -->
+        <!-- Login Button -->
         <a
           href="#login"
-          class="px-4.5 py-2 rounded-xl text-xs sm:text-sm font-bold aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow flex items-center gap-1.5"
+          class="px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow flex items-center gap-1.5"
         >
           <span>เข้าสู่ระบบ</span>
         </a>
+
+        <!-- Mobile Hamburger Toggle Button (Mobile Only) -->
+        <button
+          id="mobile-menu-toggle"
+          type="button"
+          aria-label="Toggle Mobile Navigation Menu"
+          class="lg:hidden p-2 rounded-xl bg-surface-card border border-white/15 text-slate-300 hover:text-white hover:border-sky-400/50 transition-all"
+        >
+          <svg id="hamburger-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <svg id="close-icon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
 
     </div>
   </div>
+
+  <!-- Mobile Drawer Menu Overlay -->
+  <div
+    id="mobile-menu-drawer"
+    class="hidden lg:hidden w-full border-t border-white/10 bg-[#040914]/95 backdrop-blur-2xl px-4 py-5 space-y-4 shadow-2xl transition-all duration-300"
+  >
+    <!-- Mobile Agent Online Indicator -->
+    <div class="flex items-center justify-between px-3.5 py-2 rounded-xl bg-surface-card border border-emerald-500/35 text-emerald-300 text-xs font-semibold">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 live-dot"></span>
+        <span>สถานะเจ้าหน้าที่นายหน้า:</span>
+      </div>
+      <span class="text-white font-black">Agent ออนไลน์ 8/10</span>
+    </div>
+
+    <!-- Mobile Search Input -->
+    <div class="relative w-full">
+      <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-purple-300/70">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+      <input
+        type="text"
+        placeholder="ค้นหาดีล, สตรีมมิ่ง, เติมเกม..."
+        class="w-full pl-10 pr-4 py-2.5 text-xs bg-surface-card border border-white/15 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-sky-400"
+      />
+    </div>
+
+    <!-- Mobile Nav Links -->
+    <nav class="flex flex-col space-y-1 pt-1">
+      {
+        navLinks.map((link) => (
+          <a
+            href={link.href}
+            class="px-4 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:text-white hover:bg-white/10 transition-colors flex items-center justify-between"
+          >
+            <span>{link.label}</span>
+            <svg class="w-4 h-4 text-sky-400/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        ))
+      }
+    </nav>
+
+    <!-- Mobile Action CTAs -->
+    <div class="pt-2 grid grid-cols-2 gap-2 border-t border-white/10">
+      <a
+        href="#track"
+        class="w-full py-2.5 rounded-xl text-xs font-bold bg-surface-card border border-white/15 text-white flex items-center justify-center gap-1.5"
+      >
+        <svg class="w-3.5 h-3.5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>เช็คสถานะสลิป</span>
+      </a>
+      <a
+        href="https://line.me"
+        target="_blank"
+        class="w-full py-2.5 rounded-xl text-xs font-bold aurora-btn-gradient text-slate-950 flex items-center justify-center gap-1.5"
+      >
+        <span>ทักแชทไลน์แอดมิน</span>
+      </a>
+    </div>
+  </div>
 </header>
+
+<!-- Mobile Navigation Drawer Toggle Script -->
+<script>
+  function initMobileMenu() {
+    const toggleBtn = document.getElementById("mobile-menu-toggle");
+    const drawer = document.getElementById("mobile-menu-drawer");
+    const hamburgerIcon = document.getElementById("hamburger-icon");
+    const closeIcon = document.getElementById("close-icon");
+
+    if (!toggleBtn || !drawer) return;
+
+    toggleBtn.addEventListener("click", () => {
+      const isOpen = !drawer.classList.contains("hidden");
+      if (isOpen) {
+        drawer.classList.add("hidden");
+        hamburgerIcon?.classList.remove("hidden");
+        closeIcon?.classList.add("hidden");
+      } else {
+        drawer.classList.remove("hidden");
+        hamburgerIcon?.classList.add("hidden");
+        closeIcon?.classList.remove("hidden");
+      }
+    });
+
+    // Close drawer when clicking nav links
+    drawer.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        drawer.classList.add("hidden");
+        hamburgerIcon?.classList.remove("hidden");
+        closeIcon?.classList.add("hidden");
+      });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initMobileMenu);
+  } else {
+    initMobileMenu();
+  }
+</script>
