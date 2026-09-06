@@ -15,7 +15,7 @@ const { products = [] } = Astro.props;
     <div>
       <h2 class="font-display font-black text-2xl sm:text-3xl text-white flex items-center gap-2">
         <span>ดีลสินค้า & บริการออนไลน์ทั้งหมด</span>
-        <span class="text-xs sm:text-sm font-bold px-3 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/40 shadow-[0_0_10px_rgba(168,85,247,0.2)]">
+        <span class="text-xs sm:text-sm font-bold px-3 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-400/40 shadow-[0_0_12px_rgba(244,114,182,0.3)]">
           {products.length} ดีลแนะนำ
         </span>
       </h2>
@@ -32,7 +32,7 @@ const { products = [] } = Astro.props;
               "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all",
               idx === 0
                 ? "aurora-btn-gradient text-slate-950 shadow-glow"
-                : "aurora-glass hover:bg-white/10 hover:border-purple-400/50 text-slate-200 hover:text-white",
+                : "aurora-glass hover:bg-pink-500/15 hover:border-pink-400/50 text-slate-200 hover:text-pink-300",
             ]}
           >
             {cat.label}
@@ -59,21 +59,21 @@ const { products = [] } = Astro.props;
               />
               <div class="absolute inset-0 bg-gradient-to-t from-[#120F2B] via-transparent to-black/30"></div>
 
-              <!-- Top Badges -->
+              <!-- Top Badges (Pastel Pink & Purple Badges) -->
               <div class="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none">
                 {item.badge && (
                   <span class:list={[
-                    "px-3 py-1 rounded-md text-xs font-black tracking-wide shadow-md backdrop-blur-md border border-white/20",
+                    "px-3 py-1 rounded-lg text-xs font-black tracking-wide shadow-md backdrop-blur-md border border-white/20",
                     item.badgeType === "sale"
-                      ? "bg-rose-500 text-white"
+                      ? "bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-[0_0_12px_rgba(244,114,182,0.5)]"
                       : item.badgeType === "hot"
-                      ? "bg-amber-400 text-slate-950 font-black"
-                      : "bg-purple-500 text-white font-bold",
+                      ? "bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-[0_0_12px_rgba(168,85,247,0.5)]"
+                      : "bg-gradient-to-r from-pink-400 to-purple-500 text-white font-bold",
                   ]}>
                     {item.badge}
                   </span>
                 )}
-                <span class="text-xs font-bold px-2.5 py-1 rounded-md bg-slate-950/85 backdrop-blur-md text-sky-300 ml-auto border border-sky-400/30 shadow-sm">
+                <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-950/85 backdrop-blur-md text-pink-300 ml-auto border border-pink-400/40 shadow-sm">
                   ⚡ {item.deliverySpeed}
                 </span>
               </div>
@@ -81,13 +81,13 @@ const { products = [] } = Astro.props;
 
             <!-- Partner Store Info & Category -->
             <div class="flex items-center justify-between text-xs sm:text-sm font-medium mb-1.5">
-              <span class="text-sky-300 font-bold uppercase tracking-wider">{item.categoryLabel}</span>
+              <span class="text-pink-300 font-bold uppercase tracking-wider">{item.categoryLabel}</span>
               <span class="text-amber-300 flex items-center gap-1 font-bold">
                 ★ {item.storeRating}
               </span>
             </div>
 
-            <h3 class="font-display font-black text-lg sm:text-xl text-white group-hover:text-purple-300 transition-colors leading-snug drop-shadow-sm">
+            <h3 class="font-display font-black text-lg sm:text-xl text-white group-hover:text-pink-300 transition-colors leading-snug drop-shadow-sm">
               {item.title}
             </h3>
 
@@ -109,14 +109,14 @@ const { products = [] } = Astro.props;
                   {item.originalPrice}
                 </div>
               )}
-              <div class="font-display font-black text-xl sm:text-2xl text-emerald-300 drop-shadow-sm">
+              <div class="font-display font-black text-xl sm:text-2xl text-pink-300 drop-shadow-[0_0_10px_rgba(244,114,182,0.4)]">
                 {item.price}
               </div>
             </div>
 
             <a
               href={`#order-${item.id}`}
-              class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-surface-card group-hover:aurora-btn-gradient text-white group-hover:text-slate-950 border border-white/15 group-hover:border-purple-400 transition-all flex items-center gap-1.5 group-hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]"
+              class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-surface-card group-hover:aurora-btn-gradient text-white group-hover:text-slate-950 border border-white/15 group-hover:border-pink-400 transition-all flex items-center gap-1.5 group-hover:shadow-[0_0_20px_rgba(244,114,182,0.5)]"
             >
               <span>สั่งซื้อผ่านนายหน้า</span>
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

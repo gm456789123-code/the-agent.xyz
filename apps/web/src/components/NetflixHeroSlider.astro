@@ -82,7 +82,7 @@ const slides = [
   <!-- Compact Panoramic Horizontal Banner Carousel Frame -->
   <div
     id="netflix-hero-slider"
-    class="w-full h-[360px] sm:h-[420px] lg:h-[460px] 2xl:h-[490px] rounded-3xl relative overflow-hidden aurora-glass border border-sky-400/30 shadow-aurora group select-none"
+    class="w-full h-[360px] sm:h-[420px] lg:h-[460px] 2xl:h-[490px] rounded-3xl relative overflow-hidden aurora-glass border border-pink-400/40 shadow-[0_0_40px_-5px_rgba(244,114,182,0.35),0_0_20px_-2px_rgba(196,181,253,0.3)] group select-none"
   >
     
     <!-- Slides Track -->
@@ -107,9 +107,9 @@ const slides = [
             <!-- Content Area Over Vignette -->
             <div class="relative z-20 max-w-2xl lg:max-w-3xl 2xl:max-w-4xl px-6 sm:px-12 lg:px-16 py-6 flex flex-col justify-center h-full">
               
-              <!-- Store & Partner Badge Pill -->
-              <div class="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-full bg-slate-950/80 border border-sky-400/40 text-sky-300 text-xs sm:text-sm font-bold w-fit mb-2 sm:mb-3 shadow-md backdrop-blur-md">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 live-dot"></span>
+              <!-- Store & Partner Badge Pill (Pastel Purple / Pink Glass Glow) -->
+              <div class="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-full bg-slate-950/80 border border-pink-400/50 text-pink-200 text-xs sm:text-sm font-bold w-fit mb-2 sm:mb-3 shadow-[0_0_15px_rgba(244,114,182,0.3)] backdrop-blur-md">
+                <span class="w-2 h-2 rounded-full bg-pink-400 live-dot"></span>
                 <span class="truncate max-w-[280px] sm:max-w-none">{slide.badge}</span>
               </div>
 
@@ -125,12 +125,12 @@ const slides = [
 
               <!-- Price Callout & Discount Pill -->
               <div class="mt-3.5 sm:mt-5 flex items-baseline gap-3">
-                <span class="font-display font-black text-2xl sm:text-4xl lg:text-5xl text-emerald-300 drop-shadow-md">
+                <span class="font-display font-black text-2xl sm:text-4xl lg:text-5xl text-pink-300 drop-shadow-[0_0_15px_rgba(244,114,182,0.5)]">
                   {slide.price}
                 </span>
-                <span class="text-xs sm:text-sm text-slate-300 font-semibold">{slide.unit}</span>
+                <span class="text-xs sm:text-sm text-purple-200 font-semibold">{slide.unit}</span>
                 <span class="text-xs sm:text-sm line-through text-slate-400 font-medium">{slide.originalPrice}</span>
-                <span class="text-xs font-black px-2.5 py-1 rounded bg-rose-500 text-white shadow-md border border-white/20">
+                <span class="text-xs font-black px-2.5 py-1 rounded-lg bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md border border-pink-300/30">
                   {slide.discountBadge}
                 </span>
               </div>
