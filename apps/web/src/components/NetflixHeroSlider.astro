@@ -79,10 +79,10 @@ const slides = [
 ---
 
 <div class="w-full relative">
-  <!-- Compact Panoramic Horizontal Banner Carousel Frame (Enlarged Height) -->
+  <!-- Panoramic Horizontal Banner Carousel Frame (Mobile Responsive Height) -->
   <div
     id="netflix-hero-slider"
-    class="w-full h-[420px] sm:h-[480px] lg:h-[540px] 2xl:h-[580px] rounded-3xl relative overflow-hidden aurora-glass border border-pink-400/40 shadow-[0_0_40px_-5px_rgba(244,114,182,0.35),0_0_20px_-2px_rgba(196,181,253,0.3)] group select-none"
+    class="w-full h-[450px] xs:h-[420px] sm:h-[480px] lg:h-[540px] 2xl:h-[580px] rounded-2xl sm:rounded-3xl relative overflow-hidden aurora-glass border border-pink-400/40 shadow-[0_0_40px_-5px_rgba(244,114,182,0.35),0_0_20px_-2px_rgba(196,181,253,0.3)] group select-none"
   >
     
     <!-- Slides Track -->
@@ -101,47 +101,47 @@ const slides = [
 
             <!-- Netflix Vignette Gradients (Dark Left Overlay + Bottom Fade + Ambient Glow) -->
             <div class="absolute inset-0 bg-gradient-to-r from-[#040914] via-[#040914]/90 to-transparent w-full lg:w-3/4 z-10"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-[#040914] via-[#040914]/30 to-transparent z-10"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#040914] via-[#040914]/40 to-transparent z-10"></div>
             <div class={`absolute -left-20 -top-20 w-[600px] h-[600px] bg-gradient-to-br ${slide.gradientColor} blur-3xl rounded-full pointer-events-none z-10`}></div>
 
             <!-- Content Area Over Vignette -->
-            <div class="relative z-20 max-w-3xl lg:max-w-4xl 2xl:max-w-5xl px-6 sm:px-14 lg:px-20 py-8 flex flex-col justify-center h-full">
+            <div class="relative z-20 max-w-3xl lg:max-w-4xl 2xl:max-w-5xl px-4 sm:px-14 lg:px-20 py-5 sm:py-8 flex flex-col justify-center h-full">
               
-              <!-- Store & Partner Badge Pill (Enlarged) -->
-              <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-slate-950/85 border border-pink-400/50 text-pink-200 text-sm sm:text-base font-bold w-fit mb-3 sm:mb-4 shadow-[0_0_20px_rgba(244,114,182,0.35)] backdrop-blur-md">
-                <span class="w-2.5 h-2.5 rounded-full bg-pink-400 live-dot"></span>
-                <span class="truncate max-w-[320px] sm:max-w-none">{slide.badge}</span>
+              <!-- Store & Partner Badge Pill (Responsive Mobile Scale) -->
+              <div class="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 rounded-full bg-slate-950/85 border border-pink-400/50 text-pink-200 text-xs sm:text-base font-bold w-fit mb-2 sm:mb-4 shadow-[0_0_20px_rgba(244,114,182,0.35)] backdrop-blur-md">
+                <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-pink-400 live-dot"></span>
+                <span class="truncate max-w-[220px] xs:max-w-[300px] sm:max-w-none">{slide.badge}</span>
               </div>
 
-              <!-- Main Title (Enlarged) -->
-              <h1 class="font-display font-black text-3xl sm:text-5xl lg:text-6xl 2xl:text-7xl text-white tracking-tight leading-tight drop-shadow-xl">
+              <!-- Main Title (Mobile Responsive Font Size) -->
+              <h1 class="font-display font-black text-xl xs:text-2xl sm:text-4xl lg:text-6xl 2xl:text-7xl text-white tracking-tight leading-tight drop-shadow-xl">
                 {slide.title}
               </h1>
 
-              <!-- Subtitle Description (Enlarged) -->
-              <p class="mt-3 sm:mt-4 text-sm sm:text-lg lg:text-xl 2xl:text-2xl text-slate-200 font-medium leading-relaxed max-w-2xl 2xl:max-w-3xl line-clamp-2">
+              <!-- Subtitle Description -->
+              <p class="mt-2 sm:mt-4 text-xs sm:text-base lg:text-xl 2xl:text-2xl text-slate-200 font-medium leading-relaxed max-w-2xl 2xl:max-w-3xl line-clamp-2">
                 {slide.subtitle}
               </p>
 
-              <!-- Price Callout & Discount Pill (Enlarged) -->
-              <div class="mt-4 sm:mt-6 flex items-baseline gap-4">
-                <span class="font-display font-black text-3xl sm:text-5xl lg:text-6xl 2xl:text-7xl text-pink-300 drop-shadow-[0_0_20px_rgba(244,114,182,0.6)]">
+              <!-- Price Callout & Discount Pill -->
+              <div class="mt-3 sm:mt-6 flex items-baseline gap-2.5 sm:gap-4 flex-wrap">
+                <span class="font-display font-black text-2xl xs:text-3xl sm:text-5xl lg:text-6xl 2xl:text-7xl text-pink-300 drop-shadow-[0_0_20px_rgba(244,114,182,0.6)]">
                   {slide.price}
                 </span>
-                <span class="text-sm sm:text-base lg:text-lg text-purple-200 font-bold">{slide.unit}</span>
-                <span class="text-sm sm:text-base line-through text-slate-400 font-bold">{slide.originalPrice}</span>
-                <span class="text-xs sm:text-sm font-black px-3 py-1.5 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg border border-pink-300/40">
+                <span class="text-xs sm:text-base lg:text-lg text-purple-200 font-bold">{slide.unit}</span>
+                <span class="text-xs sm:text-base line-through text-slate-400 font-bold">{slide.originalPrice}</span>
+                <span class="text-[10px] sm:text-sm font-black px-2 py-0.5 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg border border-pink-300/40">
                   {slide.discountBadge}
                 </span>
               </div>
 
-              <!-- Action Buttons (Enlarged CTAs) -->
-              <div class="mt-6 sm:mt-8 flex flex-wrap items-center gap-4">
+              <!-- Action Buttons (Mobile Responsive CTAs) -->
+              <div class="mt-4 sm:mt-8 flex flex-wrap items-center gap-2.5 sm:gap-4">
                 <a
                   href={slide.href}
-                  class="px-7 sm:px-9 py-3.5 sm:py-4.5 rounded-2xl font-display font-black text-sm sm:text-lg lg:text-xl aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-aurora flex items-center gap-2.5 hover:scale-105 group/btn"
+                  class="px-4 py-2.5 sm:px-9 sm:py-4.5 rounded-xl sm:rounded-2xl font-display font-black text-xs sm:text-lg lg:text-xl aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-aurora flex items-center gap-2 hover:scale-105 group/btn"
                 >
-                  <svg class="w-5 h-5 sm:w-6 sm:h-6 fill-current" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 sm:w-6 sm:h-6 fill-current" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                   </svg>
                   <span>{slide.ctaPrimary}</span>
@@ -149,7 +149,7 @@ const slides = [
 
                 <a
                   href="#products"
-                  class="hidden xs:inline-flex px-4 sm:px-6 py-2.5 sm:py-3.5 rounded-xl font-display font-bold text-xs sm:text-base text-white aurora-glass hover:bg-white/10 hover:border-purple-400/50 transition-all items-center gap-2"
+                  class="hidden xs:inline-flex px-3.5 sm:px-6 py-2 sm:py-3.5 rounded-xl font-display font-bold text-xs sm:text-base text-white aurora-glass hover:bg-white/10 hover:border-purple-400/50 transition-all items-center gap-2"
                 >
                   <svg class="w-4 h-4 sm:w-5 sm:h-5 text-sky-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -165,7 +165,7 @@ const slides = [
       }
     </div>
 
-    <!-- Navigation Arrows Floating (Left / Right) -->
+    <!-- Navigation Arrows Floating (Left / Right - Desktop Only) -->
     <button
       id="netflix-prev"
       type="button"
@@ -188,11 +188,11 @@ const slides = [
     </button>
 
     <!-- Bottom Controls Bar (Centered Slide Counter + Indicator Dots) -->
-    <div class="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 sm:gap-4 z-30 bg-slate-950/85 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full border border-pink-400/40 backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.8)]">
-      <span id="netflix-counter" class="text-xs sm:text-sm font-mono font-black text-pink-300 tracking-wider">
+    <div class="absolute bottom-2.5 sm:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2.5 sm:gap-4 z-30 bg-slate-950/90 px-3 py-1 sm:px-5 sm:py-2.5 rounded-full border border-pink-400/40 backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.8)]">
+      <span id="netflix-counter" class="text-[10px] sm:text-sm font-mono font-black text-pink-300 tracking-wider">
         01 / 05
       </span>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5 sm:gap-2">
         {
           slides.map((_, idx) => (
             <button
@@ -200,10 +200,10 @@ const slides = [
               data-netflix-dot={idx}
               aria-label={`Go to slide ${idx + 1}`}
               class:list={[
-                "netflix-dot h-2.5 rounded-full transition-all duration-300 cursor-pointer",
+                "netflix-dot h-2 sm:h-2.5 rounded-full transition-all duration-300 cursor-pointer",
                 idx === 0
-                  ? "w-8 sm:w-10 bg-gradient-to-r from-pink-400 to-rose-400 shadow-[0_0_12px_rgba(244,114,182,0.9)]"
-                  : "w-2.5 sm:w-3 bg-white/30 hover:bg-white/70",
+                  ? "w-6 sm:w-10 bg-gradient-to-r from-pink-400 to-rose-400 shadow-[0_0_12px_rgba(244,114,182,0.9)]"
+                  : "w-2 sm:w-3 bg-white/30 hover:bg-white/70",
               ]}
             />
           ))
