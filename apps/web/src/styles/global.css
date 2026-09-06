@@ -3,16 +3,95 @@
 @tailwind utilities;
 
 @layer utilities {
-  .neon-border-green {
-    border: 1px solid theme("colors.neon-green");
-    box-shadow: 0 0 8px 0 rgba(0, 255, 102, 0.35);
+  .aurora-glass {
+    background: rgba(10, 23, 46, 0.78);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(56, 189, 248, 0.22);
+    box-shadow: 0 10px 35px -5px rgba(2, 6, 14, 0.7), inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
   }
-  .neon-border-purple {
-    border: 1px solid theme("colors.neon-purple");
-    box-shadow: 0 0 8px 0 rgba(157, 0, 255, 0.35);
+
+  .aurora-glass-hover {
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .neon-text-green {
-    color: theme("colors.neon-green");
-    text-shadow: 0 0 12px rgba(0, 255, 102, 0.5);
+  .aurora-glass-hover:hover {
+    background: rgba(15, 34, 66, 0.88);
+    border-color: rgba(56, 189, 248, 0.48);
+    box-shadow: 0 16px 45px -5px rgba(56, 189, 248, 0.28), inset 0 1px 2px 0 rgba(255, 255, 255, 0.25);
+    transform: translateY(-4px);
   }
+
+  .aurora-text {
+    background: linear-gradient(135deg, #38BDF8 0%, #34D399 50%, #C4B5FD 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .aurora-btn-gradient {
+    background: linear-gradient(135deg, #0284C7 0%, #059669 50%, #7C3AED 100%);
+    box-shadow: 0 0 25px rgba(52, 211, 153, 0.38);
+  }
+  .aurora-btn-gradient:hover {
+    background: linear-gradient(135deg, #0369A1 0%, #047857 50%, #6D28D9 100%);
+    box-shadow: 0 0 35px rgba(56, 189, 248, 0.5), 0 0 15px rgba(52, 211, 153, 0.4);
+  }
+}
+
+/* Floating animation for backdrop ambient orbs */
+@keyframes aurora-float {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(35px, -25px) scale(1.1);
+  }
+  66% {
+    transform: translate(-25px, 25px) scale(0.92);
+  }
+}
+
+.aurora-orb {
+  animation: aurora-float 18s ease-in-out infinite;
+}
+
+/* Live dot pulse */
+@keyframes live-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 12px rgba(52, 211, 153, 0.9);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.85);
+    box-shadow: 0 0 2px rgba(52, 211, 153, 0.2);
+  }
+}
+
+.live-dot {
+  animation: live-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Midnight Ocean subtle tech grid background overlay */
+.ocean-grid {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(56, 189, 248, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
+}
+
+/* Modern minimal scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #040914;
+}
+::-webkit-scrollbar-thumb {
+  background: #162E54;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #38BDF8;
 }

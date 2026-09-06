@@ -1,4 +1,4 @@
-import { mockProducts, type ProductTile } from "../data/mock";
+import { mockProducts, type GameProduct } from "../data/mock";
 
 const WP_API_URL = import.meta.env.PUBLIC_WP_API_URL;
 
@@ -6,35 +6,35 @@ interface WpProduct {
   id: number;
   title: { rendered: string };
   excerpt: { rendered: string };
-  meta?: { price?: number };
+  meta?: { price?: number; category?: string };
 }
 
 function stripHtml(html: string): string {
   return html.replace(/<[^>]+>/g, "").trim();
 }
 
-// Presentation-only concerns (accent color, tile size) aren't stored in WordPress —
-// they're derived here from position, keeping WP focused on content/SEO.
-function mapWpProduct(product: WpProduct, index: number): ProductTile {
+function mapWpProduct(product: WpProduct, index: number): GameProduct {
   const price = product.meta?.price;
+  const categories: GameProduct["category"][] = ["pc", "mobile", "cards", "service"];
 
   return {
     id: String(product.id),
-    title: stripHtml(product.title.rendered).toUpperCase(),
-    subtitle: stripHtml(product.excerpt.rendered),
-    price: typeof price === "number" ? `$${price.toFixed(2)}` : "",
-    accent: index % 2 === 0 ? "green" : "purple",
-    size: index === 0 ? "large" : index === 1 ? "medium" : "small",
+    title: stripHtml(product.title.rendered),
+    category: (product.meta?.category as GameProduct["category"]) || categories[index % categories.length],
+    categoryLabel: "Official Store",
+    price: typeof price === "number" ? `฿${price.toLocaleString()}` : "฿299",
+    unit: "แพ็กเกจมาตรฐาน",
+    deliverySpeed: "ส่งออโต้ทันที",
+    image: mockProducts[index % mockProducts.length]?.image || "",
+    color: "from-blue-600/20 to-indigo-700/10",
   };
 }
 
-// Falls back to mock data whenever the WordPress REST API isn't reachable yet
-// (e.g. before `docker compose up` / before products are entered in wp-admin).
-export async function getProducts(): Promise<ProductTile[]> {
+export async function getProducts(): Promise<GameProduct[]> {
   if (!WP_API_URL) return mockProducts;
 
   try {
-    const res = await fetch(`${WP_API_URL}/wp/v2/product?_fields=id,title,excerpt,meta`, {
+    const res = await fetch(`${WP_API_URL}/wp/v2/product?_fields=id,title,excerpt,meta&orderby=id&order=asc`, {
       signal: AbortSignal.timeout(2000),
     });
     if (!res.ok) return mockProducts;
@@ -47,3 +47,4 @@ export async function getProducts(): Promise<ProductTile[]> {
     return mockProducts;
   }
 }
+

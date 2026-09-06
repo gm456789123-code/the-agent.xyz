@@ -1,26 +1,91 @@
 ---
-const navItems = [
-  { en: "STORE", th: "ร้านค้า" },
-  { en: "TOP-UP", th: "เติมเงิน" },
-  { en: "SERVICES", th: "บริการ" },
-  { en: "SUPPORT", th: "ช่วยเหลือ" },
+const navLinks = [
+  { label: "หน้าแรก", href: "/" },
+  { label: "ดีลสินค้า & บริการ", href: "#products" },
+  { label: "เช็คสถานะออเดอร์", href: "#track" },
+  { label: "วิธีสั่งซื้อผ่านนายหน้า", href: "#how-it-works" },
 ];
 ---
 
-<header class="flex items-center justify-between px-8 py-6 border-b border-white/5">
-  <div class="font-display font-bold text-2xl tracking-wider">
-    NEXUS<span class="neon-text-green">X</span>
-    <div class="text-xs font-normal tracking-[0.3em] text-white/60">ARCADE</div>
-  </div>
+<header class="w-full border-b border-white/10 bg-background/70 backdrop-blur-2xl sticky top-0 z-50 shadow-glass">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 gap-4">
+      
+      <!-- Brand Logo: Tri-Color Pastel Aurora Badge -->
+      <a href="/" class="flex items-center gap-2.5 flex-shrink-0 group">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-400 via-purple-400 to-pink-400 flex items-center justify-center font-display font-black text-slate-950 text-lg shadow-[0_0_20px_rgba(167,139,250,0.5)] group-hover:scale-105 transition-transform duration-300">
+          N
+        </div>
+        <div class="flex flex-col">
+          <div class="font-display font-black text-lg tracking-wider text-white group-hover:text-aurora-purple transition-colors">
+            NEXUS<span class="aurora-text">.DEALS</span>
+          </div>
+          <div class="text-[10px] font-semibold tracking-widest text-sky-300/80 -mt-1 uppercase">
+            Multi-Store Broker Hub
+          </div>
+        </div>
+      </a>
 
-  <nav class="hidden md:flex gap-10">
-    {
-      navItems.map((item) => (
-        <a href="#" class="text-center font-display font-semibold tracking-wide hover:text-neon-green transition-colors">
-          <div>{item.en}</div>
-          <div class="text-xs font-normal text-white/50">{item.th}</div>
+      <!-- Quick Search Bar (Desktop) -->
+      <div class="hidden md:flex flex-1 max-w-md mx-6">
+        <div class="relative w-full">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-purple-300/70">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <input
+            type="text"
+            placeholder="ค้นหาดีล, สตรีมมิ่ง, เติมเกม หรือซอฟต์แวร์..."
+            class="w-full pl-10 pr-12 py-2 text-sm bg-surface-card border border-white/15 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-500/25 transition-all shadow-inner"
+          />
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+            <kbd class="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono text-purple-300/90 bg-purple-500/15 border border-purple-500/30 rounded">⌘K</kbd>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="hidden lg:flex items-center gap-6">
+        {
+          navLinks.map((link) => (
+            <a
+              href={link.href}
+              class="text-sm font-medium text-slate-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(196,181,253,0.6)] transition-all"
+            >
+              {link.label}
+            </a>
+          ))
+        }
+      </nav>
+
+      <!-- Right Actions: Status & Member -->
+      <div class="flex items-center gap-3">
+        <!-- Live Agent / Admin Online Status Pill -->
+        <div class="hidden sm:flex items-center gap-2 px-3.5 py-1 rounded-full bg-surface-card border border-emerald-500/35 text-emerald-300 text-xs font-semibold shadow-[0_0_15px_rgba(52,211,153,0.2)]">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 live-dot"></span>
+          <span>Agent ออนไลน์: <strong class="text-white font-black">8/10</strong></span>
+        </div>
+
+        <a
+          href="#track"
+          class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-surface-card border border-white/15 text-white hover:border-purple-400/50 hover:text-purple-300 transition-all shadow-subtle"
+        >
+          <svg class="w-3.5 h-3.5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>เช็คสลิป</span>
         </a>
-      ))
-    }
-  </nav>
+
+        <!-- Login Button: Aurora Tri-Blend Gradient -->
+        <a
+          href="#login"
+          class="px-4.5 py-2 rounded-xl text-xs sm:text-sm font-bold aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow flex items-center gap-1.5"
+        >
+          <span>เข้าสู่ระบบ</span>
+        </a>
+      </div>
+
+    </div>
+  </div>
 </header>

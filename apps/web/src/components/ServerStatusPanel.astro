@@ -1,30 +1,41 @@
 ---
-import type { ServerStatus } from "../data/mock";
-
-interface Props {
-  servers: ServerStatus[];
-}
-
-const { servers } = Astro.props;
-
-const statusColor: Record<ServerStatus["status"], string> = {
-  ONLINE: "bg-neon-green",
-  OFFLINE: "bg-red-500",
-  DEGRADED: "bg-yellow-400",
-};
+import { mockSystemStatus } from "../data/mock";
 ---
 
-<div class="bg-surface rounded-lg p-5 neon-border-green">
-  <div class="text-xs tracking-widest text-white/50 mb-3">SERVER STATUS</div>
-  <ul class="space-y-2">
+<div class="rounded-3xl aurora-glass p-5 shadow-pop">
+  <!-- Header -->
+  <div class="flex items-center justify-between pb-3.5 border-b border-white/10 mb-4">
+    <div class="flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 live-dot"></span>
+      <h3 class="font-display font-bold text-sm text-white">สถานะระบบอัตโนมัติ</h3>
+    </div>
+    <span class="text-[10px] font-bold px-3 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 shadow-[0_0_10px_rgba(52,211,153,0.2)]">
+      Uptime 99.9%
+    </span>
+  </div>
+
+  <!-- Status List -->
+  <ul class="space-y-3">
     {
-      servers.map((server) => (
-        <li class="flex items-center gap-2 text-sm">
-          <span class={`w-2 h-2 rounded-full ${statusColor[server.status]}`} />
-          <span class="text-white/70">{server.region}:</span>
-          <span class="font-semibold neon-text-green">{server.status}</span>
+      mockSystemStatus.map((item) => (
+        <li class="flex items-center justify-between text-xs font-medium">
+          <div class="flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span class="text-slate-300">{item.service}</span>
+          </div>
+          <span class="text-[11px] font-mono font-bold text-emerald-300">
+            {item.speed}
+          </span>
         </li>
       ))
     }
   </ul>
+
+  <!-- Security Note -->
+  <div class="mt-4 pt-3.5 border-t border-white/10 flex items-center gap-2 text-[11px] text-slate-400 font-medium">
+    <svg class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+    </svg>
+    <span>Webhook ตรวจสลิปเข้ารหัส 256-bit ปลอดภัย 100%</span>
+  </div>
 </div>

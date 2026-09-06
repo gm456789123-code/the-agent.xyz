@@ -1,24 +1,93 @@
 ---
+const popularTags = [
+  { name: "YouTube Premium", tag: "฿39", href: "#products", bg: "hover:border-rose-400/60 hover:bg-rose-500/15", tagStyle: "bg-rose-500/25 text-rose-300 border-rose-400/40" },
+  { name: "Valorant VP", tag: "เรทถูก", href: "#products", bg: "hover:border-cyan-400/60 hover:bg-sky-500/15", tagStyle: "bg-sky-500/25 text-sky-300 border-sky-400/40" },
+  { name: "Canva Pro", tag: "฿89", href: "#products", bg: "hover:border-purple-400/60 hover:bg-purple-500/15", tagStyle: "bg-purple-500/25 text-purple-300 border-purple-400/40" },
+  { name: "Steam Wallet", tag: "Auto", href: "#products", bg: "hover:border-indigo-400/60 hover:bg-indigo-500/15", tagStyle: "bg-indigo-500/25 text-indigo-300 border-indigo-400/40" },
+  { name: "Netflix 4K", tag: "พินส่วนตัว", href: "#products", bg: "hover:border-pink-400/60 hover:bg-pink-500/15", tagStyle: "bg-pink-500/25 text-pink-300 border-pink-400/40" },
+];
 ---
 
-<section class="grid md:grid-cols-2 gap-8 px-8 py-12 items-center">
-  <div>
-    <h1 class="font-display font-black text-5xl lg:text-6xl leading-tight neon-text-green">
-      NEXUS ARCADE:<br />
-      YOUR DIGITAL<br />
-      BATTLEGROUND.
-    </h1>
-    <p class="mt-6 text-lg text-white/70">Instant Access. Top-Up. Dominate.</p>
+<div class="flex flex-col justify-center py-6 lg:py-10 max-w-2xl">
+  
+  <!-- Live Announcement Pill (Frosted Aurora Glass) -->
+  <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full aurora-glass text-xs w-fit mb-6 shadow-aurora">
+    <span class="flex h-2 w-2 relative">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+    </span>
+    <span class="text-slate-300 font-medium">ศูนย์รวมนายหน้าดีลออนไลน์:</span>
+    <span class="font-bold text-sky-300">รวบรวมสินค้า & บริการจาก 100+ ร้านค้าพันธมิตร</span>
+  </div>
+
+  <!-- Main Headline with Tri-Color Pastel Aurora Gradient (Sky -> Purple -> Pink) -->
+  <h1 class="font-display font-black text-3xl sm:text-5xl lg:text-5xl tracking-tight text-white leading-[1.2]">
+    ศูนย์รวมดีลสินค้า & บริการ
+    <span class="block bg-gradient-to-r from-sky-300 via-purple-300 to-pink-300 bg-clip-text text-transparent mt-1.5 drop-shadow-[0_0_25px_rgba(168,85,247,0.45)]">
+      นายหน้าอัตโนมัติ 24 ชั่วโมง
+    </span>
+  </h1>
+
+  <!-- Subtitle -->
+  <p class="mt-4 text-base sm:text-lg text-slate-300 leading-relaxed font-normal">
+    เรารวบรวมดีลสุดพิเศษจากร้านค้าพันธมิตรชั้นนำทั่วไทย ทั้งสตรีมมิ่ง เติมเกม ซอฟต์แวร์ และบริการออนไลน์ การันตีความปลอดภัยด้วยระบบคนกลางกลางตรวจสลิปออโต้
+  </p>
+
+  <!-- Popular Deal Quick Tags -->
+  <div class="mt-6 flex flex-wrap items-center gap-2">
+    <span class="text-xs text-purple-300/80 font-medium mr-1">ดีลยอดนิยม:</span>
+    {
+      popularTags.map((item) => (
+        <a
+          href={item.href}
+          class={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-surface-card border border-white/15 text-white transition-all shadow-subtle ${item.bg}`}
+        >
+          <span>{item.name}</span>
+          <span class={`text-[10px] px-1.5 py-0.5 rounded-md font-bold border ${item.tagStyle}`}>
+            {item.tag}
+          </span>
+        </a>
+      ))
+    }
+  </div>
+
+  <!-- CTA Buttons with 3D Pop Out Aurora Gradient -->
+  <div class="mt-8 flex flex-wrap items-center gap-3.5">
+    <a
+      href="#products"
+      class="px-6 py-3.5 rounded-xl font-display font-black text-sm sm:text-base text-slate-950 hover:text-white aurora-btn-gradient transition-all shadow-aurora flex items-center gap-2 group hover:scale-105"
+    >
+      <span>เลือกชมดีลทั้งหมด</span>
+      <svg class="w-4.5 h-4.5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+      </svg>
+    </a>
 
     <a
-      href="#"
-      class="inline-block mt-8 px-8 py-4 font-display font-bold tracking-wide bg-surface neon-border-purple hover:bg-neon-purple/10 transition-colors"
+      href="#track"
+      class="px-5 py-3.5 rounded-xl font-display font-semibold text-sm sm:text-base text-white aurora-glass hover:bg-white/10 hover:border-purple-400/50 transition-all flex items-center gap-2"
     >
-      QUICK TOP-UP / เติมทันที
+      <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span>ติดตามคำสั่งซื้อ & สลิป</span>
     </a>
   </div>
 
-  <div class="aspect-[3/4] max-w-sm mx-auto w-full rounded-lg bg-gradient-to-b from-surface to-black neon-border-purple flex items-center justify-center">
-    <span class="text-white/30 text-sm px-6 text-center">Character art placeholder — swap in real key-art asset</span>
+  <!-- Trust Metrics Bar -->
+  <div class="mt-10 pt-6 border-t border-white/10 grid grid-cols-3 gap-4">
+    <div>
+      <div class="font-display font-bold text-xl sm:text-2xl text-sky-300">100+</div>
+      <div class="text-xs text-slate-400 mt-0.5">ร้านค้าพันธมิตรในระบบ</div>
+    </div>
+    <div>
+      <div class="font-display font-bold text-xl sm:text-2xl text-emerald-400">100%</div>
+      <div class="text-xs text-slate-400 mt-0.5">นายหน้าการันตีคืนเงิน</div>
+    </div>
+    <div>
+      <div class="font-display font-bold text-xl sm:text-2xl text-purple-300">15 วิ</div>
+      <div class="text-xs text-slate-400 mt-0.5">สแกนจ่ายส่งมอบออโต้</div>
+    </div>
   </div>
-</section>
+
+</div>

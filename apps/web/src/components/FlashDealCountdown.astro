@@ -7,11 +7,55 @@ interface Props {
 const { endsAt, percentOff } = Astro.props;
 ---
 
-<div class="bg-surface rounded-lg p-5 neon-border-purple" data-flash-deal data-ends-at={endsAt}>
-  <div class="text-xs tracking-widest text-white/50 mb-2">FLASH DEAL</div>
-  <div class="font-display font-black text-3xl text-neon-purple">-{percentOff}%</div>
-  <div class="text-xs text-white/50 mt-2">ENDS IN</div>
-  <div class="font-display font-bold text-xl" data-countdown-display>--:--:--</div>
+<div class="relative rounded-3xl aurora-glass p-5 shadow-pop overflow-hidden group hover:border-purple-400/60 transition-all duration-500" data-flash-deal data-ends-at={endsAt}>
+  
+  <!-- Multi-Tone Aurora Backdrop Glow inside Card -->
+  <div class="absolute top-0 right-0 w-36 h-36 bg-gradient-to-bl from-pink-500/20 via-purple-500/15 to-transparent rounded-full blur-2xl pointer-events-none"></div>
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-3">
+    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-purple-500/25 to-pink-500/20 text-pink-300 border border-purple-400/40 text-xs font-bold shadow-[0_0_12px_rgba(244,114,182,0.3)]">
+      <span>⚡ FLASH SALE</span>
+    </div>
+    <span class="font-display font-black text-2xl aurora-text drop-shadow-sm">-{percentOff}%</span>
+  </div>
+
+  <h4 class="font-display font-bold text-sm text-white leading-tight drop-shadow-sm">
+    โค้ดส่วนลดเติมเกมประจำสัปดาห์
+  </h4>
+  <p class="text-xs text-slate-300 mt-1 font-medium">
+    ใช้โค้ด <span class="font-mono text-purple-300 font-bold bg-slate-950/80 px-2 py-0.5 rounded-lg border border-purple-400/40 shadow-inner">NEXUS25</span> ก่อนหมดเวลา
+  </p>
+
+  <!-- Countdown Timer Blocks -->
+  <div class="mt-4 pt-3 border-t border-white/10">
+    <div class="text-[11px] text-purple-300/90 mb-2 font-bold">เวลานับถอยหลัง:</div>
+    <div class="flex items-center gap-2 text-center" data-countdown-container>
+      <div class="flex-1 bg-slate-950/80 py-2.5 rounded-xl border border-white/15 shadow-inner">
+        <div class="font-mono font-black text-xl text-white leading-tight" data-cd-hours>04</div>
+        <div class="text-[10px] text-slate-400 font-medium">ชม.</div>
+      </div>
+      <span class="text-purple-300 font-black text-lg">:</span>
+      <div class="flex-1 bg-slate-950/80 py-2.5 rounded-xl border border-white/15 shadow-inner">
+        <div class="font-mono font-black text-xl text-white leading-tight" data-cd-minutes>35</div>
+        <div class="text-[10px] text-slate-400 font-medium">นาที</div>
+      </div>
+      <span class="text-purple-300 font-black text-lg">:</span>
+      <div class="flex-1 bg-slate-950/80 py-2.5 rounded-xl border border-white/15 shadow-inner">
+        <div class="font-mono font-black text-xl text-emerald-400 leading-tight" data-cd-seconds>12</div>
+        <div class="text-[10px] text-slate-400 font-medium">วินาที</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Button -->
+  <a
+    href="#products"
+    class="mt-4 w-full py-3 rounded-xl text-xs font-black aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-aurora flex items-center justify-center gap-1.5 hover:scale-[1.02]"
+  >
+    <span>ใช้ส่วนลดตอนนี้</span>
+  </a>
+
 </div>
 
 <script>
@@ -21,19 +65,25 @@ const { endsAt, percentOff } = Astro.props;
 
   document.querySelectorAll<HTMLElement>("[data-flash-deal]").forEach((el) => {
     const endsAt = new Date(el.dataset.endsAt ?? "").getTime();
-    const display = el.querySelector<HTMLElement>("[data-countdown-display]");
-    if (!display) return;
+    const hEl = el.querySelector<HTMLElement>("[data-cd-hours]");
+    const mEl = el.querySelector<HTMLElement>("[data-cd-minutes]");
+    const sEl = el.querySelector<HTMLElement>("[data-cd-seconds]");
 
     const tick = () => {
       const diff = endsAt - Date.now();
       if (diff <= 0) {
-        display.textContent = "00:00:00";
+        if (hEl) hEl.textContent = "00";
+        if (mEl) mEl.textContent = "00";
+        if (sEl) sEl.textContent = "00";
         return;
       }
       const hours = Math.floor(diff / 3_600_000);
       const minutes = Math.floor((diff % 3_600_000) / 60_000);
       const seconds = Math.floor((diff % 60_000) / 1000);
-      display.textContent = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+
+      if (hEl) hEl.textContent = pad(hours);
+      if (mEl) mEl.textContent = pad(minutes);
+      if (sEl) sEl.textContent = pad(seconds);
     };
 
     tick();
