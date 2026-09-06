@@ -16,7 +16,7 @@ const products = await getProducts();
 <BaseLayout title="NEXUS.DEALS — ศูนย์รวมดีลสินค้า & บริการออนไลน์ นายหน้าปลอดภัย 24 ชม.">
   <Header />
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-14 py-4 sm:py-8 pb-20 lg:pb-8">
+  <main class="max-w-[1600px] 2xl:max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-14 py-4 sm:py-8 pb-20 lg:pb-8">
     
     <!-- Giant Full-Width Netflix-Style Auto-Slide Hero Banner Section -->
     <section class="w-full">
@@ -52,13 +52,13 @@ const products = await getProducts();
     <!-- Main Content: Product Catalog + Aside Widgets -->
     <section class="grid lg:grid-cols-12 gap-8 items-start">
       
-      <!-- Catalog (8 Columns) -->
-      <div class="lg:col-span-8">
+      <!-- Catalog (8 Columns on Desktop, 9 Columns on Ultra-Wide) -->
+      <div class="lg:col-span-8 2xl:col-span-9">
         <ProductBentoGrid products={products} />
       </div>
 
-      <!-- Right Sidebar: Flash Deal & System Health (4 Columns) -->
-      <aside class="lg:col-span-4 space-y-5">
+      <!-- Right Sidebar: Flash Deal & System Health (4 Columns on Desktop, 3 Columns on Ultra-Wide) -->
+      <aside class="lg:col-span-4 2xl:col-span-3 space-y-5">
         <FlashDealCountdown endsAt={flashDealEndsAt} percentOff={flashDealPercentOff} />
         <ServerStatusPanel />
 
@@ -67,7 +67,7 @@ const products = await getProducts();
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 shadow-[0_0_15px_rgba(168,85,247,0.3)]">
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div>
