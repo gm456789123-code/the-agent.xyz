@@ -4,6 +4,8 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import MobileQuickDock from "../components/MobileQuickDock.astro";
 import OrderTrackingModal from "../components/OrderTrackingModal.astro";
+import AuthModal from "../components/AuthModal.astro";
+import PdpaModal from "../components/PdpaModal.astro";
 
 interface Props {
   title: string;
@@ -53,5 +55,7 @@ const { title } = Astro.props;
       <Footer />
     </div>
     <OrderTrackingModal />
+    <AuthModal />
+    <PdpaModal />
   </body>
 </html>

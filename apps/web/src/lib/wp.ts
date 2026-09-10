@@ -1,6 +1,6 @@
 import { mockProducts, type ProductDeal } from "../data/mock";
 
-const WP_API_URL = import.meta.env.PUBLIC_WP_API_URL;
+const WP_API_URL = import.meta.env.PUBLIC_WP_API_URL || "https://azure-bison-824750.hostingersite.com/wp-json";
 
 interface WpProduct {
   id: number;

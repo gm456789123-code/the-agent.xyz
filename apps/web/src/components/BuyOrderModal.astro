@@ -32,7 +32,7 @@
 </div>
 
 <script>
-  const WP_API_URL = import.meta.env.PUBLIC_WP_API_URL;
+  const WP_API_URL = import.meta.env.PUBLIC_WP_API_URL || "https://azure-bison-824750.hostingersite.com/wp-json";
 
   function initBuyModal() {
     const modal = document.getElementById("buy-modal");
@@ -65,12 +65,27 @@
       modal!.classList.remove("flex");
     }
 
+    let pendingBuy: { productId: string; productTitle: string } | null = null;
+
     document.querySelectorAll(".js-buy-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const productId = btn.getAttribute("data-product-id") || "";
         const productTitle = btn.getAttribute("data-product-title") || "";
+
+        if (!localStorage.getItem("nexus_token")) {
+          pendingBuy = { productId, productTitle };
+          document.dispatchEvent(new CustomEvent("nexus:open-auth", { detail: { mode: "login" } }));
+          return;
+        }
         openModal(productId, productTitle);
       });
+    });
+
+    document.addEventListener("nexus:auth-success", () => {
+      if (pendingBuy) {
+        openModal(pendingBuy.productId, pendingBuy.productTitle);
+        pendingBuy = null;
+      }
     });
 
     closeBtn?.addEventListener("click", closeModal);

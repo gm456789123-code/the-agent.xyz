@@ -1,0 +1,323 @@
+<!-- Global Auth Modal (Login + Register as tabbed popup) -->
+<div id="auth-modal" class="hidden fixed inset-0 z-[70] items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+  <div class="w-full max-w-md rounded-2xl sm:rounded-3xl aurora-glass p-6 sm:p-8 border border-purple-400/40 shadow-aurora relative max-h-[92vh] overflow-y-auto">
+    <button type="button" id="auth-modal-close" class="absolute top-4 right-4 text-slate-300 hover:text-white text-2xl leading-none cursor-pointer">&times;</button>
+
+    <div class="flex gap-1.5 mb-6 p-1 rounded-xl bg-surface-card border border-white/10">
+      <button type="button" id="auth-tab-login" class="flex-1 py-2 rounded-lg text-sm font-black transition-all">เข้าสู่ระบบ</button>
+      <button type="button" id="auth-tab-register" class="flex-1 py-2 rounded-lg text-sm font-black transition-all">สมัครสมาชิก</button>
+    </div>
+
+    <!-- Login Panel -->
+    <div id="auth-panel-login">
+      <form id="auth-login-form" class="space-y-4">
+        <div>
+          <label for="auth-login-username" class="block text-sm font-bold text-slate-200 mb-1.5">อีเมลหรือชื่อผู้ใช้</label>
+          <input id="auth-login-username" name="log" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required placeholder="อีเมลหรือชื่อผู้ใช้ของคุณ" class="w-full min-w-0 rounded-xl border border-white/20 bg-surface-card px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-500/30" />
+        </div>
+        <div>
+          <label for="auth-login-password" class="block text-sm font-bold text-slate-200 mb-1.5">รหัสผ่าน</label>
+          <div class="relative">
+            <input id="auth-login-password" name="pwd" type="password" autocomplete="current-password" required placeholder="กรอกรหัสผ่าน" class="w-full min-w-0 rounded-xl border border-white/20 bg-surface-card pl-4 pr-20 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-500/30" />
+            <button id="auth-login-toggle-password" type="button" aria-pressed="false" aria-label="แสดงรหัสผ่าน" class="absolute inset-y-0 right-0 px-4 text-sm font-bold text-purple-300 hover:text-white">แสดง</button>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-3 text-sm">
+          <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" name="rememberme" value="forever" class="h-4 w-4 accent-purple-400" />จดจำการเข้าสู่ระบบ</label>
+          <a href="https://line.me" target="_blank" rel="noopener noreferrer" class="text-pink-300 hover:text-white font-bold">ลืมรหัสผ่าน?</a>
+        </div>
+        <p id="auth-login-message" role="alert" class="hidden text-sm text-rose-300"></p>
+        <button id="auth-login-submit" type="submit" class="w-full rounded-xl aurora-btn-gradient px-5 py-3.5 text-base font-black text-white disabled:opacity-50 disabled:cursor-wait">เข้าสู่ระบบ</button>
+      </form>
+      <div class="mt-5 text-center text-sm text-slate-300">
+        ยังไม่มีบัญชีสมาชิก? <button type="button" id="auth-goto-register" class="text-pink-300 hover:text-white font-bold cursor-pointer">สมัครสมาชิกฟรี →</button>
+      </div>
+    </div>
+
+    <!-- Register Panel -->
+    <div id="auth-panel-register" class="hidden">
+      <form id="auth-register-form" class="space-y-4" novalidate>
+        <div>
+          <label for="auth-reg-username" class="block text-sm font-bold text-slate-200 mb-1.5">ชื่อผู้ใช้ <span class="text-pink-400">*</span></label>
+          <input id="auth-reg-username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required minlength="4" placeholder="ตัวอักษรหรือตัวเลข ไม่มีช่องว่าง" class="w-full min-w-0 rounded-xl border border-white/20 bg-surface-card px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all" />
+        </div>
+        <div>
+          <label for="auth-reg-email" class="block text-sm font-bold text-slate-200 mb-1.5">อีเมล <span class="text-pink-400">*</span></label>
+          <input id="auth-reg-email" name="email" type="email" autocomplete="email" required placeholder="example@email.com" class="w-full min-w-0 rounded-xl border border-white/20 bg-surface-card px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all" />
+        </div>
+        <div>
+          <label for="auth-reg-phone" class="block text-sm font-bold text-slate-200 mb-1.5">เบอร์โทรศัพท์ <span class="text-pink-400">*</span></label>
+          <input id="auth-reg-phone" name="phone" type="tel" autocomplete="tel" required placeholder="08xxxxxxxx" class="w-full min-w-0 rounded-xl border border-white/20 bg-surface-card px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all" />
+        </div>
+        <div>
+          <label for="auth-reg-password" class="block text-sm font-bold text-slate-200 mb-1.5">รหัสผ่าน <span class="text-pink-400">*</span></label>
+          <div class="relative">
+            <input id="auth-reg-password" name="password" type="password" autocomplete="new-password" required minlength="8" placeholder="อย่างน้อย 8 ตัวอักษร" class="w-full min-w-0 rounded-xl border border-white/20 bg-surface-card pl-4 pr-20 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all" />
+            <button id="auth-reg-toggle-password" type="button" aria-pressed="false" aria-label="แสดงรหัสผ่าน" class="absolute inset-y-0 right-0 px-4 text-sm font-bold text-purple-300 hover:text-white">แสดง</button>
+          </div>
+          <div id="auth-password-strength" class="mt-2 flex gap-1.5">
+            <div class="strength-bar flex-1 h-1 rounded-full bg-white/10 transition-all duration-300"></div>
+            <div class="strength-bar flex-1 h-1 rounded-full bg-white/10 transition-all duration-300"></div>
+            <div class="strength-bar flex-1 h-1 rounded-full bg-white/10 transition-all duration-300"></div>
+            <div class="strength-bar flex-1 h-1 rounded-full bg-white/10 transition-all duration-300"></div>
+          </div>
+          <p id="auth-password-strength-label" class="mt-1 text-xs text-slate-500"></p>
+        </div>
+        <div>
+          <label for="auth-reg-confirm-password" class="block text-sm font-bold text-slate-200 mb-1.5">ยืนยันรหัสผ่าน <span class="text-pink-400">*</span></label>
+          <input id="auth-reg-confirm-password" name="confirmPassword" type="password" autocomplete="new-password" required placeholder="กรอกรหัสผ่านอีกครั้ง" class="w-full min-w-0 rounded-xl border border-white/20 bg-surface-card px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all" />
+        </div>
+        <div class="flex items-start gap-3 pt-1">
+          <input id="auth-reg-terms" name="terms" type="checkbox" required class="mt-0.5 h-4 w-4 flex-shrink-0 accent-pink-400 cursor-pointer" />
+          <label for="auth-reg-terms" class="text-sm text-slate-300 cursor-pointer leading-relaxed">
+            ฉันยอมรับ <a href="#" class="text-pink-300 hover:text-white font-bold">ข้อกำหนดการใช้งาน</a> และ <a href="#" class="text-purple-300 hover:text-white font-bold">นโยบายความเป็นส่วนตัว</a> ของ NEXUS.DEALS
+          </label>
+        </div>
+        <p id="auth-reg-error" role="alert" class="hidden rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-300 font-bold"></p>
+        <p id="auth-reg-success" role="status" class="hidden rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300 font-bold"></p>
+        <button id="auth-reg-submit" type="submit" class="w-full rounded-xl aurora-btn-gradient px-5 py-3.5 text-base font-black text-slate-950 hover:text-white transition-all shadow-glow disabled:opacity-50 disabled:cursor-wait">
+          สร้างบัญชีสมาชิก
+        </button>
+      </form>
+      <div class="mt-5 text-center text-sm text-slate-300">
+        มีบัญชีอยู่แล้ว? <button type="button" id="auth-goto-login" class="text-purple-300 hover:text-white font-bold cursor-pointer">เข้าสู่ระบบ →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  #auth-tab-login.is-active,
+  #auth-tab-register.is-active {
+    background: linear-gradient(135deg, #f472b6, #a78bfa);
+    color: #030712;
+  }
+  #auth-tab-login:not(.is-active),
+  #auth-tab-register:not(.is-active) {
+    color: #cbd5e1;
+  }
+</style>
+
+<script>
+  type AuthMode = "login" | "register";
+
+  function initAuthModal() {
+    const modal = document.getElementById("auth-modal");
+    const closeBtn = document.getElementById("auth-modal-close");
+    const tabLogin = document.getElementById("auth-tab-login");
+    const tabRegister = document.getElementById("auth-tab-register");
+    const panelLogin = document.getElementById("auth-panel-login");
+    const panelRegister = document.getElementById("auth-panel-register");
+    const gotoRegister = document.getElementById("auth-goto-register");
+    const gotoLogin = document.getElementById("auth-goto-login");
+
+    if (!modal || !tabLogin || !tabRegister || !panelLogin || !panelRegister) return;
+
+    let pendingRedirect: string | null = null;
+
+    function setMode(mode: AuthMode) {
+      const isLogin = mode === "login";
+      panelLogin!.classList.toggle("hidden", !isLogin);
+      panelRegister!.classList.toggle("hidden", isLogin);
+      tabLogin!.classList.toggle("is-active", isLogin);
+      tabRegister!.classList.toggle("is-active", !isLogin);
+    }
+
+    function openModal(mode: AuthMode, redirect?: string | null) {
+      pendingRedirect = redirect ?? null;
+      setMode(mode);
+      modal!.classList.remove("hidden");
+      modal!.classList.add("flex");
+    }
+
+    function closeModal() {
+      modal!.classList.add("hidden");
+      modal!.classList.remove("flex");
+    }
+
+    closeBtn?.addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !modal!.classList.contains("hidden")) closeModal();
+    });
+
+    tabLogin.addEventListener("click", () => setMode("login"));
+    tabRegister.addEventListener("click", () => setMode("register"));
+    gotoRegister?.addEventListener("click", () => setMode("register"));
+    gotoLogin?.addEventListener("click", () => setMode("login"));
+
+    // Any element on the page can open this modal via data-auth-open="login|register"
+    document.addEventListener("click", (e) => {
+      const trigger = (e.target as HTMLElement)?.closest?.("[data-auth-open]") as HTMLElement | null;
+      if (!trigger) return;
+      e.preventDefault();
+      const mode = (trigger.getAttribute("data-auth-open") as AuthMode) || "login";
+      openModal(mode, trigger.getAttribute("data-auth-redirect"));
+    });
+
+    document.addEventListener("nexus:open-auth", ((e: CustomEvent<{ mode?: AuthMode; redirect?: string }>) => {
+      openModal(e.detail?.mode ?? "login", e.detail?.redirect);
+    }) as EventListener);
+
+    // --- Login form ---
+    const WP_API_URL = import.meta.env.PUBLIC_WP_API_URL || "https://azure-bison-824750.hostingersite.com/wp-json";
+    const loginPassword = document.getElementById("auth-login-password") as HTMLInputElement;
+    const loginToggle = document.getElementById("auth-login-toggle-password") as HTMLButtonElement;
+    loginToggle?.addEventListener("click", () => {
+      const visible = loginPassword.type === "password";
+      loginPassword.type = visible ? "text" : "password";
+      loginToggle.textContent = visible ? "ซ่อน" : "แสดง";
+      loginToggle.setAttribute("aria-pressed", String(visible));
+    });
+
+    const loginForm = document.getElementById("auth-login-form") as HTMLFormElement;
+    const loginMessage = document.getElementById("auth-login-message");
+    const loginSubmit = document.getElementById("auth-login-submit") as HTMLButtonElement;
+
+    loginForm?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      loginMessage?.classList.add("hidden");
+
+      const username = (document.getElementById("auth-login-username") as HTMLInputElement).value.trim();
+      const pwd = loginPassword.value;
+
+      if (!WP_API_URL) {
+        if (loginMessage) { loginMessage.textContent = "ระบบเข้าสู่ระบบยังไม่พร้อมใช้งาน"; loginMessage.classList.remove("hidden"); }
+        return;
+      }
+
+      loginSubmit.disabled = true;
+      loginSubmit.textContent = "กำลังเข้าสู่ระบบ...";
+
+      try {
+        const res = await fetch(`${WP_API_URL}/nexus/v1/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password: pwd }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.message || "เข้าสู่ระบบไม่สำเร็จ");
+
+        localStorage.setItem("nexus_token", data.token);
+        localStorage.setItem("nexus_user", JSON.stringify(data.user));
+        document.dispatchEvent(new CustomEvent("nexus:auth-changed"));
+        document.dispatchEvent(new CustomEvent("nexus:auth-success", { detail: { user: data.user } }));
+
+        loginForm.reset();
+        closeModal();
+        if (pendingRedirect) window.location.href = pendingRedirect;
+      } catch (err) {
+        if (loginMessage) {
+          loginMessage.textContent = err instanceof Error ? err.message : "เกิดข้อผิดพลาด กรุณาลองใหม่";
+          loginMessage.classList.remove("hidden");
+        }
+      } finally {
+        loginSubmit.disabled = false;
+        loginSubmit.textContent = "เข้าสู่ระบบ";
+      }
+    });
+
+    // --- Register form ---
+    const regPwInput = document.getElementById("auth-reg-password") as HTMLInputElement;
+    const regToggleBtn = document.getElementById("auth-reg-toggle-password") as HTMLButtonElement;
+    regToggleBtn?.addEventListener("click", () => {
+      const visible = regPwInput.type === "password";
+      regPwInput.type = visible ? "text" : "password";
+      regToggleBtn.textContent = visible ? "ซ่อน" : "แสดง";
+      regToggleBtn.setAttribute("aria-pressed", String(visible));
+    });
+
+    const strengthBars = panelRegister.querySelectorAll<HTMLElement>(".strength-bar");
+    const strengthLabel = document.getElementById("auth-password-strength-label");
+    const levels = [
+      { color: "bg-rose-500", label: "รหัสผ่านอ่อนแอมาก" },
+      { color: "bg-amber-400", label: "รหัสผ่านพอใช้ได้" },
+      { color: "bg-sky-400", label: "รหัสผ่านแข็งแกร่ง" },
+      { color: "bg-emerald-400", label: "รหัสผ่านแข็งแกร่งมาก!" },
+    ];
+    function calcStrength(pw: string): number {
+      let score = 0;
+      if (pw.length >= 8) score++;
+      if (/[A-Z]/.test(pw)) score++;
+      if (/[0-9]/.test(pw)) score++;
+      if (/[^A-Za-z0-9]/.test(pw)) score++;
+      return score;
+    }
+    regPwInput?.addEventListener("input", () => {
+      const score = calcStrength(regPwInput.value);
+      strengthBars.forEach((bar, i) => {
+        bar.className = "strength-bar flex-1 h-1 rounded-full transition-all duration-300 " +
+          (i < score ? levels[Math.min(score - 1, 3)].color : "bg-white/10");
+      });
+      if (strengthLabel) strengthLabel.textContent = regPwInput.value ? (levels[Math.min(score - 1, 3)]?.label ?? "") : "";
+    });
+
+    const registerForm = document.getElementById("auth-register-form") as HTMLFormElement;
+    const regError = document.getElementById("auth-reg-error");
+    const regSuccess = document.getElementById("auth-reg-success");
+    const regSubmit = document.getElementById("auth-reg-submit") as HTMLButtonElement;
+
+    registerForm?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      regError?.classList.add("hidden");
+      regSuccess?.classList.add("hidden");
+      const username = (document.getElementById("auth-reg-username") as HTMLInputElement).value.trim();
+      const email    = (document.getElementById("auth-reg-email") as HTMLInputElement).value.trim();
+      const phone    = (document.getElementById("auth-reg-phone") as HTMLInputElement).value.trim();
+      const password = regPwInput.value;
+      const confirm  = (document.getElementById("auth-reg-confirm-password") as HTMLInputElement).value;
+
+      if (password !== confirm) {
+        if (regError) { regError.textContent = "รหัสผ่านไม่ตรงกัน กรุณากรอกใหม่"; regError.classList.remove("hidden"); } return;
+      }
+      if (password.length < 8) {
+        if (regError) { regError.textContent = "รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร"; regError.classList.remove("hidden"); } return;
+      }
+      if (!/^0[0-9]{9}$/.test(phone.replace(/[-\s]/g, ""))) {
+        if (regError) { regError.textContent = "กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (10 หลัก)"; regError.classList.remove("hidden"); } return;
+      }
+
+      regSubmit.disabled = true;
+      regSubmit.textContent = "กำลังสร้างบัญชี...";
+      try {
+        if (WP_API_URL) {
+          const res = await fetch(`${WP_API_URL}/nexus/v1/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, email, phone, password }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data?.message || "สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่");
+        } else {
+          localStorage.setItem("nexus_demo_user", JSON.stringify({ username, email, phone }));
+          await new Promise((r) => setTimeout(r, 500));
+        }
+
+        if (regSuccess) {
+          regSuccess.textContent = "สมัครสมาชิกสำเร็จ! ยินดีต้อนรับคุณ " + username + " กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ";
+          regSuccess.classList.remove("hidden");
+        }
+        registerForm.reset();
+        setTimeout(() => setMode("login"), 1400);
+      } catch (err) {
+        if (regError) {
+          regError.textContent = err instanceof Error ? err.message : "เกิดข้อผิดพลาด กรุณาลองใหม่";
+          regError.classList.remove("hidden");
+        }
+      } finally {
+        regSubmit.disabled = false;
+        regSubmit.textContent = "สร้างบัญชีสมาชิก";
+      }
+    });
+
+    setMode("login");
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initAuthModal);
+  } else {
+    initAuthModal();
+  }
+</script>

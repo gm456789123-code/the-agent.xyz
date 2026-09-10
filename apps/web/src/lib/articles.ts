@@ -1,4 +1,4 @@
-const apiUrl = import.meta.env.PUBLIC_WP_API_URL;
+const apiUrl = import.meta.env.PUBLIC_WP_API_URL || "https://azure-bison-824750.hostingersite.com/wp-json";
 
 export interface Article {
   id: number;

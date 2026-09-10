@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Plugin Name: Nexus Member Auth
  * Description: Registration and authentication REST endpoints (nexus/v1/register, nexus/v1/login) for NEXUS.DEALS
@@ -70,5 +70,105 @@ add_action('rest_api_init', function () {
             ]);
         },
     ]);
+
+    register_rest_route('nexus/v1', '/login', [
+        'methods' => 'POST',
+        'permission_callback' => '__return_true',
+        'args' => [
+            'username' => ['required' => true, 'type' => 'string'],
+            'password' => ['required' => true, 'type' => 'string'],
+        ],
+        'callback' => function (WP_REST_Request $request) {
+            $username = sanitize_text_field($request->get_param('username'));
+            $password = $request->get_param('password');
+
+            $user = wp_authenticate($username, $password);
+
+            if (is_wp_error($user)) {
+                return new WP_Error('invalid_credentials', 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', ['status' => 401]);
+            }
+
+            $token = bin2hex(random_bytes(32));
+            update_user_meta($user->ID, 'nexus_auth_token', $token);
+            update_user_meta($user->ID, 'nexus_auth_token_created', time());
+
+            return rest_ensure_response([
+                'success' => true,
+                'token' => $token,
+                'user' => [
+                    'id' => $user->ID,
+                    'username' => $user->user_login,
+                    'email' => $user->user_email,
+                    'phone' => get_user_meta($user->ID, 'nexus_phone', true),
+                ],
+            ]);
+        },
+    ]);
+
+    register_rest_route('nexus/v1', '/me', [
+        'methods' => 'GET',
+        'permission_callback' => '__return_true',
+        'callback' => function (WP_REST_Request $request) {
+            $user = nexus_get_user_from_token($request);
+
+            if (!$user) {
+                return new WP_Error('invalid_token', 'เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่', ['status' => 401]);
+            }
+
+            return rest_ensure_response([
+                'id' => $user->ID,
+                'username' => $user->user_login,
+                'email' => $user->user_email,
+                'phone' => get_user_meta($user->ID, 'nexus_phone', true),
+            ]);
+        },
+    ]);
+
+    register_rest_route('nexus/v1', '/logout', [
+        'methods' => 'POST',
+        'permission_callback' => '__return_true',
+        'callback' => function (WP_REST_Request $request) {
+            $user = nexus_get_user_from_token($request);
+            if ($user) {
+                delete_user_meta($user->ID, 'nexus_auth_token');
+                delete_user_meta($user->ID, 'nexus_auth_token_created');
+            }
+            return rest_ensure_response(['success' => true]);
+        },
+    ]);
 });
 
+const NEXUS_TOKEN_TTL_SECONDS = 30 * DAY_IN_SECONDS;
+
+function nexus_get_user_from_token(WP_REST_Request $request): ?WP_User {
+    $token = $request->get_header('x-nexus-token');
+    if (!$token) {
+        $auth = $request->get_header('authorization');
+        if ($auth && stripos($auth, 'Bearer ') === 0) {
+            $token = substr($auth, 7);
+        }
+    }
+    if (!$token) {
+        return null;
+    }
+
+    $users = get_users([
+        'meta_key' => 'nexus_auth_token',
+        'meta_value' => $token,
+        'number' => 1,
+    ]);
+
+    if (empty($users)) {
+        return null;
+    }
+
+    $user = $users[0];
+    $created = (int) get_user_meta($user->ID, 'nexus_auth_token_created', true);
+    if ($created && (time() - $created) > NEXUS_TOKEN_TTL_SECONDS) {
+        delete_user_meta($user->ID, 'nexus_auth_token');
+        delete_user_meta($user->ID, 'nexus_auth_token_created');
+        return null;
+    }
+
+    return $user;
+}

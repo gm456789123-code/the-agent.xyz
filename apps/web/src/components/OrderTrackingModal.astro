@@ -25,7 +25,7 @@
   const input = document.getElementById("track-input") as HTMLInputElement;
   const submit = document.getElementById("track-submit") as HTMLButtonElement;
   const results = document.getElementById("track-results")!;
-  const apiUrl = import.meta.env.PUBLIC_WP_API_URL;
+  const apiUrl = import.meta.env.PUBLIC_WP_API_URL || "https://azure-bison-824750.hostingersite.com/wp-json";
   const statuses: Record<string, string> = {
     pending_payment: "รอชำระเงิน",
     paid: "ชำระเงินแล้ว กำลังจัดส่ง",

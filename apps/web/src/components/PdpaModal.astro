@@ -1,0 +1,52 @@
+<!-- Cookie / PDPA Consent Banner (non-blocking, bottom bar) -->
+<div id="pdpa-banner" class="hidden fixed inset-x-0 bottom-0 z-[80] p-3 sm:p-4">
+  <div class="w-full max-w-4xl mx-auto rounded-2xl aurora-glass p-4 sm:p-5 border border-purple-400/40 shadow-aurora flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+    <p class="text-xs sm:text-sm leading-relaxed text-slate-300 flex-1">
+      เว็บไซต์ NEXUS.DEALS ใช้คุกกี้และข้อมูลส่วนบุคคลของคุณ เพื่อดำเนินการสั่งซื้อ ติดตามสถานะออเดอร์ และปรับปรุงประสบการณ์การใช้งานให้ดียิ่งขึ้น ตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล (PDPA) อ่าน
+      <a href="#" class="text-pink-300 hover:text-white font-bold">นโยบายความเป็นส่วนตัว</a>
+    </p>
+    <button
+      type="button"
+      id="pdpa-accept"
+      class="w-full sm:w-auto flex-shrink-0 px-5 py-2.5 rounded-xl font-display font-black text-sm aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow cursor-pointer whitespace-nowrap"
+    >
+      ตกลง
+    </button>
+  </div>
+</div>
+
+<script>
+  const PDPA_CONSENT_KEY = "nexus_pdpa_consent";
+
+  function initPdpaBanner() {
+    const banner = document.getElementById("pdpa-banner");
+    const acceptBtn = document.getElementById("pdpa-accept");
+    if (!banner || !acceptBtn) return;
+
+    let hasConsented = false;
+    try {
+      hasConsented = localStorage.getItem(PDPA_CONSENT_KEY) === "1";
+    } catch {
+      hasConsented = false;
+    }
+
+    if (!hasConsented) {
+      banner.classList.remove("hidden");
+    }
+
+    acceptBtn.addEventListener("click", () => {
+      try {
+        localStorage.setItem(PDPA_CONSENT_KEY, "1");
+      } catch {
+        // Storage unavailable; consent still applies for this session.
+      }
+      banner.classList.add("hidden");
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initPdpaBanner);
+  } else {
+    initPdpaBanner();
+  }
+</script>

@@ -8,6 +8,16 @@
 
 define('NEXUS_SETTINGS_OPTION', 'nexus_settings');
 
+add_action('init', function () {
+    header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+    header("Access-Control-Allow-Headers: Authorization, X-WP-Nonce, Content-Type, Origin, Accept");
+    if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        status_header(200);
+        exit;
+    }
+});
+
 function nexus_default_settings(): array {
     return [
         'flash_deal' => [
