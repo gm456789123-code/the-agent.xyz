@@ -107,14 +107,23 @@
       submitBtn!.textContent = "กำลังส่งคำสั่งซื้อ...";
 
       try {
+        const token = localStorage.getItem("nexus_token");
+        if (!token) throw new Error("กรุณาเข้าสู่ระบบก่อนสร้างคำสั่งซื้อ");
         const res = await fetch(`${WP_API_URL}/nexus/v1/orders`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify({ product_id: Number(activeProductId), phone: phoneInput!.value.trim() }),
         });
         const data = await res.json();
 
         if (!res.ok) {
+          if (res.status === 401) {
+            localStorage.removeItem("nexus_token");
+            localStorage.removeItem("nexus_user");
+            document.dispatchEvent(new CustomEvent("nexus:auth-changed"));
+            closeModal();
+            document.dispatchEvent(new CustomEvent("nexus:open-auth", { detail: { mode: "login" } }));
+          }
           throw new Error(data?.message || "สร้างคำสั่งซื้อไม่สำเร็จ");
         }
 

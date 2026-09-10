@@ -4,32 +4,7 @@
  * Description: Registration and authentication REST endpoints (nexus/v1/register, nexus/v1/login) for NEXUS.DEALS
  */
 
-if (!function_exists('nexus_get_client_ip')) {
-    function nexus_get_client_ip(): string {
-        if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
-            return sanitize_text_field(trim($_SERVER['HTTP_CF_CONNECTING_IP']));
-        }
-        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            return sanitize_text_field(trim(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0]));
-        }
-        return sanitize_text_field($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
-    }
-}
-
-if (!function_exists('nexus_check_rate_limit')) {
-    function nexus_check_rate_limit(string $action, int $max_attempts = 10, int $decay_seconds = 60): bool {
-        $ip = nexus_get_client_ip();
-        $key = 'nexus_rl_' . md5($action . '_' . $ip);
-        $attempts = (int) get_transient($key);
-
-        if ($attempts >= $max_attempts) {
-            return false;
-        }
-
-        set_transient($key, $attempts + 1, $decay_seconds);
-        return true;
-    }
-}
+require_once __DIR__ . '/nexus-security.php';
 
 add_action('rest_api_init', function () {
     register_rest_route('nexus/v1', '/register', [
@@ -124,7 +99,7 @@ add_action('rest_api_init', function () {
             }
 
             $token = bin2hex(random_bytes(32));
-            update_user_meta($user->ID, 'nexus_auth_token', $token);
+            update_user_meta($user->ID, 'nexus_auth_token', hash('sha256', $token));
             update_user_meta($user->ID, 'nexus_auth_token_created', time());
 
             return rest_ensure_response([
@@ -183,13 +158,13 @@ function nexus_get_user_from_token(WP_REST_Request $request): ?WP_User {
             $token = substr($auth, 7);
         }
     }
-    if (!$token) {
+    if (!$token || !preg_match('/^[a-f0-9]{64}$/D', $token)) {
         return null;
     }
 
     $users = get_users([
         'meta_key' => 'nexus_auth_token',
-        'meta_value' => $token,
+        'meta_value' => hash('sha256', $token),
         'number' => 1,
     ]);
 
@@ -199,7 +174,7 @@ function nexus_get_user_from_token(WP_REST_Request $request): ?WP_User {
 
     $user = $users[0];
     $created = (int) get_user_meta($user->ID, 'nexus_auth_token_created', true);
-    if ($created && (time() - $created) > NEXUS_TOKEN_TTL_SECONDS) {
+    if ($created <= 0 || $created > time() || (time() - $created) > NEXUS_TOKEN_TTL_SECONDS) {
         delete_user_meta($user->ID, 'nexus_auth_token');
         delete_user_meta($user->ID, 'nexus_auth_token_created');
         return null;
@@ -207,3 +182,21 @@ function nexus_get_user_from_token(WP_REST_Request $request): ?WP_User {
 
     return $user;
 }
+
+add_action('after_password_reset', function ($user) {
+    delete_user_meta($user->ID, 'nexus_auth_token');
+    delete_user_meta($user->ID, 'nexus_auth_token_created');
+});
+add_action('wp_set_password', function ($password, $user_id) {
+    delete_user_meta($user_id, 'nexus_auth_token');
+    delete_user_meta($user_id, 'nexus_auth_token_created');
+}, 10, 2);
+
+// wp-admin profile edits use wp_update_user, not wp_set_password. Revoking on
+// any profile/role change also covers email and account privilege changes.
+function nexus_revoke_member_tokens($user_id) {
+    delete_user_meta($user_id, 'nexus_auth_token');
+    delete_user_meta($user_id, 'nexus_auth_token_created');
+}
+add_action('profile_update', 'nexus_revoke_member_tokens');
+add_action('set_user_role', 'nexus_revoke_member_tokens');

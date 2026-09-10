@@ -1,5 +1,6 @@
 ---
 import { articleDate, type Article } from "../lib/articles";
+import { safeArticleHtml } from "../lib/safe-html.mjs";
 interface Props { articles: Article[]; unavailable?: boolean }
 const { articles, unavailable = false } = Astro.props;
 ---
@@ -10,9 +11,9 @@ const { articles, unavailable = false } = Astro.props;
       <article class="aurora-glass aurora-glass-hover rounded-2xl border border-purple-400/30 p-5 sm:p-7 min-w-0 flex flex-col">
         <time datetime={article.date} class="text-xs text-purple-300 font-bold">{articleDate(article.date)}</time>
         <h3 class="mt-3 font-display font-black text-xl sm:text-2xl text-white break-words">
-          <a href={`/articles/${article.id}`} class="hover:text-pink-300" set:html={article.title.rendered} />
+          <a href={`/articles/${article.id}`} class="hover:text-pink-300" set:html={safeArticleHtml(article.title.rendered)} />
         </h3>
-        <div class="article-excerpt mt-3 text-sm text-slate-300 leading-relaxed line-clamp-3" set:html={article.excerpt.rendered} />
+        <div class="article-excerpt mt-3 text-sm text-slate-300 leading-relaxed line-clamp-3" set:html={safeArticleHtml(article.excerpt.rendered)} />
         <a href={`/articles/${article.id}`} class="mt-auto pt-6 inline-block text-pink-300 hover:text-white font-bold text-sm">อ่านบทความ →</a>
       </article>
     ))}

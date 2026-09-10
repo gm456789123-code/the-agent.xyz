@@ -17,6 +17,7 @@ add_action('init', function () {
     ];
 
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    header('Vary: Origin', false);
     if (in_array($origin, $allowed_origins, true)) {
         header("Access-Control-Allow-Origin: {$origin}");
     } else {
@@ -32,6 +33,18 @@ add_action('init', function () {
         exit;
     }
 });
+
+// WordPress's default REST CORS filter reflects arbitrary origins. Keep the
+// explicit allowlist above authoritative, including on actual REST responses.
+add_action('rest_api_init', function () {
+    remove_filter('rest_pre_serve_request', 'rest_send_cors_headers');
+});
+add_filter('rest_post_dispatch', function ($response, $server, $request) {
+    if (str_starts_with($request->get_route(), '/nexus/v1/')) {
+        $response->header('Cache-Control', 'no-store, private');
+    }
+    return $response;
+}, 10, 3);
 
 function nexus_default_settings(): array {
     return [

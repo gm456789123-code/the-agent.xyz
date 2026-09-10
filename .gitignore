@@ -19,6 +19,7 @@ npm-debug.log*
 # Sensitive & local dev files
 Z-no_push
 Z-On
+Z-On.txt
 *.zip
 docker/phpmyadmin/
 

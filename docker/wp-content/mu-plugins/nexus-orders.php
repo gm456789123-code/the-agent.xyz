@@ -20,37 +20,16 @@ add_action('init', function () {
     ]);
 });
 
+require_once __DIR__ . '/nexus-security.php';
+
 function nexus_generate_order_code(): string {
-    return 'NX-' . strtoupper(substr(uniqid(), -6));
-}
-
-function nexus_get_client_ip(): string {
-    if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
-        return sanitize_text_field(trim($_SERVER['HTTP_CF_CONNECTING_IP']));
-    }
-    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        return sanitize_text_field(trim(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0]));
-    }
-    return sanitize_text_field($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
-}
-
-function nexus_check_rate_limit(string $action, int $max_attempts = 10, int $decay_seconds = 60): bool {
-    $ip = nexus_get_client_ip();
-    $key = 'nexus_rl_' . md5($action . '_' . $ip);
-    $attempts = (int) get_transient($key);
-
-    if ($attempts >= $max_attempts) {
-        return false;
-    }
-
-    set_transient($key, $attempts + 1, $decay_seconds);
-    return true;
+    return 'NX-' . strtoupper(bin2hex(random_bytes(16)));
 }
 
 add_action('rest_api_init', function () {
     register_rest_route('nexus/v1', '/orders', [
         'methods' => 'POST',
-        'permission_callback' => '__return_true',
+        'permission_callback' => 'nexus_require_member',
         'args' => [
             'product_id' => ['required' => true, 'type' => 'integer'],
             'phone' => ['required' => true, 'type' => 'string'],
@@ -61,7 +40,7 @@ add_action('rest_api_init', function () {
             }
 
             $product_id = (int) $request->get_param('product_id');
-            $phone = sanitize_text_field($request->get_param('phone'));
+            $phone = preg_replace('/[-\s]/', '', sanitize_text_field($request->get_param('phone')));
 
             if (!preg_match('/^0[0-9]{8,9}$/', preg_replace('/[-\s]/', '', $phone))) {
                 return new WP_Error('invalid_phone', 'กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง', ['status' => 400]);
@@ -74,12 +53,18 @@ add_action('rest_api_init', function () {
 
             $order_code = nexus_generate_order_code();
             $price = get_post_meta($product_id, 'price', true);
+            if (!is_numeric($price) || !is_finite((float) $price) || (float) $price <= 0) {
+                return new WP_Error('invalid_price', 'สินค้ายังไม่พร้อมจำหน่าย', ['status' => 400]);
+            }
+            $user = nexus_get_user_from_token($request);
+            if (!$user) return new WP_Error('authentication_required', 'กรุณาเข้าสู่ระบบ', ['status' => 401]);
 
             $order_id = wp_insert_post([
                 'post_type' => 'nexus_order',
                 'post_title' => $order_code,
                 'post_status' => 'publish',
                 'meta_input' => [
+                    'customer_user_id' => $user->ID,
                     'order_code' => $order_code,
                     'phone' => $phone,
                     'product_id' => $product_id,
@@ -104,7 +89,7 @@ add_action('rest_api_init', function () {
 
     register_rest_route('nexus/v1', '/orders/track', [
         'methods' => 'GET',
-        'permission_callback' => '__return_true',
+        'permission_callback' => 'nexus_require_member',
         'args' => [
             'query' => ['required' => true, 'type' => 'string'],
         ],
@@ -115,7 +100,7 @@ add_action('rest_api_init', function () {
 
             $query = sanitize_text_field(trim($request->get_param('query')));
             $clean_phone = preg_replace('/[-\s]/', '', $query);
-            $is_order_code = (stripos($query, 'NX-') === 0) && strlen($query) <= 15;
+            $is_order_code = preg_match('/^NX-(?:[A-F0-9]{6}|[A-F0-9]{32})$/iD', $query);
             $is_phone = preg_match('/^0[0-9]{8,9}$/', $clean_phone);
 
             if (!$is_order_code && !$is_phone) {
@@ -125,6 +110,9 @@ add_action('rest_api_init', function () {
             $meta_query = $is_order_code
                 ? [['key' => 'order_code', 'value' => strtoupper($query), 'compare' => '=']]
                 : [['key' => 'phone', 'value' => $clean_phone, 'compare' => '=']];
+            $user = nexus_get_user_from_token($request);
+            if (!$user) return new WP_Error('authentication_required', 'กรุณาเข้าสู่ระบบ', ['status' => 401]);
+            $meta_query[] = ['key' => 'customer_user_id', 'value' => $user->ID, 'compare' => '='];
 
             $orders = get_posts([
                 'post_type' => 'nexus_order',
@@ -141,14 +129,11 @@ add_action('rest_api_init', function () {
             }
 
             return array_map(function ($order) {
-                $phone = get_post_meta($order->ID, 'phone', true);
-                $masked_phone = $phone ? preg_replace('/^(\d{3})\d{3}(\d{4})$/', '$1-xxx-$2', $phone) : '';
                 return [
                     'order_code' => get_post_meta($order->ID, 'order_code', true),
                     'product_title' => get_post_meta($order->ID, 'product_title', true),
                     'amount' => get_post_meta($order->ID, 'amount', true),
                     'status' => get_post_meta($order->ID, 'status', true) ?: 'pending_payment',
-                    'customer_phone' => $masked_phone,
                     'created_at' => $order->post_date,
                 ];
             }, $orders);
@@ -170,12 +155,6 @@ add_action('rest_api_init', function () {
             ]);
 
             return array_map(function ($order) {
-                $phone = (string) get_post_meta($order->ID, 'phone', true);
-                $clean = preg_replace('/\D/', '', $phone);
-                $masked_phone = strlen($clean) >= 9
-                    ? substr($clean, 0, 3) . '-xxx-' . substr($clean, -4)
-                    : '08x-xxx-xxxx';
-
                 $seconds_ago = time() - get_post_time('U', true, $order);
                 if ($seconds_ago < 60) {
                     $time_label = 'เมื่อสักครู่';
@@ -186,7 +165,7 @@ add_action('rest_api_init', function () {
                 }
 
                 return [
-                    'user' => $masked_phone ?: 'xxx-xxx-xxxx',
+                    'user' => 'สมาชิก',
                     'item' => get_post_meta($order->ID, 'product_title', true),
                     'amount' => '฿' . get_post_meta($order->ID, 'amount', true),
                     'store' => 'Nexus Arcade',
@@ -245,5 +224,4 @@ add_action('save_post_nexus_order', function ($post_id) {
         update_post_meta($post_id, 'status', sanitize_text_field($_POST['nexus_order_status']));
     }
 });
-
 

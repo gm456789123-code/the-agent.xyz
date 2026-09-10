@@ -6,7 +6,7 @@
     <h2 id="order-tracking-title" class="font-display font-black text-xl sm:text-3xl">เช็คสถานะ<span class="aurora-text">ออเดอร์</span></h2>
     <button id="track-close" type="button" aria-label="ปิดหน้าต่างเช็คสถานะออเดอร์" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/15 text-2xl text-slate-300 hover:bg-white/10 hover:text-white">×</button>
   </div>
-  <p id="order-tracking-description" class="mt-3 text-sm text-slate-300">กรอกเบอร์โทรศัพท์หรือเลขออเดอร์ เพื่อติดตามสถานะคำสั่งซื้อของคุณ</p>
+  <p id="order-tracking-description" class="mt-3 text-sm text-slate-300">เข้าสู่ระบบและกรอกเบอร์โทรศัพท์หรือเลขออเดอร์ เพื่อติดตามคำสั่งซื้อในบัญชีของคุณ</p>
   <form id="track-form" class="mt-6 space-y-3">
     <label for="track-input" class="block text-sm font-bold text-slate-200">เบอร์โทรศัพท์หรือเลขออเดอร์</label>
     <input id="track-input" type="text" required autofocus placeholder="08xxxxxxxx หรือ NX-XXXXXX" class="w-full min-w-0 rounded-xl border border-pink-400/35 bg-surface-card px-4 py-3 text-base text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-pink-500/40" />
@@ -38,6 +38,10 @@
 
   function openTracking(trigger: HTMLElement | null = null) {
     if (dialog.open) return;
+    if (!localStorage.getItem("nexus_token")) {
+      document.dispatchEvent(new CustomEvent("nexus:open-auth", { detail: { mode: "login" } }));
+      return;
+    }
     opener = trigger;
     previousOverflow = document.documentElement.style.overflow;
     document.documentElement.style.overflow = "hidden";
@@ -103,7 +107,19 @@
     results.setAttribute("aria-busy", "true");
     showMessage("กำลังค้นหา...");
     try {
-      const response = await fetch(`${apiUrl}/nexus/v1/orders/track?query=${encodeURIComponent(query)}`, { signal: current.signal });
+      const token = localStorage.getItem("nexus_token");
+      if (!token) throw new Error("กรุณาเข้าสู่ระบบก่อนค้นหาออเดอร์");
+      const response = await fetch(`${apiUrl}/nexus/v1/orders/track?query=${encodeURIComponent(query)}`, {
+        signal: current.signal, headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.status === 401) {
+        localStorage.removeItem("nexus_token");
+        localStorage.removeItem("nexus_user");
+        document.dispatchEvent(new CustomEvent("nexus:auth-changed"));
+        dialog.close();
+        document.dispatchEvent(new CustomEvent("nexus:open-auth", { detail: { mode: "login" } }));
+        return;
+      }
       const orders = await response.json();
       if (!response.ok) throw new Error(typeof orders?.message === "string" ? orders.message : "ค้นหาออเดอร์ไม่สำเร็จ");
       if (!Array.isArray(orders)) throw new Error("ข้อมูลออเดอร์ไม่ถูกต้อง กรุณาลองใหม่");

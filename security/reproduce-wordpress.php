@@ -2,6 +2,7 @@
 // Executes original plugin callbacks with synthetic WordPress fixtures.
 // No actual WordPress database, accounts, or remote requests are used.
 $routes = []; $posts = []; $meta = []; $evidence = [];
+$retest = in_array('--retest', $argv, true);
 class WP_REST_Request {
     public function __construct(private array $params = []) {}
     public function get_param($name) { return $this->params[$name] ?? null; }
@@ -22,7 +23,7 @@ function get_transient($key) { return $GLOBALS['audit_transients'][$key] ?? fals
 function set_transient($key, $value, $ttl) { $GLOBALS['audit_transients'][$key] = $value; return true; }
 function wp_insert_post($value, $errors) {
     $id = count($GLOBALS['posts']) + 100;
-    $GLOBALS['posts'][$id] = (object) array_merge($value, ['ID' => $id, 'post_date' => '2026-09-10 00:00:00']);
+    $GLOBALS['posts'][$id] = (object) array_merge($value, ['ID' => $id, 'post_date' => date('Y-m-d H:i:s')]);
     $GLOBALS['meta'][$id] = $value['meta_input'];
     return $id;
 }
@@ -62,14 +63,36 @@ $created = call_route('/orders', ['product_id' => 10, 'phone' => '000000000']);
 check(is_array($created) && isset($created['order_code']), 'Anonymous order did not succeed');
 $evidence[] = ['finding' => 'WP-AUTH', 'reproduced' => true, 'anonymous_order' => $created];
 $draft = call_route('/orders', ['product_id' => 11, 'phone' => '0000000000']);
-check(is_array($draft) && $draft['product_title'] === 'Synthetic unpublished product', 'Draft purchase did not succeed');
-$evidence[] = ['finding' => 'WP-DRAFT', 'reproduced' => true, 'anonymous_draft_order' => $draft];
+if ($retest) {
+    check($draft instanceof WP_Error && $draft->code === 'invalid_product', 'Draft purchase protection failed');
+    $evidence[] = ['finding' => 'WP-DRAFT', 'status' => 'fixed in callback', 'code' => $draft->code];
+} else {
+    check(is_array($draft) && $draft['product_title'] === 'Synthetic unpublished product', 'Draft purchase did not succeed');
+    $evidence[] = ['finding' => 'WP-DRAFT', 'reproduced' => true, 'anonymous_draft_order' => $draft];
+}
 $tracked = call_route('/orders/track', ['query' => '000000000']);
 check(is_array($tracked) && count($tracked) === 1, 'Anonymous phone lookup failed');
 $evidence[] = ['finding' => 'WP-TRACK', 'reproduced' => true, 'anonymous_phone_lookup' => $tracked];
 $recent = call_route('/orders/recent');
-check(in_array('000000000', array_column($recent, 'user'), true), 'Nine-digit phone was masked');
-$evidence[] = ['finding' => 'WP-PHONE', 'reproduced' => true, 'recent' => $recent];
+if ($retest) {
+    check(!in_array('000000000', array_column($recent, 'user'), true), 'Recent feed still exposes full nine-digit phone');
+    $evidence[] = ['finding' => 'WP-PHONE-RECENT', 'status' => 'full-phone exposure fixed in callback', 'recent' => $recent];
+    check($tracked[0]['customer_phone'] === '000000000', 'Expected tracking phone exposure not reproduced');
+    $evidence[] = ['finding' => 'WP-PHONE-TRACK', 'status' => 'still exposed in tracking callback', 'customer_phone' => $tracked[0]['customer_phone']];
+    $_SERVER['REMOTE_ADDR'] = '192.0.2.10';
+    unset($_SERVER['HTTP_CF_CONNECTING_IP'], $_SERVER['HTTP_X_FORWARDED_FOR']);
+    for ($i = 0; $i < 5; $i++) check(nexus_check_rate_limit('audit_fixture', 5, 60), 'Limiter blocked too early');
+    check(!nexus_check_rate_limit('audit_fixture', 5, 60), 'Limiter did not block sixth request');
+    $_SERVER['HTTP_CF_CONNECTING_IP'] = '192.0.2.11';
+    check(nexus_check_rate_limit('audit_fixture', 5, 60), 'CF header did not bypass limiter');
+    unset($_SERVER['HTTP_CF_CONNECTING_IP']);
+    $_SERVER['HTTP_X_FORWARDED_FOR'] = '192.0.2.12';
+    check(nexus_check_rate_limit('audit_fixture', 5, 60), 'Forwarded header did not bypass limiter');
+    $evidence[] = ['finding' => 'WP-RATE-LIMIT', 'sixth_request_blocked' => true, 'same_remote_addr_cf_header_bypass' => true, 'same_remote_addr_xff_header_bypass' => true];
+} else {
+    check(in_array('000000000', array_column($recent, 'user'), true), 'Nine-digit phone was masked');
+    $evidence[] = ['finding' => 'WP-PHONE', 'reproduced' => true, 'recent' => $recent];
+}
 $invalid = call_route('/orders', ['product_id' => 10, 'phone' => 'invalid']);
 check($invalid instanceof WP_Error && $invalid->code === 'invalid_phone', 'Invalid phone control failed');
 $evidence[] = ['control' => 'Invalid phone rejected', 'code' => $invalid->code];
