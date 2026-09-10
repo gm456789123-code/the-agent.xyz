@@ -5,6 +5,7 @@
     "apps/*"
   ],
   "scripts": {
+    "build": "npm run build --workspace=apps/web && node -e \"require('fs').cpSync('apps/web/dist', 'dist', { recursive: true })\"",
     "dev:web": "npm run dev --workspace=apps/web",
     "build:web": "npm run build --workspace=apps/web",
     "dev:webhook": "npm run dev --workspace=apps/webhook-service",
