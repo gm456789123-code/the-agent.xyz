@@ -1,20 +1,13 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import Header from "../components/Header.astro";
 import NetflixHeroSlider from "../components/NetflixHeroSlider.astro";
-import ProductBentoGrid from "../components/ProductBentoGrid.astro";
 import ServerStatusPanel from "../components/ServerStatusPanel.astro";
 import FlashDealCountdown from "../components/FlashDealCountdown.astro";
-import Footer from "../components/Footer.astro";
-import MobileQuickDock from "../components/MobileQuickDock.astro";
-import { getProducts } from "../lib/wp";
 import { liveTransactions, flashDealEndsAt, flashDealPercentOff } from "../data/mock";
 
-const products = await getProducts();
 ---
 
 <BaseLayout title="NEXUS.DEALS — ศูนย์รวมดีลสินค้า & บริการออนไลน์ นายหน้าปลอดภัย 24 ชม.">
-  <Header />
 
   <main class="w-full max-w-[1920px] mx-auto px-3.5 sm:px-6 lg:px-10 xl:px-14 space-y-8 sm:space-y-16 py-3 sm:py-8 pb-28 lg:pb-14 overflow-hidden">
     
@@ -54,7 +47,18 @@ const products = await getProducts();
       
       <!-- Catalog (8 Columns on Desktop, 9 Columns on Ultra-Wide 1920px) -->
       <div class="lg:col-span-8 2xl:col-span-9 w-full max-w-full min-w-0">
-        <ProductBentoGrid products={products} />
+        <div class="grid sm:grid-cols-2 gap-5">
+          <a href="/products" class="aurora-glass aurora-glass-hover rounded-2xl p-6 sm:p-8 border border-purple-400/30">
+            <h2 class="font-display font-black text-2xl sm:text-3xl text-white">สินค้า</h2>
+            <p class="mt-3 text-slate-300">เลือกซื้อแอปสตรีมมิ่ง เกม ซอฟต์แวร์ และบัตรดิจิทัล</p>
+            <span class="inline-block mt-6 font-bold text-purple-300">ดูสินค้าทั้งหมด →</span>
+          </a>
+          <a href="/services" class="aurora-glass aurora-glass-hover rounded-2xl p-6 sm:p-8 border border-pink-400/30">
+            <h2 class="font-display font-black text-2xl sm:text-3xl text-white">บริการ</h2>
+            <p class="mt-3 text-slate-300">เลือกบริการออนไลน์และบูสต์แรงค์จากร้านค้าพันธมิตร</p>
+            <span class="inline-block mt-6 font-bold text-pink-300">ดูบริการทั้งหมด →</span>
+          </a>
+        </div>
       </div>
 
       <!-- Right Sidebar: Flash Deal & System Health (4 Columns on Desktop, 3 Columns on Ultra-Wide 1920px) -->
@@ -137,36 +141,6 @@ const products = await getProducts();
       </div>
     </section>
 
-    <!-- Quick Order Tracking Section (Aurora Container Glass - Mobile Padding Fix) -->
-    <section id="track" class="rounded-2xl sm:rounded-3xl aurora-glass p-6 sm:p-16 shadow-aurora relative overflow-hidden border border-pink-400/40 w-full max-w-full min-w-0">
-      <div class="max-w-3xl mx-auto text-center relative z-10 w-full max-w-full min-w-0">
-        <h2 class="font-display font-black text-2xl sm:text-5xl lg:text-6xl text-white break-words">
-          ตรวจสอบสถานะคำสั่งซื้อ & <span class="aurora-text">สลิปคนกลาง</span>
-        </h2>
-        <p class="text-xs sm:text-xl text-slate-300 mt-2 sm:mt-4 mb-6 sm:mb-10 font-medium break-words">
-          หากคุณชำระเงินแล้ว สามารถใส่เบอร์โทรศัพท์ หรือเลขที่ออเดอร์ เพื่อติดตามสถานะส่งมอบจากร้านค้า
-        </p>
-
-        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-xl mx-auto w-full max-w-full min-w-0">
-          <input
-            type="text"
-            placeholder="กรอกเบอร์โทร หรือ Order ID..."
-            class="flex-1 w-full min-w-0 px-4 py-3 sm:px-6 sm:py-4 text-sm sm:text-xl bg-surface-card border border-pink-400/35 rounded-xl sm:rounded-2xl text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all shadow-inner font-bold"
-          />
-          <button
-            type="button"
-            class="px-6 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl font-display font-black text-sm sm:text-xl aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow flex items-center justify-center gap-2 hover:scale-105 flex-shrink-0 whitespace-nowrap"
-          >
-            <span>ค้นหาออเดอร์</span>
-          </button>
-        </div>
-      </div>
-    </section>
-
   </main>
 
-  <!-- App-Like Mobile Navigation Dock -->
-  <MobileQuickDock />
-
-  <Footer />
 </BaseLayout>

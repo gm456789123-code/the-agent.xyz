@@ -3,55 +3,67 @@ import { mockCategories, type ProductDeal } from "../data/mock";
 
 interface Props {
   products?: ProductDeal[];
+  kind: "products" | "services";
 }
 
-const { products = [] } = Astro.props;
+const { products = [], kind } = Astro.props;
+const isServices = kind === "services";
+const categories = [...mockCategories.filter((cat) => cat.id !== "services"), { id: "vouchers", label: "บัตรดิจิทัล" }];
+const requestedCategory = Astro.url.searchParams.get("category") || "all";
+const activeCategory = !isServices && categories.some((cat) => cat.id === requestedCategory)
+  ? requestedCategory : "all";
+const visibleProducts = products.filter((product) => activeCategory === "all" || product.category === activeCategory);
 ---
 
-<div id="products" class="w-full space-y-6 sm:space-y-8">
+<div id={kind} class="w-full space-y-6 sm:space-y-8">
   
   <!-- Section Title & Filter Pills (Responsive Header) -->
   <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-5 border-b border-white/10 pb-4 sm:pb-6">
     <div>
-      <h2 class="font-display font-black text-2xl sm:text-4xl lg:text-5xl text-white flex items-center gap-2.5 flex-wrap">
-        <span>ดีลสินค้า & บริการออนไลน์ทั้งหมด</span>
-        <span class="text-xs sm:text-base font-black px-3 py-0.5 sm:px-4 sm:py-1 rounded-full bg-pink-500/20 text-pink-300 border border-pink-400/40 shadow-[0_0_15px_rgba(244,114,182,0.4)]">
-          {products.length} ดีลแนะนำ
+      <h2 class="font-display font-black text-xl sm:text-2xl lg:text-3xl text-white flex items-center gap-2.5 flex-wrap">
+        <span>{isServices ? "บริการออนไลน์ทั้งหมด" : "สินค้าทั้งหมด"}</span>
+        <span class="text-[11px] sm:text-sm font-black px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-pink-500/20 text-pink-300 border border-pink-400/40 shadow-[0_0_15px_rgba(244,114,182,0.4)]">
+          {visibleProducts.length} รายการ
         </span>
       </h2>
-      <p class="text-xs sm:text-base lg:text-lg text-slate-300 mt-1.5 sm:mt-2 font-medium">รวมสินค้าและบริการจากร้านค้าพันธมิตรที่ผ่านการคัดสรร ตรวจสอบได้ทุกออโต้ 24 ชั่วโมง</p>
+      <p class="text-xs sm:text-sm text-slate-300 mt-1.5 font-medium">{isServices ? "เลือกบริการออนไลน์และบูสต์แรงค์จากร้านค้าพันธมิตร" : "เลือกซื้อแอปสตรีมมิ่ง เกม ซอฟต์แวร์ และบัตรดิจิทัล"}</p>
     </div>
 
     <!-- Category Filter Tabs (Responsive Mobile Scroll Pills) -->
-    <div class="flex items-center gap-2 sm:gap-2.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+    {!isServices && <div class="flex items-center gap-2 sm:gap-2.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
       {
-        mockCategories.map((cat, idx) => (
-          <button
-            type="button"
+        categories.map((cat) => (
+          <a
+            href={cat.id === "all" ? "/products" : `/products?category=${cat.id}`}
+            aria-current={activeCategory === cat.id ? "true" : undefined}
             class:list={[
-              "px-3.5 py-2 sm:px-5 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-base font-bold whitespace-nowrap transition-all",
-              idx === 0
+              "px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all",
+              activeCategory === cat.id
                 ? "aurora-btn-gradient text-slate-950 shadow-glow scale-105"
                 : "aurora-glass hover:bg-pink-500/15 hover:border-pink-400/50 text-slate-200 hover:text-pink-300",
             ]}
           >
-            {cat.label}
-          </button>
+            {cat.id === "all" ? "สินค้าทั้งหมด" : cat.label}
+          </a>
         ))
       }
-    </div>
+    </div>}
   </div>
+
+  {visibleProducts.length === 0 && (
+    <p class="aurora-glass rounded-2xl p-8 text-center text-slate-300">ยังไม่มีรายการในหมวดนี้</p>
+  )}
 
   <!-- Products Grid: Responsive Cards (1 Column on Mobile, 2 on Tablet, 3 on Laptop, 4 on 1920px Ultra-Wide Desktop) -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 w-full max-w-full min-w-0">
     {
-      products.map((item) => (
+      visibleProducts.map((item) => (
         <div class="group relative rounded-2xl sm:rounded-3xl aurora-glass aurora-glass-hover p-4 sm:p-7 flex flex-col justify-between overflow-hidden border border-white/15 w-full max-w-full min-w-0">
           
           <!-- Card Top: Image & Badges -->
           <div class="w-full max-w-full min-w-0">
             <!-- Proportional Image Frame (100% Full Uncropped Image Display) -->
-            <div class="relative w-full h-44 sm:h-64 lg:h-72 rounded-xl sm:rounded-2xl overflow-hidden bg-slate-950/90 mb-3.5 sm:mb-5 border border-white/15 shadow-inner flex items-center justify-center p-1.5 sm:p-2">
+            <div class="relative w-full h-36 sm:h-48 lg:h-56 rounded-xl sm:rounded-2xl overflow-hidden bg-slate-950/90 mb-3 sm:mb-4 border border-white/15 shadow-inner flex items-center justify-center p-1.5 sm:p-2">
               <!-- Ambient Blurred Backdrop -->
               <img
                 src={item.image}
@@ -97,7 +109,7 @@ const { products = [] } = Astro.props;
             </div>
 
             <!-- Main Title (Responsive Mobile Scale & Break Words) -->
-            <h3 class="font-display font-black text-lg sm:text-2xl lg:text-3xl text-white group-hover:text-pink-300 transition-colors leading-tight drop-shadow-sm break-words min-w-0">
+            <h3 class="font-display font-black text-base sm:text-xl lg:text-2xl text-white group-hover:text-pink-300 transition-colors leading-tight drop-shadow-sm break-words min-w-0">
               {item.title}
             </h3>
 
@@ -119,20 +131,22 @@ const { products = [] } = Astro.props;
                   {item.originalPrice}
                 </div>
               )}
-              <div class="font-display font-black text-xl sm:text-3xl lg:text-4xl text-pink-300 drop-shadow-[0_0_15px_rgba(244,114,182,0.5)] truncate">
+              <div class="font-display font-black text-lg sm:text-2xl lg:text-3xl text-pink-300 drop-shadow-[0_0_15px_rgba(244,114,182,0.5)] truncate">
                 {item.price}
               </div>
             </div>
 
-            <a
-              href={`#order-${item.id}`}
-              class="px-3.5 py-2 sm:px-6 sm:py-3.5 rounded-xl sm:rounded-2xl text-xs sm:text-base font-black bg-surface-card group-hover:aurora-btn-gradient text-white group-hover:text-slate-950 border border-white/15 group-hover:border-pink-400 transition-all flex items-center gap-1.5 group-hover:shadow-[0_0_25px_rgba(244,114,182,0.6)] group-hover:scale-105 flex-shrink-0 whitespace-nowrap"
+            <button
+              type="button"
+              class="js-buy-btn px-3.5 py-2 sm:px-6 sm:py-3.5 rounded-xl sm:rounded-2xl text-xs sm:text-base font-black bg-surface-card group-hover:aurora-btn-gradient text-white group-hover:text-slate-950 border border-white/15 group-hover:border-pink-400 transition-all flex items-center gap-1.5 group-hover:shadow-[0_0_25px_rgba(244,114,182,0.6)] group-hover:scale-105 flex-shrink-0 whitespace-nowrap cursor-pointer"
+              data-product-id={item.id}
+              data-product-title={item.title}
             >
               <span>สั่งซื้อดีลนี้</span>
               <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
               </svg>
-            </a>
+            </button>
           </div>
 
         </div>
@@ -141,3 +155,127 @@ const { products = [] } = Astro.props;
   </div>
 
 </div>
+
+<!-- Buy Order Modal (Creates a Real Order via WordPress REST API) -->
+<div id="buy-modal" class="hidden fixed inset-0 z-50 items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+  <div class="w-full max-w-md rounded-2xl sm:rounded-3xl aurora-glass p-6 sm:p-8 border border-pink-400/40 shadow-aurora">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-display font-black text-lg sm:text-2xl text-white">ยืนยันคำสั่งซื้อ</h3>
+      <button type="button" id="buy-modal-close" class="text-slate-300 hover:text-white text-2xl leading-none cursor-pointer">&times;</button>
+    </div>
+    <p id="buy-modal-product" class="text-sm sm:text-base text-pink-300 font-bold mb-4"></p>
+
+    <form id="buy-modal-form" class="space-y-4">
+      <div>
+        <label class="text-xs sm:text-sm text-slate-300 font-bold" for="buy-modal-phone">เบอร์โทรศัพท์ (สำหรับติดตามออเดอร์)</label>
+        <input
+          id="buy-modal-phone"
+          type="tel"
+          required
+          placeholder="08xxxxxxxx"
+          class="mt-1.5 w-full px-4 py-3 bg-surface-card border border-pink-400/35 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 font-bold"
+        />
+      </div>
+      <p id="buy-modal-error" class="hidden text-xs sm:text-sm text-rose-400 font-bold"></p>
+      <p id="buy-modal-success" class="hidden text-xs sm:text-sm text-emerald-400 font-bold"></p>
+      <button
+        type="submit"
+        id="buy-modal-submit"
+        class="w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-display font-black text-sm sm:text-base aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow"
+      >
+        สร้างคำสั่งซื้อ
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const WP_API_URL = import.meta.env.PUBLIC_WP_API_URL;
+
+  function initBuyModal() {
+    const modal = document.getElementById("buy-modal");
+    const closeBtn = document.getElementById("buy-modal-close");
+    const form = document.getElementById("buy-modal-form") as HTMLFormElement | null;
+    const phoneInput = document.getElementById("buy-modal-phone") as HTMLInputElement | null;
+    const productLabel = document.getElementById("buy-modal-product");
+    const errorEl = document.getElementById("buy-modal-error");
+    const successEl = document.getElementById("buy-modal-success");
+    const submitBtn = document.getElementById("buy-modal-submit") as HTMLButtonElement | null;
+
+    if (!modal || !form || !phoneInput || !productLabel || !errorEl || !successEl || !submitBtn) return;
+
+    let activeProductId = "";
+
+    function openModal(productId: string, productTitle: string) {
+      activeProductId = productId;
+      productLabel!.textContent = productTitle;
+      errorEl!.classList.add("hidden");
+      successEl!.classList.add("hidden");
+      form!.reset();
+      form!.classList.remove("hidden");
+      submitBtn!.disabled = false;
+      modal!.classList.remove("hidden");
+      modal!.classList.add("flex");
+    }
+
+    function closeModal() {
+      modal!.classList.add("hidden");
+      modal!.classList.remove("flex");
+    }
+
+    document.querySelectorAll(".js-buy-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const productId = btn.getAttribute("data-product-id") || "";
+        const productTitle = btn.getAttribute("data-product-title") || "";
+        openModal(productId, productTitle);
+      });
+    });
+
+    closeBtn?.addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorEl!.classList.add("hidden");
+
+      if (!WP_API_URL) {
+        errorEl!.textContent = "ระบบสั่งซื้อยังไม่พร้อมใช้งานในขณะนี้";
+        errorEl!.classList.remove("hidden");
+        return;
+      }
+
+      submitBtn!.disabled = true;
+      submitBtn!.textContent = "กำลังส่งคำสั่งซื้อ...";
+
+      try {
+        const res = await fetch(`${WP_API_URL}/nexus/v1/orders`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ product_id: Number(activeProductId), phone: phoneInput!.value.trim() }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data?.message || "สร้างคำสั่งซื้อไม่สำเร็จ");
+        }
+
+        successEl!.textContent = `สั่งซื้อสำเร็จ! รหัสออเดอร์ของคุณคือ ${data.order_code} (ใช้เบอร์โทรหรือรหัสนี้ตรวจสอบสถานะได้ในหน้าติดตามคำสั่งซื้อ)`;
+        successEl!.classList.remove("hidden");
+        form!.classList.add("hidden");
+      } catch (err) {
+        errorEl!.textContent = err instanceof Error ? err.message : "เกิดข้อผิดพลาด กรุณาลองใหม่";
+        errorEl!.classList.remove("hidden");
+        submitBtn!.disabled = false;
+        submitBtn!.textContent = "สร้างคำสั่งซื้อ";
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initBuyModal);
+  } else {
+    initBuyModal();
+  }
+</script>

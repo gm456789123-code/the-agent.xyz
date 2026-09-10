@@ -42,6 +42,8 @@ services:
       PMA_HOST: mysql
       PMA_USER: ${MYSQL_USER}
       PMA_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
     ports:
       - "${PHPMYADMIN_PORT}:80"
 

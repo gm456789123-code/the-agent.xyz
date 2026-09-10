@@ -1,0 +1,145 @@
+---
+---
+
+<dialog id="order-tracking-modal" aria-labelledby="order-tracking-title" aria-describedby="order-tracking-description" class="m-auto w-[calc(100%-2rem)] max-w-xl max-h-[85dvh] overflow-y-auto rounded-2xl sm:rounded-3xl border border-pink-400/40 bg-[#0a1124] p-5 sm:p-8 text-white shadow-aurora">
+  <div class="flex items-start justify-between gap-4">
+    <h2 id="order-tracking-title" class="font-display font-black text-xl sm:text-3xl">เช็คสถานะ<span class="aurora-text">ออเดอร์</span></h2>
+    <button id="track-close" type="button" aria-label="ปิดหน้าต่างเช็คสถานะออเดอร์" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/15 text-2xl text-slate-300 hover:bg-white/10 hover:text-white">×</button>
+  </div>
+  <p id="order-tracking-description" class="mt-3 text-sm text-slate-300">กรอกเบอร์โทรศัพท์หรือเลขออเดอร์ เพื่อติดตามสถานะคำสั่งซื้อของคุณ</p>
+  <form id="track-form" class="mt-6 space-y-3">
+    <label for="track-input" class="block text-sm font-bold text-slate-200">เบอร์โทรศัพท์หรือเลขออเดอร์</label>
+    <input id="track-input" type="text" required autofocus placeholder="08xxxxxxxx หรือ NX-XXXXXX" class="w-full min-w-0 rounded-xl border border-pink-400/35 bg-surface-card px-4 py-3 text-base text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-pink-500/40" />
+    <button id="track-submit" type="submit" class="w-full rounded-xl aurora-btn-gradient px-5 py-3 font-bold text-slate-950 disabled:opacity-50 disabled:cursor-wait">ค้นหาออเดอร์</button>
+  </form>
+  <div id="track-results" role="status" aria-live="polite" aria-atomic="true" class="mt-5 space-y-3 text-sm"></div>
+</dialog>
+
+<style>
+  dialog::backdrop { background: rgb(0 0 0 / 0.75); backdrop-filter: blur(6px); }
+</style>
+
+<script>
+  const dialog = document.getElementById("order-tracking-modal") as HTMLDialogElement;
+  const form = document.getElementById("track-form") as HTMLFormElement;
+  const input = document.getElementById("track-input") as HTMLInputElement;
+  const submit = document.getElementById("track-submit") as HTMLButtonElement;
+  const results = document.getElementById("track-results")!;
+  const apiUrl = import.meta.env.PUBLIC_WP_API_URL;
+  const statuses: Record<string, string> = {
+    pending_payment: "รอชำระเงิน",
+    paid: "ชำระเงินแล้ว กำลังจัดส่ง",
+    delivered: "จัดส่งสำเร็จ",
+    cancelled: "ยกเลิกคำสั่งซื้อ",
+  };
+  let request: AbortController | undefined;
+  let opener: HTMLElement | null = null;
+  let previousOverflow = "";
+
+  function openTracking(trigger: HTMLElement | null = null) {
+    if (dialog.open) return;
+    opener = trigger;
+    previousOverflow = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    dialog.showModal();
+    input.focus();
+  }
+
+  document.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) return;
+    const trigger = event.target.closest<HTMLElement>('[data-order-tracking]');
+    if (!trigger) return;
+    event.preventDefault();
+    openTracking(trigger);
+  });
+  document.getElementById("track-close")!.addEventListener("click", () => dialog.close());
+  dialog.addEventListener("click", (event) => {
+    if (event.target !== dialog) return;
+    const bounds = dialog.getBoundingClientRect();
+    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
+  });
+  dialog.addEventListener("close", () => {
+    request?.abort();
+    request = undefined;
+    document.documentElement.style.overflow = previousOverflow;
+    form.reset();
+    results.replaceChildren();
+    submit.disabled = false;
+    results.removeAttribute("aria-busy");
+    if (location.hash === "#track") history.replaceState(null, "", location.pathname + location.search);
+    if (opener?.getClientRects().length) opener.focus({ preventScroll: true });
+    else document.querySelector<HTMLButtonElement>("#mobile-menu-toggle")?.focus({ preventScroll: true });
+  });
+  function openFromHash() {
+    if (location.hash === "#track") openTracking();
+  }
+  window.addEventListener("hashchange", openFromHash);
+  openFromHash();
+
+  function showMessage(message: string, error = false) {
+    const paragraph = document.createElement("p");
+    paragraph.className = error ? "text-rose-300 font-bold" : "text-slate-300";
+    paragraph.textContent = message;
+    results.replaceChildren(paragraph);
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const query = input.value.trim();
+    if (!query) {
+      showMessage("กรุณากรอกเบอร์โทรศัพท์หรือเลขออเดอร์", true);
+      input.focus();
+      return;
+    }
+    if (!apiUrl) {
+      showMessage("ระบบตรวจสอบออเดอร์ยังไม่พร้อมใช้งาน", true);
+      return;
+    }
+    request?.abort();
+    const current = new AbortController();
+    request = current;
+    const timeout = window.setTimeout(() => current.abort(), 15000);
+    submit.disabled = true;
+    results.setAttribute("aria-busy", "true");
+    showMessage("กำลังค้นหา...");
+    try {
+      const response = await fetch(`${apiUrl}/nexus/v1/orders/track?query=${encodeURIComponent(query)}`, { signal: current.signal });
+      const orders = await response.json();
+      if (!response.ok) throw new Error(typeof orders?.message === "string" ? orders.message : "ค้นหาออเดอร์ไม่สำเร็จ");
+      if (!Array.isArray(orders)) throw new Error("ข้อมูลออเดอร์ไม่ถูกต้อง กรุณาลองใหม่");
+      if (request !== current) return;
+      if (!orders.length) {
+        showMessage("ไม่พบคำสั่งซื้อ กรุณาตรวจสอบเบอร์โทรศัพท์หรือเลขออเดอร์");
+        return;
+      }
+      const cards = orders.map((order) => {
+        const card = document.createElement("article");
+        card.className = "rounded-xl border border-pink-400/30 bg-surface-card p-4 space-y-2 break-words";
+        for (const [value, className] of [
+          [order.order_code, "text-pink-300 font-black"],
+          [order.product_title, "text-white font-bold"],
+          [order.created_at, "text-slate-400 text-xs"],
+          [`฿${order.amount}`, "text-pink-300 font-bold"],
+          [statuses[order.status] || order.status, "text-emerald-300 font-bold"],
+        ]) {
+          const line = document.createElement("p");
+          line.className = className;
+          line.textContent = String(value ?? "");
+          card.append(line);
+        }
+        return card;
+      });
+      results.replaceChildren(...cards);
+    } catch (error) {
+      if (request !== current) return;
+      showMessage(current.signal.aborted ? "การค้นหาใช้เวลานานเกินไป กรุณาลองใหม่" : error instanceof Error ? error.message : "เกิดข้อผิดพลาด กรุณาลองใหม่", true);
+    } finally {
+      window.clearTimeout(timeout);
+      if (request === current) {
+        submit.disabled = false;
+        results.removeAttribute("aria-busy");
+        request = undefined;
+      }
+    }
+  });
+</script>

@@ -15,3 +15,8 @@ Thumbs.db
 .claude/
 
 npm-debug.log*
+
+# Sensitive & local dev files
+Z-no_push
+docker/phpmyadmin/
+

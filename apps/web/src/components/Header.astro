@@ -1,58 +1,61 @@
 ---
 const navLinks = [
   { label: "หน้าแรก", href: "/" },
-  { label: "ดีลสินค้า & บริการ", href: "#products" },
+  { label: "สินค้า", href: "/products" },
+  { label: "บริการ", href: "/services" },
   { label: "เช็คสถานะออเดอร์", href: "#track" },
-  { label: "วิธีสั่งซื้อผ่านนายหน้า", href: "#how-it-works" },
+  { label: "วิธีสั่งซื้อผ่านนายหน้า", href: "/#how-it-works" },
 ];
+const pathname = Astro.url.pathname.replace(/\/$/, "") || "/";
 ---
 
 <header class="w-full border-b border-white/10 bg-background/85 backdrop-blur-2xl sticky top-0 z-50 shadow-glass">
   <div class="w-full max-w-[1920px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-14">
-    <div class="flex items-center justify-between h-16 sm:h-20 lg:h-22 gap-2">
-      
+    <div class="flex items-center justify-between h-14 sm:h-16 lg:h-20 gap-2">
+
       <!-- Brand Logo: Tri-Color Pastel Aurora Badge -->
-      <a href="/" class="flex items-center gap-2 sm:gap-3 flex-shrink-0 group">
-        <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-pink-400 via-purple-400 to-sky-300 flex items-center justify-center font-display font-black text-slate-950 text-base sm:text-2xl shadow-[0_0_20px_rgba(244,114,182,0.5)] group-hover:scale-105 transition-transform duration-300">
+      <a href="/" class="flex items-center gap-2 sm:gap-2.5 flex-shrink-0 group">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-tr from-pink-400 via-purple-400 to-sky-300 flex items-center justify-center font-display font-black text-slate-950 text-sm sm:text-xl shadow-[0_0_20px_rgba(244,114,182,0.5)] group-hover:scale-105 transition-transform duration-300">
           N
         </div>
         <div class="flex flex-col">
-          <div class="font-display font-black text-base sm:text-2xl lg:text-3xl tracking-wider text-white group-hover:text-pink-300 transition-colors leading-none">
+          <div class="font-display font-black text-sm sm:text-lg lg:text-xl tracking-wider text-white group-hover:text-pink-300 transition-colors leading-none">
             NEXUS<span class="aurora-text">.DEALS</span>
           </div>
-          <div class="text-[9px] sm:text-xs font-black tracking-widest text-purple-300 mt-0.5 uppercase flex items-center gap-1">
+          <div class="text-[8px] sm:text-[10px] font-black tracking-widest text-purple-300 mt-0.5 uppercase flex items-center gap-1">
             <span>Broker Hub</span>
-            <span class="px-1 py-0.2 rounded bg-pink-500/25 text-pink-200 text-[8px] sm:text-xs border border-pink-400/40">VIP</span>
+            <span class="px-1 py-0.2 rounded bg-pink-500/25 text-pink-200 text-[7px] sm:text-[10px] border border-pink-400/40">VIP</span>
           </div>
         </div>
       </a>
 
       <!-- Quick Search Bar (Desktop Wide) -->
-      <div class="hidden md:flex flex-1 max-w-xl lg:max-w-2xl mx-6">
+      <div class="hidden 2xl:flex flex-1 max-w-lg lg:max-w-xl mx-4 lg:mx-6">
         <div class="relative w-full">
-          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-pink-300">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-pink-300">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
           <input
             type="text"
             placeholder="ค้นหาดีล, สตรีมมิ่ง, เติมเกม หรือซอฟต์แวร์..."
-            class="w-full pl-11 pr-14 py-3 text-base sm:text-lg bg-surface-card border border-pink-400/30 rounded-2xl text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all shadow-inner font-bold"
+            class="w-full pl-10 pr-12 py-2 text-sm bg-surface-card border border-pink-400/30 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all shadow-inner font-bold"
           />
-          <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center">
-            <kbd class="hidden sm:inline-block px-2.5 py-1 text-xs font-mono text-pink-300 font-bold bg-pink-500/20 border border-pink-500/40 rounded-lg">⌘K</kbd>
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+            <kbd class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-mono text-pink-300 font-bold bg-pink-500/20 border border-pink-500/40 rounded-md">⌘K</kbd>
           </div>
         </div>
       </div>
 
       <!-- Desktop Navigation Links -->
-      <nav class="hidden lg:flex items-center gap-8">
+      <nav class="hidden lg:flex items-center gap-5">
         {
           navLinks.map((link) => (
             <a
-              href={link.href}
-              class="text-lg font-bold text-slate-200 hover:text-pink-300 hover:drop-shadow-[0_0_15px_rgba(244,114,182,0.8)] transition-all"
+              href={link.href} data-order-tracking={link.href === "#track" ? "" : undefined} aria-haspopup={link.href === "#track" ? "dialog" : undefined} aria-controls={link.href === "#track" ? "order-tracking-modal" : undefined}
+              aria-current={pathname === link.href ? "page" : undefined}
+              class="text-sm font-bold text-slate-200 hover:text-pink-300 hover:drop-shadow-[0_0_15px_rgba(244,114,182,0.8)] transition-all whitespace-nowrap"
             >
               {link.label}
             </a>
@@ -61,19 +64,19 @@ const navLinks = [
       </nav>
 
       <!-- Right Actions: Status & Member -->
-      <div class="flex items-center gap-2 sm:gap-3.5">
+      <div class="flex items-center gap-1.5 sm:gap-2.5">
         <!-- Live Agent Status Pill (Desktop & Tablet) -->
-        <div class="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-card border border-emerald-500/40 text-emerald-300 text-xs sm:text-base font-black shadow-[0_0_15px_rgba(52,211,153,0.25)]">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 live-dot"></span>
-          <span>Agent ออนไลน์: <strong class="text-white font-black">8/10</strong></span>
+        <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-card border border-emerald-500/40 text-emerald-300 text-xs font-black shadow-[0_0_15px_rgba(52,211,153,0.25)] whitespace-nowrap">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 live-dot"></span>
+          <span>Agent: <strong class="text-white font-black">8/10</strong></span>
         </div>
 
         <!-- Order Track Button (Desktop) -->
         <a
-          href="#track"
-          class="hidden md:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-base font-black bg-surface-card border border-white/15 text-white hover:border-pink-400/50 hover:text-pink-300 transition-all shadow-subtle"
+          href="#track" data-order-tracking aria-haspopup="dialog" aria-controls="order-tracking-modal"
+          class="hidden md:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-black bg-surface-card border border-white/15 text-white hover:border-pink-400/50 hover:text-pink-300 transition-all shadow-subtle whitespace-nowrap"
         >
-          <svg class="w-4 h-4 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg class="w-3.5 h-3.5 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span>เช็คสลิป</span>
@@ -82,7 +85,7 @@ const navLinks = [
         <!-- Login Button -->
         <a
           href="#login"
-          class="px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-base font-black aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow flex items-center gap-1.5 hover:scale-105 whitespace-nowrap"
+          class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs font-black aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow flex items-center gap-1.5 hover:scale-105 whitespace-nowrap"
         >
           <span>เข้าสู่ระบบ</span>
         </a>
@@ -92,12 +95,12 @@ const navLinks = [
           id="mobile-menu-toggle"
           type="button"
           aria-label="Toggle Mobile Navigation Menu"
-          class="lg:hidden p-2 rounded-xl bg-surface-card border border-white/15 text-slate-300 hover:text-white hover:border-pink-400/50 transition-all"
+          class="lg:hidden p-1.5 rounded-lg bg-surface-card border border-white/15 text-slate-300 hover:text-white hover:border-pink-400/50 transition-all"
         >
-          <svg id="hamburger-icon" class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg id="hamburger-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
-          <svg id="close-icon" class="w-5 h-5 sm:w-6 sm:h-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg id="close-icon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
@@ -139,7 +142,8 @@ const navLinks = [
       {
         navLinks.map((link) => (
           <a
-            href={link.href}
+            href={link.href} data-order-tracking={link.href === "#track" ? "" : undefined} aria-haspopup={link.href === "#track" ? "dialog" : undefined} aria-controls={link.href === "#track" ? "order-tracking-modal" : undefined}
+            aria-current={pathname === link.href ? "page" : undefined}
             class="px-4 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors flex items-center justify-between"
           >
             <span>{link.label}</span>
@@ -154,7 +158,7 @@ const navLinks = [
     <!-- Mobile Action CTAs -->
     <div class="pt-2 grid grid-cols-2 gap-2 border-t border-white/10">
       <a
-        href="#track"
+        href="#track" data-order-tracking aria-haspopup="dialog" aria-controls="order-tracking-modal"
         class="w-full py-3 rounded-xl text-xs sm:text-sm font-bold bg-surface-card border border-white/15 text-white flex items-center justify-center gap-1.5"
       >
         <svg class="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -172,6 +176,10 @@ const navLinks = [
     </div>
   </div>
 </header>
+
+<style>
+  nav a[aria-current="page"] { color: #f9a8d4; }
+</style>
 
 <!-- Mobile Navigation Drawer Toggle Script -->
 <script>

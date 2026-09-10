@@ -1,0 +1,18 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ProductBentoGrid from "../components/ProductBentoGrid.astro";
+import { getProducts } from "../lib/wp";
+
+const services = (await getProducts()).filter((item) => item.category === "services");
+---
+
+<BaseLayout title="บริการ — NEXUS.DEALS">
+  <main class="w-full max-w-[1920px] mx-auto px-3.5 sm:px-6 lg:px-10 xl:px-14 py-8 sm:py-12 pb-28 lg:pb-14 space-y-8">
+    <div>
+      <p class="text-pink-300 font-bold text-sm">NEXUS.DEALS / บริการ</p>
+      <h1 class="font-display font-black text-3xl sm:text-5xl mt-3">เลือก<span class="aurora-text">บริการออนไลน์</span></h1>
+      <a href="/products" class="inline-block mt-4 text-purple-300 hover:text-white">กำลังมองหาสินค้าดิจิทัล? ดูสินค้าทั้งหมด →</a>
+    </div>
+    <ProductBentoGrid products={services} kind="services" />
+  </main>
+</BaseLayout>
