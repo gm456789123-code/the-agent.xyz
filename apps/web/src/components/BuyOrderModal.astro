@@ -1,0 +1,123 @@
+<!-- Buy Order Modal (Creates a Real Order via WordPress REST API) -->
+<div id="buy-modal" class="hidden fixed inset-0 z-50 items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+  <div class="w-full max-w-md rounded-2xl sm:rounded-3xl aurora-glass p-6 sm:p-8 border border-pink-400/40 shadow-aurora">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-display font-black text-lg sm:text-2xl text-white">ยืนยันคำสั่งซื้อ</h3>
+      <button type="button" id="buy-modal-close" class="text-slate-300 hover:text-white text-2xl leading-none cursor-pointer">&times;</button>
+    </div>
+    <p id="buy-modal-product" class="text-sm sm:text-base text-pink-300 font-bold mb-4"></p>
+
+    <form id="buy-modal-form" class="space-y-4">
+      <div>
+        <label class="text-xs sm:text-sm text-slate-300 font-bold" for="buy-modal-phone">เบอร์โทรศัพท์ (สำหรับติดตามออเดอร์)</label>
+        <input
+          id="buy-modal-phone"
+          type="tel"
+          required
+          placeholder="08xxxxxxxx"
+          class="mt-1.5 w-full px-4 py-3 bg-surface-card border border-pink-400/35 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 font-bold"
+        />
+      </div>
+      <p id="buy-modal-error" class="hidden text-xs sm:text-sm text-rose-400 font-bold"></p>
+      <p id="buy-modal-success" class="hidden text-xs sm:text-sm text-emerald-400 font-bold"></p>
+      <button
+        type="submit"
+        id="buy-modal-submit"
+        class="w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-display font-black text-sm sm:text-base aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow"
+      >
+        สร้างคำสั่งซื้อ
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const WP_API_URL = import.meta.env.PUBLIC_WP_API_URL;
+
+  function initBuyModal() {
+    const modal = document.getElementById("buy-modal");
+    const closeBtn = document.getElementById("buy-modal-close");
+    const form = document.getElementById("buy-modal-form") as HTMLFormElement | null;
+    const phoneInput = document.getElementById("buy-modal-phone") as HTMLInputElement | null;
+    const productLabel = document.getElementById("buy-modal-product");
+    const errorEl = document.getElementById("buy-modal-error");
+    const successEl = document.getElementById("buy-modal-success");
+    const submitBtn = document.getElementById("buy-modal-submit") as HTMLButtonElement | null;
+
+    if (!modal || !form || !phoneInput || !productLabel || !errorEl || !successEl || !submitBtn) return;
+
+    let activeProductId = "";
+
+    function openModal(productId: string, productTitle: string) {
+      activeProductId = productId;
+      productLabel!.textContent = productTitle;
+      errorEl!.classList.add("hidden");
+      successEl!.classList.add("hidden");
+      form!.reset();
+      form!.classList.remove("hidden");
+      submitBtn!.disabled = false;
+      modal!.classList.remove("hidden");
+      modal!.classList.add("flex");
+    }
+
+    function closeModal() {
+      modal!.classList.add("hidden");
+      modal!.classList.remove("flex");
+    }
+
+    document.querySelectorAll(".js-buy-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const productId = btn.getAttribute("data-product-id") || "";
+        const productTitle = btn.getAttribute("data-product-title") || "";
+        openModal(productId, productTitle);
+      });
+    });
+
+    closeBtn?.addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorEl!.classList.add("hidden");
+
+      if (!WP_API_URL) {
+        errorEl!.textContent = "ระบบสั่งซื้อยังไม่พร้อมใช้งานในขณะนี้";
+        errorEl!.classList.remove("hidden");
+        return;
+      }
+
+      submitBtn!.disabled = true;
+      submitBtn!.textContent = "กำลังส่งคำสั่งซื้อ...";
+
+      try {
+        const res = await fetch(`${WP_API_URL}/nexus/v1/orders`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ product_id: Number(activeProductId), phone: phoneInput!.value.trim() }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data?.message || "สร้างคำสั่งซื้อไม่สำเร็จ");
+        }
+
+        successEl!.textContent = `สั่งซื้อสำเร็จ! รหัสออเดอร์ของคุณคือ ${data.order_code} (ใช้เบอร์โทรหรือรหัสนี้ตรวจสอบสถานะได้ในหน้าติดตามคำสั่งซื้อ)`;
+        successEl!.classList.remove("hidden");
+        form!.classList.add("hidden");
+      } catch (err) {
+        errorEl!.textContent = err instanceof Error ? err.message : "เกิดข้อผิดพลาด กรุณาลองใหม่";
+        errorEl!.classList.remove("hidden");
+        submitBtn!.disabled = false;
+        submitBtn!.textContent = "สร้างคำสั่งซื้อ";
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initBuyModal);
+  } else {
+    initBuyModal();
+  }
+</script>

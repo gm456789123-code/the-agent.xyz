@@ -1,0 +1,87 @@
+---
+import type { ProductDeal } from "../data/mock";
+import ProductCard from "./ProductCard.astro";
+import BuyOrderModal from "./BuyOrderModal.astro";
+import ProductTagFilter from "./ProductTagFilter.astro";
+import { getProductTags } from "../lib/wp";
+interface ProductSection { products: ProductDeal[]; unavailable: boolean }
+interface Props { featured: ProductSection; latest: ProductSection }
+const { featured, latest } = Astro.props;
+const tags = await getProductTags();
+---
+
+<section id="featured-products" class="space-y-6 w-full min-w-0" aria-labelledby="featured-title">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <p class="text-sm text-purple-300 font-bold">คัดสรรโดยแอดมิน</p>
+      <h2 id="featured-title" class="font-display font-black text-2xl sm:text-4xl mt-2">สินค้า<span class="aurora-text">แนะนำ</span></h2>
+    </div>
+    <a href="/products" class="text-pink-300 hover:text-white font-bold text-sm">ดูสินค้าทั้งหมด →</a>
+  </div>
+  <ProductTagFilter tags={tags} gridId="featured-grid" countId="featured-count" emptyId="featured-empty" />
+  <p id="featured-count" role="status" aria-live="polite" class="text-sm text-slate-400">{featured.products.length} รายการ</p>
+  <div id="featured-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+    {featured.products.map((item) => (
+      <div data-featured-item data-product-tag-ids={(item.tagIds || []).join(" ")} class="min-w-0"><ProductCard item={item} /></div>
+    ))}
+  </div>
+  <p id="featured-empty" hidden={featured.products.length > 0} class="rounded-2xl border border-white/10 p-6 text-slate-300 text-center">
+    {featured.unavailable ? "ไม่สามารถโหลดสินค้าแนะนำได้ กรุณาลองใหม่ภายหลัง" : "ยังไม่มีสินค้าแนะนำในหมวดหมู่นี้"}
+  </p>
+</section>
+
+<section id="latest-products" class="space-y-6 w-full min-w-0" aria-labelledby="latest-title">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <p class="text-sm text-pink-300 font-bold">อัปเดตใหม่</p>
+      <h2 id="latest-title" class="font-display font-black text-2xl sm:text-4xl mt-2">สินค้า<span class="aurora-text">ล่าสุด</span></h2>
+    </div>
+    {latest.products.length > 0 && (
+      <div class="flex gap-2" aria-label="เลื่อนสินค้าล่าสุด">
+        <button type="button" id="latest-prev" aria-label="สินค้าล่าสุดก่อนหน้า" aria-controls="latest-track" disabled class="rounded-xl border border-purple-400/40 px-4 py-2 text-purple-300 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed">←</button>
+        <button type="button" id="latest-next" aria-label="สินค้าล่าสุดถัดไป" aria-controls="latest-track" class="rounded-xl border border-pink-400/40 px-4 py-2 text-pink-300 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed">→</button>
+      </div>
+    )}
+  </div>
+  {latest.products.length ? (
+    <div id="latest-track" class="latest-track" tabindex="0" role="region" aria-label="สินค้าล่าสุด เลื่อนเพื่อดูรายการเพิ่มเติม">
+      {latest.products.map((item) => (
+        <div class="latest-item min-w-0"><ProductCard item={item} /></div>
+      ))}
+    </div>
+  ) : (
+    <p class="rounded-2xl border border-white/10 p-6 text-slate-300 text-center">{latest.unavailable ? "ไม่สามารถโหลดสินค้าล่าสุดได้ กรุณาลองใหม่ภายหลัง" : "ยังไม่มีสินค้าที่เผยแพร่"}</p>
+  )}
+</section>
+
+<BuyOrderModal />
+
+<style>
+  [data-featured-item] :global(.group), .latest-item :global(.group) { height: 100%; }
+  .latest-track { display: grid; grid-auto-flow: column; grid-auto-columns: 86%; gap: 1rem; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; padding-bottom: 1rem; }
+  .latest-item { scroll-snap-align: start; }
+  @media (min-width: 768px) { .latest-track { grid-auto-columns: calc((100% - 1.5rem) / 2); gap: 1.5rem; } }
+  @media (min-width: 1280px) { .latest-track { grid-auto-columns: calc((100% - 3rem) / 3); } }
+</style>
+
+<script>
+  const track = document.getElementById("latest-track");
+  const previous = document.getElementById("latest-prev") as HTMLButtonElement | null;
+  const next = document.getElementById("latest-next") as HTMLButtonElement | null;
+  if (track && previous && next) {
+    const updateControls = () => {
+      previous.disabled = track.scrollLeft <= 1;
+      next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+    };
+    const move = (direction: number) => {
+      const card = track.firstElementChild as HTMLElement;
+      const distance = card.getBoundingClientRect().width + parseFloat(getComputedStyle(track).columnGap);
+      track.scrollBy({ left: direction * distance, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+    };
+    previous.addEventListener("click", () => move(-1));
+    next.addEventListener("click", () => move(1));
+    track.addEventListener("scroll", updateControls, { passive: true });
+    new ResizeObserver(updateControls).observe(track);
+    updateControls();
+  }
+</script>

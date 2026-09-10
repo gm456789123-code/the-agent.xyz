@@ -1,0 +1,66 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="เข้าสู่ระบบ — NEXUS.DEALS">
+  <main class="w-full max-w-6xl mx-auto px-4 sm:px-8 py-10 sm:py-16 pb-28 lg:pb-16">
+    <div class="grid lg:grid-cols-2 items-center gap-10 lg:gap-16">
+      <section class="min-w-0">
+        <a href="/" class="inline-flex items-center gap-2 text-sm font-bold text-purple-300 hover:text-white">← กลับหน้าแรก</a>
+        <p class="mt-8 text-xs font-black tracking-[0.2em] text-pink-300">WELCOME TO NEXUS</p>
+        <h1 class="mt-4 font-display font-black text-4xl sm:text-5xl lg:text-6xl leading-tight">ยินดีต้อนรับ<br /><span class="aurora-text">กลับมาอีกครั้ง</span></h1>
+        <p class="mt-5 max-w-md text-base sm:text-lg leading-relaxed text-slate-300">เข้าสู่ระบบเพื่อเริ่มต้นใช้งานบัญชีของคุณกับ NEXUS.DEALS</p>
+        <div class="mt-8 flex flex-wrap gap-3 text-sm font-bold">
+          <a href="/products" class="rounded-xl border border-purple-400/30 bg-purple-500/10 px-4 py-3 text-purple-200 hover:bg-purple-500/20">เลือกซื้อสินค้า →</a>
+          <a href="/services" class="rounded-xl border border-pink-400/30 bg-pink-500/10 px-4 py-3 text-pink-200 hover:bg-pink-500/20">ดูบริการออนไลน์ →</a>
+        </div>
+      </section>
+
+      <section class="min-w-0 aurora-glass rounded-3xl border border-purple-400/30 p-6 sm:p-9 shadow-aurora" aria-labelledby="login-title">
+        <div class="flex items-center gap-3">
+          <div class="h-11 w-11 rounded-xl aurora-btn-gradient flex items-center justify-center text-slate-950" aria-hidden="true">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11V7a5 5 0 0110 0v4m-11 0h12a1 1 0 011 1v8a1 1 0 01-1 1H6a1 1 0 01-1-1v-8a1 1 0 011-1zm6 4v2" /></svg>
+          </div>
+          <div>
+            <h2 id="login-title" class="font-display font-black text-2xl text-white">เข้าสู่ระบบ</h2>
+            <p class="mt-1 text-sm text-slate-400">กรอกข้อมูลบัญชีของคุณ</p>
+          </div>
+        </div>
+        <form id="login-form" method="post" class="mt-8 space-y-5">
+          <div>
+            <label for="login-username" class="block text-sm font-bold text-slate-200 mb-2">อีเมลหรือชื่อผู้ใช้</label>
+            <input id="login-username" name="log" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required placeholder="อีเมลหรือชื่อผู้ใช้ของคุณ" class="w-full min-w-0 rounded-xl border border-white/20 bg-surface-card px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-500/30" />
+          </div>
+          <div>
+            <label for="login-password" class="block text-sm font-bold text-slate-200 mb-2">รหัสผ่าน</label>
+            <div class="relative">
+              <input id="login-password" name="pwd" type="password" autocomplete="current-password" required placeholder="กรอกรหัสผ่าน" class="w-full min-w-0 rounded-xl border border-white/20 bg-surface-card pl-4 pr-20 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-500/30" />
+              <button id="toggle-password" type="button" aria-controls="login-password" aria-pressed="false" aria-label="แสดงรหัสผ่าน" class="absolute inset-y-0 right-0 px-4 text-sm font-bold text-purple-300 hover:text-white">แสดง</button>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center justify-between gap-3 text-sm">
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" name="rememberme" value="forever" class="h-4 w-4 accent-purple-400" />จดจำการเข้าสู่ระบบ</label>
+            <a id="forgot-password" class="text-pink-300 hover:text-white font-bold">ลืมรหัสผ่าน?</a>
+          </div>
+          <p id="login-message" role="alert" class="hidden text-sm text-rose-300"></p>
+          <button id="login-submit" type="submit" class="w-full rounded-xl aurora-btn-gradient px-5 py-3.5 text-base font-black text-white disabled:opacity-50 disabled:cursor-wait">เข้าสู่ระบบ</button>
+        </form>
+        <div class="mt-6 border-t border-white/10 pt-5 text-center text-sm text-slate-400">
+          มีปัญหาในการเข้าสู่ระบบ? <a href="https://line.me" target="_blank" rel="noopener noreferrer" class="text-purple-300 hover:text-white font-bold">ติดต่อแอดมิน</a>
+        </div>
+      </section>
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  const password = document.getElementById("login-password") as HTMLInputElement;
+  const toggle = document.getElementById("toggle-password") as HTMLButtonElement;
+  toggle.addEventListener("click", () => {
+    const visible = password.type === "password";
+    password.type = visible ? "text" : "password";
+    toggle.textContent = visible ? "ซ่อน" : "แสดง";
+    toggle.setAttribute("aria-pressed", String(visible));
+    toggle.setAttribute("aria-label", visible ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน");
+  });
+</script>

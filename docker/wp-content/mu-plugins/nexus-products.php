@@ -19,6 +19,26 @@ add_action('init', function () {
         'menu_icon' => 'dashicons-cart',
     ]);
 
+    register_taxonomy('nexus_product_tag', ['product'], [
+        'labels' => [
+            'name' => 'แท็กสินค้า',
+            'singular_name' => 'แท็กสินค้า',
+            'menu_name' => 'แท็กสินค้า',
+            'add_new_item' => 'เพิ่มแท็กสินค้าใหม่',
+            'edit_item' => 'แก้ไขแท็กสินค้า',
+            'search_items' => 'ค้นหาแท็กสินค้า',
+            'all_items' => 'แท็กสินค้าทั้งหมด',
+            'separate_items_with_commas' => 'แยกแท็กด้วยเครื่องหมายจุลภาค (,)',
+        ],
+        'public' => true,
+        'hierarchical' => false,
+        'show_ui' => true,
+        'show_admin_column' => true,
+        'show_in_rest' => true,
+        'rest_base' => 'product-tags',
+        'rewrite' => false,
+    ]);
+
     register_post_meta('product', 'price', [
         'type' => 'number',
         'single' => true,
@@ -89,33 +109,89 @@ add_action('rest_api_init', function () {
             $products = get_posts([
                 'post_type' => 'product',
                 'post_status' => 'publish',
-                'numberposts' => 8,
-                'orderby' => 'menu_order',
-                'order' => 'ASC',
-                'meta_query' => [[
+                'numberposts' => 9,
+                'orderby' => ['menu_order' => 'ASC', 'date' => 'DESC', 'ID' => 'DESC'],
+                'meta_query' => ['relation' => 'AND', [
                     'key' => 'featured_home',
                     'value' => '1',
                     'compare' => '=',
-                ]],
+                ], nexus_home_product_categories()],
             ]);
 
-            return array_map(function ($post) {
-                $image_id = get_post_thumbnail_id($post->ID);
-                return [
-                    'id' => $post->ID,
-                    'title' => ['rendered' => $post->post_title],
-                    'excerpt' => ['rendered' => $post->post_excerpt],
-                    'meta' => [
-                        'price' => (float) get_post_meta($post->ID, 'price', true),
-                        'category' => get_post_meta($post->ID, 'category', true),
-                        'store_name' => get_post_meta($post->ID, 'store_name', true),
-                        'unit' => get_post_meta($post->ID, 'unit', true),
-                    ],
-                    'featured_image_url' => $image_id ? wp_get_attachment_image_url($image_id, 'large') : null,
-                ];
-            }, $products);
+            return array_map('nexus_home_product_response', $products);
         },
     ]);
+
+    register_rest_route('nexus/v1', '/products/latest', [
+        'methods' => 'GET',
+        'permission_callback' => '__return_true',
+        'callback' => function () {
+            return array_map('nexus_home_product_response', get_posts([
+                'post_type' => 'product',
+                'post_status' => 'publish',
+                'numberposts' => 6,
+                'orderby' => ['date' => 'DESC', 'ID' => 'DESC'],
+                'meta_query' => [nexus_home_product_categories()],
+            ]));
+        },
+    ]);
+});
+
+function nexus_home_product_categories() {
+    return [
+        'relation' => 'OR',
+        ['key' => 'category', 'value' => 'services', 'compare' => '!='],
+        ['key' => 'category', 'compare' => 'NOT EXISTS'],
+    ];
+}
+
+function nexus_home_product_response($post) {
+    $image_id = get_post_thumbnail_id($post->ID);
+    $tag_ids = wp_get_object_terms($post->ID, 'nexus_product_tag', ['fields' => 'ids']);
+    return [
+        'id' => $post->ID,
+        'product-tags' => is_wp_error($tag_ids) ? [] : $tag_ids,
+        'title' => ['rendered' => $post->post_title],
+        'excerpt' => ['rendered' => $post->post_excerpt],
+        'meta' => [
+            'price' => (float) get_post_meta($post->ID, 'price', true),
+            'category' => get_post_meta($post->ID, 'category', true),
+            'store_name' => get_post_meta($post->ID, 'store_name', true),
+            'unit' => get_post_meta($post->ID, 'unit', true),
+        ],
+        'featured_image_url' => $image_id ? wp_get_attachment_image_url($image_id, 'large') : null,
+    ];
+}
+
+// One-time migration: preserve the existing filter labels and assignments.
+// Subsequent admin edits/removals are never overwritten.
+function nexus_migrate_product_tags() {
+    if (get_option('nexus_product_tags_version') === '1') return;
+    $defaults = [
+        'streaming' => 'แอป & สตรีมมิ่ง',
+        'gaming' => 'เติมเกม & บัตรเติมเงิน',
+        'software' => 'ซอฟต์แวร์ & คีย์ดิจิทัล',
+        'vouchers' => 'บัตรดิจิทัล',
+    ];
+    foreach ($defaults as $slug => $name) {
+        $term = term_exists($slug, 'nexus_product_tag');
+        if (!$term) $term = wp_insert_term($name, 'nexus_product_tag', ['slug' => $slug]);
+        if (is_wp_error($term)) return;
+        $term_id = (int) (is_array($term) ? $term['term_id'] : $term);
+        $product_ids = get_posts([
+            'post_type' => 'product', 'post_status' => 'any', 'numberposts' => -1,
+            'fields' => 'ids', 'meta_key' => 'category', 'meta_value' => $slug,
+        ]);
+        foreach ($product_ids as $product_id) {
+            $result = wp_set_object_terms($product_id, [$term_id], 'nexus_product_tag', true);
+            if (is_wp_error($result)) return;
+        }
+    }
+    update_option('nexus_product_tags_version', '1');
+}
+
+add_action('admin_init', function () {
+    if (current_user_can('manage_categories')) nexus_migrate_product_tags();
 });
 
 // --- wp-admin meta box: friendly product fields instead of raw Custom Fields ---
@@ -157,7 +233,7 @@ function nexus_render_product_meta_box(WP_Post $post) {
             <td><input type="text" name="nexus_unit" id="nexus_unit" value="<?php echo esc_attr($unit); ?>" class="regular-text" /></td>
         </tr>
         <tr>
-            <th><label for="nexus_featured_home">แสดงในแบนเนอร์หน้าแรก</label></th>
+            <th><label for="nexus_featured_home">ปักหมุดสินค้าแนะนำหน้าแรก</label></th>
             <td><input type="checkbox" name="nexus_featured_home" id="nexus_featured_home" value="1" <?php checked($featured, '1'); ?> /></td>
         </tr>
     </table>

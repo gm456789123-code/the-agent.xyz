@@ -3,6 +3,7 @@ export interface ProductDeal {
   title: string;
   category: "streaming" | "gaming" | "software" | "services" | "vouchers";
   categoryLabel: string;
+  tagIds?: number[];
   storeName: string;
   storeRating: number;
   badge?: string;

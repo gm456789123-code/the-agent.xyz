@@ -1,0 +1,66 @@
+---
+import type { ProductTag } from "../lib/wp";
+interface Props {
+  tags: ProductTag[];
+  gridId: string;
+  countId: string;
+  emptyId: string;
+  syncUrl?: boolean;
+}
+const { tags, gridId, countId, emptyId, syncUrl = false } = Astro.props;
+---
+
+<div data-product-tag-filter data-grid-id={gridId} data-count-id={countId} data-empty-id={emptyId} data-sync-url={String(syncUrl)} class="flex flex-wrap gap-2" role="group" aria-label="กรองตามแท็กสินค้า">
+  <button type="button" data-tag-id="all" data-tag-slug="all" aria-pressed="true" aria-controls={gridId} class="tag-button rounded-xl border border-white/15 px-4 py-2 text-sm font-bold text-slate-200 hover:border-pink-400/50">ทั้งหมด</button>
+  {tags.map((tag) => (
+    <button type="button" data-tag-id={tag.id} data-tag-slug={tag.slug} aria-pressed="false" aria-controls={gridId} class="tag-button rounded-xl border border-white/15 px-4 py-2 text-sm font-bold text-slate-200 hover:border-pink-400/50">{tag.name}</button>
+  ))}
+</div>
+
+<style>
+  .tag-button[aria-pressed="true"] { background: linear-gradient(120deg, #c084fc, #f9a8d4); color: #020617; border-color: transparent; }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-product-tag-filter]").forEach((filter) => {
+    const grid = document.getElementById(filter.dataset.gridId!);
+    const count = document.getElementById(filter.dataset.countId!);
+    const empty = document.getElementById(filter.dataset.emptyId!);
+    const buttons = [...filter.querySelectorAll<HTMLButtonElement>("[data-tag-id]")];
+    if (!grid || !count || !empty) return;
+
+    function selectTag(button: HTMLButtonElement) {
+      const id = button.dataset.tagId!;
+      let visible = 0;
+      grid!.querySelectorAll<HTMLElement>("[data-product-tag-ids]").forEach((card) => {
+        const ids = (card.dataset.productTagIds || "").split(" ");
+        card.hidden = id !== "all" && !ids.includes(id);
+        if (!card.hidden) visible++;
+      });
+      buttons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+      count!.textContent = `${visible} รายการ`;
+      empty!.hidden = visible > 0;
+    }
+
+    buttons.forEach((button) => button.addEventListener("click", () => {
+      selectTag(button);
+      if (filter.dataset.syncUrl === "true") {
+        const url = new URL(location.href);
+        url.searchParams.delete("category");
+        if (button.dataset.tagId === "all") url.searchParams.delete("tag");
+        else url.searchParams.set("tag", button.dataset.tagSlug!);
+        history.replaceState(null, "", url);
+      }
+    }));
+
+    if (filter.dataset.syncUrl === "true") {
+      const fromUrl = () => {
+        const query = new URLSearchParams(location.search);
+        const slug = query.get("tag") || query.get("category");
+        selectTag(buttons.find((button) => button.dataset.tagSlug === slug) || buttons[0]);
+      };
+      fromUrl();
+      window.addEventListener("popstate", fromUrl);
+    }
+  });
+</script>

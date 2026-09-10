@@ -1,0 +1,98 @@
+---
+import type { ProductDeal } from "../data/mock";
+interface Props { item: ProductDeal }
+const { item } = Astro.props;
+---
+
+<div class="group relative rounded-2xl sm:rounded-3xl aurora-glass aurora-glass-hover p-4 sm:p-7 flex flex-col justify-between overflow-hidden border border-white/15 w-full max-w-full min-w-0">
+          
+          <!-- Card Top: Image & Badges -->
+          <div class="w-full max-w-full min-w-0">
+            <!-- Proportional Image Frame (100% Full Uncropped Image Display) -->
+            <div class="relative w-full h-36 sm:h-48 lg:h-56 rounded-xl sm:rounded-2xl overflow-hidden bg-slate-950/90 mb-3 sm:mb-4 border border-white/15 shadow-inner flex items-center justify-center p-1.5 sm:p-2">
+              <!-- Ambient Blurred Backdrop -->
+              <img
+                src={item.image}
+                alt=""
+                aria-hidden="true"
+                class="absolute inset-0 w-full h-full object-cover blur-xl opacity-35 scale-110 pointer-events-none"
+              />
+              <!-- Full Clear Uncropped Main Image -->
+              <img
+                src={item.image}
+                alt={item.title}
+                class="relative z-10 max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500 rounded-lg drop-shadow-md"
+                loading="lazy"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-[#0A1124]/90 via-transparent to-black/20 pointer-events-none z-10"></div>
+
+              <!-- Top Badges (Responsive flex wrap & truncate) -->
+              <div class="absolute top-2.5 left-2.5 right-2.5 sm:top-3 sm:left-3 sm:right-3 flex items-center justify-between gap-1.5 pointer-events-none z-20">
+                {item.badge && (
+                  <span class:list={[
+                    "px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-black tracking-wide shadow-lg backdrop-blur-md border border-white/20 truncate max-w-[55%]",
+                    item.badgeType === "sale"
+                      ? "bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-[0_0_15px_rgba(244,114,182,0.6)]"
+                      : item.badgeType === "hot"
+                      ? "bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-[0_0_15px_rgba(168,85,247,0.6)]"
+                      : "bg-gradient-to-r from-pink-400 to-purple-500 text-white font-bold",
+                  ]}>
+                    {item.badge}
+                  </span>
+                )}
+                <span class="text-[11px] sm:text-sm font-black px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl bg-slate-950/90 backdrop-blur-md text-pink-300 ml-auto border border-pink-400/50 shadow-md flex-shrink-0 whitespace-nowrap">
+                  ⚡ {item.deliverySpeed}
+                </span>
+              </div>
+            </div>
+
+            <!-- Partner Store Info & Category -->
+            <div class="flex items-center justify-between gap-2 text-xs sm:text-base font-bold mb-1.5 sm:mb-2 min-w-0">
+              <span class="text-pink-300 font-extrabold uppercase tracking-wider truncate flex-1 min-w-0">{item.categoryLabel}</span>
+              <span class="text-amber-300 flex items-center gap-1 font-black text-xs sm:text-lg flex-shrink-0">
+                ★ {item.storeRating}
+              </span>
+            </div>
+
+            <!-- Main Title (Responsive Mobile Scale & Break Words) -->
+            <h3 class="font-display font-black text-base sm:text-xl lg:text-2xl text-white group-hover:text-pink-300 transition-colors leading-tight drop-shadow-sm break-words min-w-0">
+              {item.title}
+            </h3>
+
+            <!-- Store Partner Tag & Detail -->
+            <div class="text-xs sm:text-base text-slate-200 mt-2 flex items-center gap-2 font-medium min-w-0 max-w-full flex-wrap">
+              <span class="text-purple-300 font-bold flex-shrink-0">ร้านค้า:</span>
+              <span class="text-white font-black bg-purple-500/20 px-2 py-0.5 rounded-md sm:rounded-lg border border-purple-400/30 truncate max-w-full min-w-0">{item.storeName}</span>
+            </div>
+            <div class="text-xs sm:text-sm text-slate-300 mt-1 font-medium break-words">
+              เงื่อนไข: {item.unit}
+            </div>
+          </div>
+
+          <!-- Card Bottom: Pricing & Buy Button -->
+          <div class="mt-4 sm:mt-6 pt-3.5 sm:pt-4 border-t border-white/10 flex items-center justify-between gap-2 min-w-0">
+            <div class="min-w-0 flex-1">
+              {item.originalPrice && (
+                <div class="text-[10px] sm:text-sm line-through text-slate-400 font-bold truncate">
+                  {item.originalPrice}
+                </div>
+              )}
+              <div class="font-display font-black text-lg sm:text-2xl lg:text-3xl text-pink-300 drop-shadow-[0_0_15px_rgba(244,114,182,0.5)] truncate">
+                {item.price}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="js-buy-btn px-3.5 py-2 sm:px-6 sm:py-3.5 rounded-xl sm:rounded-2xl text-xs sm:text-base font-black bg-surface-card group-hover:aurora-btn-gradient text-white group-hover:text-slate-950 border border-white/15 group-hover:border-pink-400 transition-all flex items-center gap-1.5 group-hover:shadow-[0_0_25px_rgba(244,114,182,0.6)] group-hover:scale-105 flex-shrink-0 whitespace-nowrap cursor-pointer"
+              data-product-id={item.id}
+              data-product-title={item.title}
+            >
+              <span>สั่งซื้อดีลนี้</span>
+              <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
+        </div>

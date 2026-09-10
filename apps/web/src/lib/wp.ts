@@ -8,6 +8,7 @@ interface WpProduct {
   excerpt: { rendered: string };
   meta?: { price?: number; category?: string; store_name?: string; unit?: string };
   featured_image_url?: string | null;
+  "product-tags"?: number[];
 }
 
 const CATEGORY_COLORS: Record<ProductDeal["category"], string> = {
@@ -46,6 +47,7 @@ function mapWpProduct(product: WpProduct, index: number): ProductDeal {
     title: stripHtml(product.title.rendered),
     category,
     categoryLabel,
+    tagIds: product["product-tags"] || [],
     storeName: product.meta?.store_name || "Nexus Arcade Official Store",
     storeRating: 4.8,
     price: typeof price === "number" ? `฿${price.toLocaleString()}` : "฿299",
@@ -61,7 +63,7 @@ export async function getProducts(): Promise<ProductDeal[]> {
 
   try {
     const res = await fetch(
-      `${WP_API_URL}/wp/v2/product?_fields=id,title,excerpt,meta,featured_image_url&orderby=id&order=desc&per_page=50`,
+      `${WP_API_URL}/wp/v2/product?_fields=id,title,excerpt,meta,featured_image_url,product-tags&orderby=id&order=desc&per_page=50`,
       { signal: AbortSignal.timeout(2000) }
     );
     if (!res.ok) return mockProducts;
@@ -72,5 +74,54 @@ export async function getProducts(): Promise<ProductDeal[]> {
     return data.map(mapWpProduct);
   } catch {
     return mockProducts;
+  }
+}
+
+async function getHomeProducts(section: "featured" | "latest", limit: number) {
+  if (!WP_API_URL) return { products: [] as ProductDeal[], unavailable: true };
+  try {
+    const response = await fetch(`${WP_API_URL}/nexus/v1/products/${section}`, {
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!response.ok) throw new Error("Products unavailable");
+    const data: WpProduct[] = await response.json();
+    if (!Array.isArray(data)) throw new Error("Invalid product response");
+    return {
+      products: data.filter((product) => product.meta?.category !== "services").slice(0, limit).map(mapWpProduct),
+      unavailable: false,
+    };
+  } catch {
+    return { products: [] as ProductDeal[], unavailable: true };
+  }
+}
+
+export async function getHomepageProducts() {
+  const [featured, latest] = await Promise.all([
+    getHomeProducts("featured", 9),
+    getHomeProducts("latest", 6),
+  ]);
+  return { featured, latest };
+}
+
+export interface ProductTag { id: number; name: string; slug: string }
+
+export async function getProductTags(): Promise<ProductTag[]> {
+  if (!WP_API_URL) return [];
+  try {
+    const tags: ProductTag[] = [];
+    let totalPages = 1;
+    for (let page = 1; page <= totalPages; page++) {
+      const response = await fetch(`${WP_API_URL}/wp/v2/product-tags?hide_empty=false&per_page=100&page=${page}&orderby=name&order=asc&_fields=id,name,slug`, {
+        signal: AbortSignal.timeout(5000),
+      });
+      if (!response.ok) throw new Error("Product tags unavailable");
+      const data = await response.json();
+      if (!Array.isArray(data)) throw new Error("Invalid product tags");
+      tags.push(...data);
+      totalPages = Number(response.headers.get("X-WP-TotalPages")) || 1;
+    }
+    return tags;
+  } catch {
+    return [];
   }
 }
