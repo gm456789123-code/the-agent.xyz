@@ -9,9 +9,24 @@
 define('NEXUS_SETTINGS_OPTION', 'nexus_settings');
 
 add_action('init', function () {
-    header("Access-Control-Allow-Origin: *");
+    $allowed_origins = [
+        'https://lime-oryx-922373.hostingersite.com',
+        'http://localhost:4321',
+        'http://localhost:3000',
+        'http://localhost:8080',
+    ];
+
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    if (in_array($origin, $allowed_origins, true)) {
+        header("Access-Control-Allow-Origin: {$origin}");
+    } else {
+        header("Access-Control-Allow-Origin: https://lime-oryx-922373.hostingersite.com");
+    }
+
     header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-    header("Access-Control-Allow-Headers: Authorization, X-WP-Nonce, Content-Type, Origin, Accept");
+    header("Access-Control-Allow-Headers: Authorization, X-WP-Nonce, Content-Type, Origin, Accept, X-Nexus-Token");
+    header("Access-Control-Allow-Credentials: true");
+
     if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
         status_header(200);
         exit;

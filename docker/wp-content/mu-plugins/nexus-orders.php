@@ -24,6 +24,29 @@ function nexus_generate_order_code(): string {
     return 'NX-' . strtoupper(substr(uniqid(), -6));
 }
 
+function nexus_get_client_ip(): string {
+    if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+        return sanitize_text_field(trim($_SERVER['HTTP_CF_CONNECTING_IP']));
+    }
+    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        return sanitize_text_field(trim(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0]));
+    }
+    return sanitize_text_field($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
+}
+
+function nexus_check_rate_limit(string $action, int $max_attempts = 10, int $decay_seconds = 60): bool {
+    $ip = nexus_get_client_ip();
+    $key = 'nexus_rl_' . md5($action . '_' . $ip);
+    $attempts = (int) get_transient($key);
+
+    if ($attempts >= $max_attempts) {
+        return false;
+    }
+
+    set_transient($key, $attempts + 1, $decay_seconds);
+    return true;
+}
+
 add_action('rest_api_init', function () {
     register_rest_route('nexus/v1', '/orders', [
         'methods' => 'POST',
@@ -33,16 +56,20 @@ add_action('rest_api_init', function () {
             'phone' => ['required' => true, 'type' => 'string'],
         ],
         'callback' => function (WP_REST_Request $request) {
+            if (!nexus_check_rate_limit('order_create', 5, 60)) {
+                return new WP_Error('rate_limit_exceeded', 'คุณทำรายการบ่อยเกินไป กรุณารอ 1 นาทีแล้วลองใหม่อีกครั้ง', ['status' => 429]);
+            }
+
             $product_id = (int) $request->get_param('product_id');
             $phone = sanitize_text_field($request->get_param('phone'));
 
-            if (!preg_match('/^0[0-9]{8,9}$/', $phone)) {
+            if (!preg_match('/^0[0-9]{8,9}$/', preg_replace('/[-\s]/', '', $phone))) {
                 return new WP_Error('invalid_phone', 'กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง', ['status' => 400]);
             }
 
             $product = get_post($product_id);
-            if (!$product || $product->post_type !== 'product') {
-                return new WP_Error('invalid_product', 'ไม่พบสินค้านี้', ['status' => 404]);
+            if (!$product || $product->post_type !== 'product' || $product->post_status !== 'publish') {
+                return new WP_Error('invalid_product', 'ไม่พบสินค้านี้หรือสินค้ายังไม่พร้อมจำหน่าย', ['status' => 404]);
             }
 
             $order_code = nexus_generate_order_code();
@@ -82,32 +109,46 @@ add_action('rest_api_init', function () {
             'query' => ['required' => true, 'type' => 'string'],
         ],
         'callback' => function (WP_REST_Request $request) {
-            $query = sanitize_text_field($request->get_param('query'));
-            $is_order_code = stripos($query, 'NX-') === 0;
+            if (!nexus_check_rate_limit('order_track', 10, 60)) {
+                return new WP_Error('rate_limit_exceeded', 'คุณค้นหาออเดอร์บ่อยเกินไป กรุณารอ 1 นาทีแล้วลองใหม่', ['status' => 429]);
+            }
+
+            $query = sanitize_text_field(trim($request->get_param('query')));
+            $clean_phone = preg_replace('/[-\s]/', '', $query);
+            $is_order_code = (stripos($query, 'NX-') === 0) && strlen($query) <= 15;
+            $is_phone = preg_match('/^0[0-9]{8,9}$/', $clean_phone);
+
+            if (!$is_order_code && !$is_phone) {
+                return new WP_Error('invalid_format', 'กรุณากรอกรหัสออเดอร์ (เช่น NX-XXXXXX) หรือเบอร์โทร 10 หลัก', ['status' => 400]);
+            }
+
+            $meta_query = $is_order_code
+                ? [['key' => 'order_code', 'value' => strtoupper($query), 'compare' => '=']]
+                : [['key' => 'phone', 'value' => $clean_phone, 'compare' => '=']];
 
             $orders = get_posts([
                 'post_type' => 'nexus_order',
                 'post_status' => 'publish',
-                'numberposts' => $is_order_code ? 1 : 10,
-                'meta_query' => [[
-                    'key' => $is_order_code ? 'order_code' : 'phone',
-                    'value' => $query,
-                    'compare' => '=',
-                ]],
+                'numberposts' => $is_order_code ? 1 : 5,
+                'meta_query' => $meta_query,
+                'date_query' => $is_phone ? [['after' => '7 days ago']] : [],
                 'orderby' => 'date',
                 'order' => 'DESC',
             ]);
 
             if (empty($orders)) {
-                return new WP_Error('not_found', 'ไม่พบคำสั่งซื้อที่ตรงกับข้อมูลนี้', ['status' => 404]);
+                return new WP_Error('not_found', 'ไม่พบคำสั่งซื้อที่ตรงกับข้อมูลนี้ กรุณาตรวจสอบรหัสออเดอร์อีกครั้ง', ['status' => 404]);
             }
 
             return array_map(function ($order) {
+                $phone = get_post_meta($order->ID, 'phone', true);
+                $masked_phone = $phone ? preg_replace('/^(\d{3})\d{3}(\d{4})$/', '$1-xxx-$2', $phone) : '';
                 return [
                     'order_code' => get_post_meta($order->ID, 'order_code', true),
                     'product_title' => get_post_meta($order->ID, 'product_title', true),
                     'amount' => get_post_meta($order->ID, 'amount', true),
-                    'status' => get_post_meta($order->ID, 'status', true),
+                    'status' => get_post_meta($order->ID, 'status', true) ?: 'pending_payment',
+                    'customer_phone' => $masked_phone,
                     'created_at' => $order->post_date,
                 ];
             }, $orders);
@@ -129,8 +170,11 @@ add_action('rest_api_init', function () {
             ]);
 
             return array_map(function ($order) {
-                $phone = get_post_meta($order->ID, 'phone', true);
-                $masked_phone = preg_replace('/^(\d{3})\d{3}(\d{4})$/', '$1-xxx-$2', $phone);
+                $phone = (string) get_post_meta($order->ID, 'phone', true);
+                $clean = preg_replace('/\D/', '', $phone);
+                $masked_phone = strlen($clean) >= 9
+                    ? substr($clean, 0, 3) . '-xxx-' . substr($clean, -4)
+                    : '08x-xxx-xxxx';
 
                 $seconds_ago = time() - get_post_time('U', true, $order);
                 if ($seconds_ago < 60) {

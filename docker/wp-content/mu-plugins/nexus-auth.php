@@ -4,6 +4,33 @@
  * Description: Registration and authentication REST endpoints (nexus/v1/register, nexus/v1/login) for NEXUS.DEALS
  */
 
+if (!function_exists('nexus_get_client_ip')) {
+    function nexus_get_client_ip(): string {
+        if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+            return sanitize_text_field(trim($_SERVER['HTTP_CF_CONNECTING_IP']));
+        }
+        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            return sanitize_text_field(trim(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0]));
+        }
+        return sanitize_text_field($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
+    }
+}
+
+if (!function_exists('nexus_check_rate_limit')) {
+    function nexus_check_rate_limit(string $action, int $max_attempts = 10, int $decay_seconds = 60): bool {
+        $ip = nexus_get_client_ip();
+        $key = 'nexus_rl_' . md5($action . '_' . $ip);
+        $attempts = (int) get_transient($key);
+
+        if ($attempts >= $max_attempts) {
+            return false;
+        }
+
+        set_transient($key, $attempts + 1, $decay_seconds);
+        return true;
+    }
+}
+
 add_action('rest_api_init', function () {
     register_rest_route('nexus/v1', '/register', [
         'methods' => 'POST',
@@ -15,13 +42,17 @@ add_action('rest_api_init', function () {
             'password' => ['required' => true, 'type' => 'string'],
         ],
         'callback' => function (WP_REST_Request $request) {
+            if (!nexus_check_rate_limit('auth_register', 5, 300)) {
+                return new WP_Error('rate_limit_exceeded', 'คุณส่งคำขอสมัครสมาชิกถี่เกินไป กรุณารอ 5 นาทีแล้วลองใหม่อีกครั้ง', ['status' => 429]);
+            }
+
             $username = sanitize_user($request->get_param('username'), true);
             $email    = sanitize_email($request->get_param('email'));
             $phone    = sanitize_text_field($request->get_param('phone'));
             $password = $request->get_param('password');
 
-            if (empty($username) || strlen($username) < 4) {
-                return new WP_Error('invalid_username', 'ชื่อผู้ใช้ต้องมีอย่างน้อย 4 ตัวอักษร', ['status' => 400]);
+            if (empty($username) || strlen($username) < 4 || strlen($username) > 50) {
+                return new WP_Error('invalid_username', 'ชื่อผู้ใช้ต้องมีความยาว 4 - 50 ตัวอักษร', ['status' => 400]);
             }
 
             if (!validate_username($username)) {
@@ -79,6 +110,10 @@ add_action('rest_api_init', function () {
             'password' => ['required' => true, 'type' => 'string'],
         ],
         'callback' => function (WP_REST_Request $request) {
+            if (!nexus_check_rate_limit('auth_login', 5, 60)) {
+                return new WP_Error('rate_limit_exceeded', 'คุณพยายามเข้าสู่ระบบถี่เกินไป กรุณารอ 1 นาทีแล้วลองใหม่อีกครั้ง', ['status' => 429]);
+            }
+
             $username = sanitize_text_field($request->get_param('username'));
             $password = $request->get_param('password');
 
