@@ -83,6 +83,14 @@ const isActive = (href: string) => pathname === href || (href === "/articles" &&
           <span>เช็คสลิป</span>
         </a>
 
+        <!-- Register Button (Desktop) -->
+        <a
+          href="/register"
+          class="hidden md:inline-flex px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs font-black border border-pink-400/50 text-pink-300 hover:bg-pink-500/10 transition-all whitespace-nowrap"
+        >
+          สมัครสมาชิก
+        </a>
+
         <!-- Login Button -->
         <a
           href="/login"
@@ -156,8 +164,24 @@ const isActive = (href: string) => pathname === href || (href === "/articles" &&
       }
     </nav>
 
+    <!-- Mobile Auth Links -->
+    <div class="grid grid-cols-2 gap-2 pt-2 border-t border-white/10">
+      <a
+        href="/login"
+        class="w-full py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-surface-card border border-white/15 text-white flex items-center justify-center gap-1.5"
+      >
+        <span>เข้าสู่ระบบ</span>
+      </a>
+      <a
+        href="/register"
+        class="w-full py-2.5 rounded-xl text-xs sm:text-sm font-bold border border-pink-400/50 text-pink-300 hover:bg-pink-500/10 flex items-center justify-center gap-1.5"
+      >
+        <span>สมัครสมาชิก</span>
+      </a>
+    </div>
+
     <!-- Mobile Action CTAs -->
-    <div class="pt-2 grid grid-cols-2 gap-2 border-t border-white/10">
+    <div class="grid grid-cols-2 gap-2">
       <a
         href="#track" data-order-tracking aria-haspopup="dialog" aria-controls="order-tracking-modal"
         class="w-full py-3 rounded-xl text-xs sm:text-sm font-bold bg-surface-card border border-white/15 text-white flex items-center justify-center gap-1.5"
