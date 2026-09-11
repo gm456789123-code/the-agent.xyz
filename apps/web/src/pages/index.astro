@@ -5,11 +5,12 @@ import ArticleGrid from "../components/ArticleGrid.astro";
 import { getArticles } from "../lib/articles";
 import HomeProducts from "../components/HomeProducts.astro";
 import PinnedProducts from "../components/PinnedProducts.astro";
-import { getHomepageProducts, getPinnedProducts } from "../lib/wp";
-const [{ articles, unavailable }, { featured, latest }, pinnedData] = await Promise.all([
+import { getHomepageProducts, getPinnedProducts, getRecentOrders } from "../lib/wp";
+const [{ articles, unavailable }, { featured, latest }, pinnedData, recentOrders] = await Promise.all([
   getArticles(1, 3),
   getHomepageProducts(),
   getPinnedProducts(),
+  getRecentOrders(),
 ]);
 
 ---
@@ -22,6 +23,34 @@ const [{ articles, unavailable }, { featured, latest }, pinnedData] = await Prom
     <section class="w-full max-w-full overflow-hidden">
       <NetflixHeroSlider />
     </section>
+
+    {/* Real-time Live Orders Ticker (Responsive Mobile Padding) */}
+    {recentOrders.length > 0 && (
+      <section class="w-full max-w-full aurora-glass rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow-glass flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-5 overflow-hidden border border-pink-400/30">
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <span class="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 rounded-full bg-pink-400 live-dot"></span>
+          <span class="font-display font-black text-xs sm:text-base text-pink-300 uppercase tracking-wider">
+            ส่งมอบดีลล่าสุดผ่านนายหน้า:
+          </span>
+        </div>
+
+        <div class="flex-1 w-full overflow-hidden">
+          <div class="flex items-center gap-3 sm:gap-8 overflow-x-auto scrollbar-none text-xs sm:text-base font-bold">
+            {
+              recentOrders.map((tx) => (
+                <div class="flex items-center gap-2 sm:gap-3 whitespace-nowrap bg-surface-card px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-lg sm:rounded-xl border border-pink-500/25 hover:border-pink-400/50 transition-colors">
+                  <span class="text-slate-300">{tx.user}</span>
+                  <span class="text-white font-extrabold">{tx.item}</span>
+                  <span class="text-[10px] sm:text-sm px-2 py-0.5 rounded bg-pink-500/20 text-pink-300 font-black border border-pink-400/30">{tx.store}</span>
+                  <span class="text-pink-300 font-black text-xs sm:text-base">{tx.amount}</span>
+                  <span class="text-[10px] sm:text-sm text-purple-300/80">({tx.time})</span>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </section>
+    )}
 
     <PinnedProducts products={pinnedData.products} unavailable={pinnedData.unavailable} />
 

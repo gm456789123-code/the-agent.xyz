@@ -103,6 +103,23 @@ export async function getHomepageProducts() {
   return { featured, latest };
 }
 
+export interface LiveOrder { user: string; item: string; time: string; amount: string; store: string }
+
+export async function getRecentOrders(limit = 8): Promise<LiveOrder[]> {
+  if (!WP_API_URL) return [];
+  try {
+    const response = await fetch(`${WP_API_URL}/nexus/v1/orders/recent?limit=${limit}`, {
+      signal: AbortSignal.timeout(3000),
+    });
+    if (!response.ok) throw new Error("Recent orders unavailable");
+    const data = await response.json();
+    if (!Array.isArray(data)) throw new Error("Invalid recent orders response");
+    return data;
+  } catch {
+    return [];
+  }
+}
+
 export async function getPinnedProducts() {
   if (!WP_API_URL) return { products: [] as ProductDeal[], unavailable: true };
   try {
