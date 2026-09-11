@@ -1,0 +1,50 @@
+---
+import type { ProductDeal } from "../data/mock";
+import ProductCard from "./ProductCard.astro";
+
+interface Props {
+  products: ProductDeal[];
+  unavailable: boolean;
+}
+
+const { products, unavailable } = Astro.props;
+---
+
+{
+  products.length > 0 && (
+    <section id="pinned-products" class="space-y-6 w-full min-w-0" aria-labelledby="pinned-title">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p class="text-sm text-pink-300 font-bold">สินค้าที่ปักหมุด</p>
+          <h2 id="pinned-title" class="font-display font-black text-2xl sm:text-4xl mt-2">
+            สินค้า<span class="aurora-text">ยอดนิยม</span>
+          </h2>
+        </div>
+        <a href="/products" class="text-purple-300 hover:text-white font-bold text-sm">ดูสินค้าทั้งหมด →</a>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+        {products.map((item) => (
+          <div class="min-w-0">
+            <ProductCard item={item} />
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+{
+  unavailable && products.length === 0 && (
+    <section id="pinned-products-empty" class="space-y-6 w-full min-w-0">
+      <div>
+        <p class="text-sm text-pink-300 font-bold">สินค้าที่ปักหมุด</p>
+        <h2 class="font-display font-black text-2xl sm:text-4xl mt-2">
+          สินค้า<span class="aurora-text">ยอดนิยม</span>
+        </h2>
+      </div>
+      <p class="rounded-2xl border border-white/10 p-6 text-slate-300 text-center">
+        ไม่สามารถโหลดสินค้าที่ปักหมุดได้ กรุณาลองใหม่ภายหลัง
+      </p>
+    </section>
+  )
+}

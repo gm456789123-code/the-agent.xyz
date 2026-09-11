@@ -103,6 +103,24 @@ export async function getHomepageProducts() {
   return { featured, latest };
 }
 
+export async function getPinnedProducts() {
+  if (!WP_API_URL) return { products: [] as ProductDeal[], unavailable: true };
+  try {
+    const response = await fetch(`${WP_API_URL}/nexus/v1/products/pinned`, {
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!response.ok) throw new Error("Pinned products unavailable");
+    const data: WpProduct[] = await response.json();
+    if (!Array.isArray(data)) throw new Error("Invalid pinned products response");
+    return {
+      products: data.slice(0, 6).map(mapWpProduct),
+      unavailable: false,
+    };
+  } catch {
+    return { products: [] as ProductDeal[], unavailable: true };
+  }
+}
+
 export interface ProductTag { id: number; name: string; slug: string }
 
 export async function getProductTags(): Promise<ProductTag[]> {

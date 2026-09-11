@@ -4,11 +4,12 @@ import NetflixHeroSlider from "../components/NetflixHeroSlider.astro";
 import ArticleGrid from "../components/ArticleGrid.astro";
 import { getArticles } from "../lib/articles";
 import HomeProducts from "../components/HomeProducts.astro";
-import { getHomepageProducts } from "../lib/wp";
-import { liveTransactions } from "../data/mock";
-const [{ articles, unavailable }, { featured, latest }] = await Promise.all([
+import PinnedProducts from "../components/PinnedProducts.astro";
+import { getHomepageProducts, getPinnedProducts } from "../lib/wp";
+const [{ articles, unavailable }, { featured, latest }, pinnedData] = await Promise.all([
   getArticles(1, 3),
   getHomepageProducts(),
+  getPinnedProducts(),
 ]);
 
 ---
@@ -16,37 +17,13 @@ const [{ articles, unavailable }, { featured, latest }] = await Promise.all([
 <BaseLayout title="NEXUS.DEALS — ศูนย์รวมดีลสินค้า & บริการออนไลน์ นายหน้าปลอดภัย 24 ชม.">
 
   <main class="w-full max-w-[1920px] mx-auto px-3.5 sm:px-6 lg:px-10 xl:px-14 space-y-8 sm:space-y-16 py-3 sm:py-8 pb-28 lg:pb-14 overflow-hidden">
-    
+
     <!-- Giant Widescreen Panoramic Horizontal Hero Banner Section -->
     <section class="w-full max-w-full overflow-hidden">
       <NetflixHeroSlider />
     </section>
 
-    <!-- Real-time Live Orders Ticker (Responsive Mobile Padding) -->
-    <section class="w-full max-w-full aurora-glass rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow-glass flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-5 overflow-hidden border border-pink-400/30">
-      <div class="flex items-center gap-2 flex-shrink-0">
-        <span class="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 rounded-full bg-pink-400 live-dot"></span>
-        <span class="font-display font-black text-xs sm:text-base text-pink-300 uppercase tracking-wider">
-          ส่งมอบดีลล่าสุดผ่านนายหน้า:
-        </span>
-      </div>
-      
-      <div class="flex-1 w-full overflow-hidden">
-        <div class="flex items-center gap-3 sm:gap-8 overflow-x-auto scrollbar-none text-xs sm:text-base font-bold">
-          {
-            liveTransactions.map((tx) => (
-              <div class="flex items-center gap-2 sm:gap-3 whitespace-nowrap bg-surface-card px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-lg sm:rounded-xl border border-pink-500/25 hover:border-pink-400/50 transition-colors">
-                <span class="text-slate-300">{tx.user}</span>
-                <span class="text-white font-extrabold">{tx.item}</span>
-                <span class="text-[10px] sm:text-sm px-2 py-0.5 rounded bg-pink-500/20 text-pink-300 font-black border border-pink-400/30">{tx.store}</span>
-                <span class="text-pink-300 font-black text-xs sm:text-base">{tx.amount}</span>
-                <span class="text-[10px] sm:text-sm text-purple-300/80">({tx.time})</span>
-              </div>
-            ))
-          }
-        </div>
-      </div>
-    </section>
+    <PinnedProducts products={pinnedData.products} unavailable={pinnedData.unavailable} />
 
     <HomeProducts featured={featured} latest={latest} />
 
