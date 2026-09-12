@@ -140,6 +140,36 @@ export async function getPinnedProducts() {
   }
 }
 
+export interface HeroSlide {
+  id: number;
+  title: string;
+  badge: string;
+  subtitle: string;
+  price: string;
+  unit: string;
+  original_price: string;
+  discount_badge: string;
+  cta_primary: string;
+  cta_secondary: string;
+  href: string;
+  image: string | null;
+}
+
+export async function getHeroSlides(): Promise<{ slides: HeroSlide[]; unavailable: boolean }> {
+  if (!WP_API_URL) return { slides: [], unavailable: true };
+  try {
+    const response = await fetch(`${WP_API_URL}/nexus/v1/hero-slides`, {
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!response.ok) throw new Error("Hero slides unavailable");
+    const data = await response.json();
+    if (!Array.isArray(data)) throw new Error("Invalid hero slides response");
+    return { slides: data, unavailable: false };
+  } catch {
+    return { slides: [], unavailable: true };
+  }
+}
+
 export interface ProductTag { id: number; name: string; slug: string }
 
 export async function getProductTags(): Promise<ProductTag[]> {
