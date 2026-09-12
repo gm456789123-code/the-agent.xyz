@@ -31,7 +31,11 @@ add_action('init', function () {
             'separate_items_with_commas' => 'แยกแท็กด้วยเครื่องหมายจุลภาค (,)',
         ],
         'public' => true,
-        'hierarchical' => false,
+        // Hierarchical taxonomies get Gutenberg's checkbox-list term selector
+        // (pick from existing tags) instead of the flat free-text/autocomplete
+        // box, which was letting admins type ad-hoc tags instead of reusing
+        // the ones already created.
+        'hierarchical' => true,
         'show_ui' => true,
         'show_admin_column' => true,
         'show_in_rest' => true,
