@@ -6,8 +6,6 @@
 
 require_once __DIR__ . '/nexus-security.php';
 
-const NEXUS_FRONTEND_URL = 'https://lime-oryx-922373.hostingersite.com';
-
 add_action('rest_api_init', function () {
     register_rest_route('nexus/v1', '/register', [
         'methods' => 'POST',

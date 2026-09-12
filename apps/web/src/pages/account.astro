@@ -26,6 +26,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
     <div id="account-error" class="hidden rounded-2xl border border-rose-400/30 p-8 text-center text-rose-300"></div>
 
+    <p id="account-pay-error" class="hidden text-sm text-rose-300 font-bold"></p>
+
     <ul id="account-orders" class="hidden space-y-4"></ul>
   </main>
 </BaseLayout>
@@ -88,6 +90,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           <div class="flex items-center gap-3 flex-shrink-0">
             <span class="text-pink-300 font-black">฿${order.amount}</span>
             <span class="text-xs font-bold px-3 py-1.5 rounded-full border ${statusColor}">${statusLabel}</span>
+            ${order.status === "pending_payment" ? `<button type="button" class="js-pay-now px-4 py-1.5 rounded-full text-xs font-black aurora-btn-gradient text-slate-950 hover:text-white transition-all cursor-pointer" data-order-code="${order.order_code}">ชำระเงิน</button>` : ""}
           </div>
         `;
         listEl!.appendChild(li);
@@ -126,6 +129,40 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         showOnly(errorEl!);
       }
     }
+
+    const payErrorEl = document.getElementById("account-pay-error");
+
+    listEl.addEventListener("click", async (e) => {
+      const button = (e.target as HTMLElement)?.closest<HTMLButtonElement>(".js-pay-now");
+      if (!button) return;
+
+      payErrorEl?.classList.add("hidden");
+      const orderCode = button.dataset.orderCode;
+      const token = localStorage.getItem("nexus_token");
+      if (!token || !orderCode) return;
+
+      button.disabled = true;
+      const originalLabel = button.textContent;
+      button.textContent = "กำลังไปหน้าชำระเงิน...";
+
+      try {
+        const res = await fetch(`${WP_API_URL}/nexus/v1/checkout`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ order_code: orderCode }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.message || "ไม่สามารถเริ่มการชำระเงินได้");
+        window.location.href = data.checkout_url;
+      } catch (err) {
+        if (payErrorEl) {
+          payErrorEl.textContent = err instanceof Error ? err.message : "เกิดข้อผิดพลาด กรุณาลองใหม่";
+          payErrorEl.classList.remove("hidden");
+        }
+        button.disabled = false;
+        button.textContent = originalLabel;
+      }
+    });
 
     document.addEventListener("nexus:auth-success", loadOrders);
     loadOrders();

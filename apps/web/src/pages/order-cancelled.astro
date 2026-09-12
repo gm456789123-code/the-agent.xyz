@@ -1,0 +1,22 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="ยกเลิกการชำระเงิน — NEXUS.DEALS">
+  <main class="w-full max-w-2xl mx-auto px-4 sm:px-8 py-16 sm:py-24 text-center">
+    <h1 class="font-display font-black text-3xl sm:text-4xl">การชำระเงิน<span class="aurora-text">ถูกยกเลิก</span></h1>
+    <p id="order-cancelled-detail" class="mt-3 text-slate-400">คำสั่งซื้อของคุณยังคงอยู่ในสถานะรอชำระเงิน คุณสามารถลองชำระเงินอีกครั้งได้จากหน้าบัญชีของคุณ</p>
+    <a href="/account" class="inline-block mt-8 px-6 py-3 rounded-xl font-black aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow">ไปหน้าบัญชีของฉัน</a>
+  </main>
+</BaseLayout>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const orderCode = params.get("order");
+  if (orderCode) {
+    const detailEl = document.getElementById("order-cancelled-detail");
+    if (detailEl) {
+      detailEl.textContent = `คำสั่งซื้อ ${orderCode} ยังคงอยู่ในสถานะรอชำระเงิน คุณสามารถลองชำระเงินอีกครั้งได้จากหน้าบัญชีของคุณ`;
+    }
+  }
+</script>

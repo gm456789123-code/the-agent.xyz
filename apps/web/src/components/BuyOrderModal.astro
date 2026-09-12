@@ -21,6 +21,13 @@
       <p id="buy-modal-error" class="hidden text-xs sm:text-sm text-rose-400 font-bold"></p>
       <p id="buy-modal-success" class="hidden text-xs sm:text-sm text-emerald-400 font-bold"></p>
       <button
+        type="button"
+        id="buy-modal-pay-now"
+        class="hidden w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-display font-black text-sm sm:text-base aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow cursor-pointer"
+      >
+        ชำระเงินตอนนี้
+      </button>
+      <button
         type="submit"
         id="buy-modal-submit"
         class="w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-display font-black text-sm sm:text-base aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow"
@@ -43,16 +50,20 @@
     const errorEl = document.getElementById("buy-modal-error");
     const successEl = document.getElementById("buy-modal-success");
     const submitBtn = document.getElementById("buy-modal-submit") as HTMLButtonElement | null;
+    const payNowBtn = document.getElementById("buy-modal-pay-now") as HTMLButtonElement | null;
 
-    if (!modal || !form || !phoneInput || !productLabel || !errorEl || !successEl || !submitBtn) return;
+    if (!modal || !form || !phoneInput || !productLabel || !errorEl || !successEl || !submitBtn || !payNowBtn) return;
 
     let activeProductId = "";
+    let activeOrderCode = "";
 
     function openModal(productId: string, productTitle: string) {
       activeProductId = productId;
+      activeOrderCode = "";
       productLabel!.textContent = productTitle;
       errorEl!.classList.add("hidden");
       successEl!.classList.add("hidden");
+      payNowBtn!.classList.add("hidden");
       form!.reset();
       form!.classList.remove("hidden");
       submitBtn!.disabled = false;
@@ -127,14 +138,42 @@
           throw new Error(data?.message || "สร้างคำสั่งซื้อไม่สำเร็จ");
         }
 
+        activeOrderCode = data.order_code;
         successEl!.textContent = `สั่งซื้อสำเร็จ! รหัสออเดอร์ของคุณคือ ${data.order_code} (ใช้เบอร์โทรหรือรหัสนี้ตรวจสอบสถานะได้ในหน้าติดตามคำสั่งซื้อ)`;
         successEl!.classList.remove("hidden");
+        payNowBtn!.classList.remove("hidden");
         form!.classList.add("hidden");
       } catch (err) {
         errorEl!.textContent = err instanceof Error ? err.message : "เกิดข้อผิดพลาด กรุณาลองใหม่";
         errorEl!.classList.remove("hidden");
         submitBtn!.disabled = false;
         submitBtn!.textContent = "สร้างคำสั่งซื้อ";
+      }
+    });
+
+    payNowBtn.addEventListener("click", async () => {
+      if (!activeOrderCode) return;
+      errorEl!.classList.add("hidden");
+      const token = localStorage.getItem("nexus_token");
+      if (!token) return;
+
+      payNowBtn.disabled = true;
+      payNowBtn.textContent = "กำลังไปหน้าชำระเงิน...";
+
+      try {
+        const res = await fetch(`${WP_API_URL}/nexus/v1/checkout`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ order_code: activeOrderCode }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.message || "ไม่สามารถเริ่มการชำระเงินได้");
+        window.location.href = data.checkout_url;
+      } catch (err) {
+        errorEl!.textContent = err instanceof Error ? err.message : "เกิดข้อผิดพลาด กรุณาลองใหม่";
+        errorEl!.classList.remove("hidden");
+        payNowBtn!.disabled = false;
+        payNowBtn!.textContent = "ชำระเงินตอนนี้";
       }
     });
   }

@@ -1,5 +1,8 @@
 <?php
 /** Shared helpers, explicitly required so plugin load order is irrelevant. */
+
+const NEXUS_FRONTEND_URL = 'https://lime-oryx-922373.hostingersite.com';
+
 function nexus_get_client_ip(): string {
     // The origin is directly reachable. Never trust client-supplied proxy headers.
     $ip = $_SERVER['REMOTE_ADDR'] ?? '';
