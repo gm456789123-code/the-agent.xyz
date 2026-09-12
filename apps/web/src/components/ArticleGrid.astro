@@ -9,6 +9,17 @@ const { articles, unavailable = false } = Astro.props;
   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-7">
     {articles.map((article) => (
       <article class="aurora-glass aurora-glass-hover rounded-2xl border border-purple-400/30 p-5 sm:p-7 min-w-0 flex flex-col">
+        <div class="relative w-full h-40 sm:h-48 rounded-xl overflow-hidden mb-4 border border-white/10">
+          {article.featured_image_url ? (
+            <img src={article.featured_image_url} alt="" class="w-full h-full object-cover" loading="lazy" />
+          ) : (
+            <div class="w-full h-full bg-gradient-to-br from-purple-500/30 via-pink-500/20 to-sky-500/20 flex items-center justify-center">
+              <svg class="w-10 h-10 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2zM4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M9 8h.01" />
+              </svg>
+            </div>
+          )}
+        </div>
         <time datetime={article.date} class="text-xs text-purple-300 font-bold">{articleDate(article.date)}</time>
         <h3 class="mt-3 font-display font-black text-xl sm:text-2xl text-white break-words">
           <a href={`/articles/${article.id}`} class="hover:text-pink-300" set:html={safeArticleHtml(article.title.rendered)} />

@@ -6,12 +6,13 @@ export interface Article {
   excerpt: { rendered: string };
   content?: { rendered: string };
   date: string;
+  featured_image_url?: string | null;
 }
 
 export async function getArticles(page = 1, perPage = 12) {
   if (!apiUrl) return { articles: [] as Article[], totalPages: 0, unavailable: true };
   try {
-    const response = await fetch(`${apiUrl}/wp/v2/posts?status=publish&page=${page}&per_page=${perPage}&orderby=date&order=desc&_fields=id,title,excerpt,content,date`, {
+    const response = await fetch(`${apiUrl}/wp/v2/posts?status=publish&page=${page}&per_page=${perPage}&orderby=date&order=desc&_fields=id,title,excerpt,content,date,featured_image_url`, {
       signal: AbortSignal.timeout(5000),
     });
     if (!response.ok) throw new Error("Articles unavailable");
