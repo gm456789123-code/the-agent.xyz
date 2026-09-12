@@ -6,6 +6,7 @@ interface WpProduct {
   id: number;
   title: { rendered: string };
   excerpt: { rendered: string };
+  content?: { rendered: string };
   meta?: { price?: number; category?: string; store_name?: string; unit?: string };
   featured_image_url?: string | null;
   "product-tags"?: number[];
@@ -55,6 +56,7 @@ function mapWpProduct(product: WpProduct, index: number): ProductDeal {
     deliverySpeed: "ส่งออโต้ทันที",
     image: product.featured_image_url || fallbackImage,
     color: CATEGORY_COLORS[category],
+    description: product.content?.rendered,
   };
 }
 
@@ -63,7 +65,7 @@ export async function getProducts(): Promise<ProductDeal[]> {
 
   try {
     const res = await fetch(
-      `${WP_API_URL}/wp/v2/product?_fields=id,title,excerpt,meta,featured_image_url,product-tags&orderby=id&order=desc&per_page=50`,
+      `${WP_API_URL}/wp/v2/product?_fields=id,title,excerpt,content,meta,featured_image_url,product-tags&orderby=id&order=desc&per_page=50`,
       { signal: AbortSignal.timeout(2000) }
     );
     if (!res.ok) return mockProducts;

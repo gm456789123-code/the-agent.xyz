@@ -91,9 +91,9 @@ const isActive = (href: string) => pathname === href || (href === "/articles" &&
 
         <!-- Logged-in User Menu (Desktop, hidden until JS confirms a session) -->
         <div id="auth-user-desktop" class="hidden items-center gap-1.5 sm:gap-2.5">
-          <span class="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black bg-surface-card border border-purple-400/40 text-purple-200 whitespace-nowrap">
+          <a href="/account" class="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black bg-surface-card border border-purple-400/40 text-purple-200 hover:text-white hover:border-pink-400/50 transition-all whitespace-nowrap">
             👤 <span id="auth-username-desktop"></span>
-          </span>
+          </a>
           <button
             type="button"
             id="auth-logout-desktop"
@@ -188,9 +188,9 @@ const isActive = (href: string) => pathname === href || (href === "/articles" &&
 
     <!-- Mobile Auth (Logged-in, hidden until JS confirms a session) -->
     <div id="auth-user-mobile" class="hidden grid-cols-2 gap-2 pt-2 border-t border-white/10 items-center">
-      <div class="text-xs sm:text-sm font-bold text-purple-200 flex items-center gap-1.5">
+      <a href="/account" class="text-xs sm:text-sm font-bold text-purple-200 hover:text-white flex items-center gap-1.5">
         👤 <span id="auth-username-mobile"></span>
-      </div>
+      </a>
       <button
         type="button"
         id="auth-logout-mobile"

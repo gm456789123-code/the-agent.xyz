@@ -1,0 +1,139 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="ประวัติการสั่งซื้อ — NEXUS.DEALS">
+  <main class="w-full max-w-4xl mx-auto px-4 sm:px-8 py-8 sm:py-12 pb-28 lg:pb-14 space-y-8">
+    <div>
+      <p class="text-pink-300 font-bold text-sm">NEXUS.DEALS / บัญชีของฉัน</p>
+      <h1 class="font-display font-black text-2xl sm:text-4xl mt-3">ประวัติ<span class="aurora-text">การสั่งซื้อ</span></h1>
+    </div>
+
+    <div id="account-loading" class="rounded-2xl border border-white/10 p-8 text-center text-slate-300">
+      กำลังโหลดข้อมูล...
+    </div>
+
+    <div id="account-guest" class="hidden rounded-2xl border border-white/10 p-8 text-center text-slate-300 space-y-4">
+      <p>กรุณาเข้าสู่ระบบเพื่อดูประวัติการสั่งซื้อของคุณ</p>
+      <button type="button" data-auth-open="login" class="inline-block px-6 py-3 rounded-xl font-black aurora-btn-gradient text-slate-950 hover:text-white transition-all cursor-pointer">
+        เข้าสู่ระบบ
+      </button>
+    </div>
+
+    <div id="account-empty" class="hidden rounded-2xl border border-white/10 p-8 text-center text-slate-300">
+      คุณยังไม่มีประวัติการสั่งซื้อ
+    </div>
+
+    <div id="account-error" class="hidden rounded-2xl border border-rose-400/30 p-8 text-center text-rose-300"></div>
+
+    <ul id="account-orders" class="hidden space-y-4"></ul>
+  </main>
+</BaseLayout>
+
+<script>
+  const WP_API_URL = import.meta.env.PUBLIC_WP_API_URL || "https://azure-bison-824750.hostingersite.com/wp-json";
+
+  const STATUS_LABELS: Record<string, string> = {
+    pending_payment: "รอชำระเงิน",
+    paid: "ชำระเงินแล้ว",
+    delivered: "จัดส่งสำเร็จ",
+    cancelled: "ยกเลิก",
+  };
+
+  const STATUS_COLORS: Record<string, string> = {
+    pending_payment: "text-amber-300 border-amber-400/30 bg-amber-500/10",
+    paid: "text-sky-300 border-sky-400/30 bg-sky-500/10",
+    delivered: "text-emerald-300 border-emerald-400/30 bg-emerald-500/10",
+    cancelled: "text-rose-300 border-rose-400/30 bg-rose-500/10",
+  };
+
+  interface OrderRow {
+    order_code: string;
+    product_title: string;
+    amount: string;
+    status: string;
+    created_at: string;
+  }
+
+  function initAccountPage() {
+    const loadingEl = document.getElementById("account-loading");
+    const guestEl = document.getElementById("account-guest");
+    const emptyEl = document.getElementById("account-empty");
+    const errorEl = document.getElementById("account-error");
+    const listEl = document.getElementById("account-orders");
+    if (!loadingEl || !guestEl || !emptyEl || !errorEl || !listEl) return;
+
+    function showOnly(el: HTMLElement) {
+      [loadingEl, guestEl, emptyEl, errorEl, listEl].forEach((node) => node?.classList.add("hidden"));
+      el.classList.remove("hidden");
+    }
+
+    function renderOrders(orders: OrderRow[]) {
+      if (orders.length === 0) {
+        showOnly(emptyEl!);
+        return;
+      }
+      listEl!.innerHTML = "";
+      orders.forEach((order) => {
+        const statusLabel = STATUS_LABELS[order.status] || order.status;
+        const statusColor = STATUS_COLORS[order.status] || "text-slate-300 border-white/15 bg-white/5";
+        const date = new Date(order.created_at).toLocaleString("th-TH", { dateStyle: "medium", timeStyle: "short" });
+        const li = document.createElement("li");
+        li.className = "aurora-glass rounded-2xl border border-white/10 p-5 flex flex-wrap items-center justify-between gap-3";
+        li.innerHTML = `
+          <div class="min-w-0">
+            <p class="font-display font-black text-white truncate">${order.product_title}</p>
+            <p class="text-xs text-slate-400 mt-1">รหัสออเดอร์: ${order.order_code} · ${date}</p>
+          </div>
+          <div class="flex items-center gap-3 flex-shrink-0">
+            <span class="text-pink-300 font-black">฿${order.amount}</span>
+            <span class="text-xs font-bold px-3 py-1.5 rounded-full border ${statusColor}">${statusLabel}</span>
+          </div>
+        `;
+        listEl!.appendChild(li);
+      });
+      showOnly(listEl!);
+    }
+
+    async function loadOrders() {
+      const token = localStorage.getItem("nexus_token");
+      if (!token) {
+        showOnly(guestEl!);
+        return;
+      }
+
+      showOnly(loadingEl!);
+
+      try {
+        const res = await fetch(`${WP_API_URL}/nexus/v1/orders/mine`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.status === 401) {
+          localStorage.removeItem("nexus_token");
+          localStorage.removeItem("nexus_user");
+          document.dispatchEvent(new CustomEvent("nexus:auth-changed"));
+          showOnly(guestEl!);
+          return;
+        }
+
+        if (!res.ok) throw new Error("ไม่สามารถโหลดประวัติการสั่งซื้อได้");
+
+        const data: OrderRow[] = await res.json();
+        renderOrders(Array.isArray(data) ? data : []);
+      } catch {
+        errorEl!.textContent = "เกิดข้อผิดพลาดในการโหลดข้อมูล กรุณาลองใหม่ภายหลัง";
+        showOnly(errorEl!);
+      }
+    }
+
+    document.addEventListener("nexus:auth-success", loadOrders);
+    loadOrders();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initAccountPage);
+  } else {
+    initAccountPage();
+  }
+</script>

@@ -14,6 +14,7 @@ export interface ProductDeal {
   deliverySpeed: string;
   image: string;
   color: string;
+  description?: string;
 }
 
 export const mockCategories = [
