@@ -83,6 +83,15 @@ add_action('init', function () {
             return current_user_can('edit_posts');
         },
     ]);
+
+    register_post_meta('product', 'pinned_home', [
+        'type' => 'boolean',
+        'single' => true,
+        'show_in_rest' => true,
+        'auth_callback' => function () {
+            return current_user_can('edit_posts');
+        },
+    ]);
 });
 
 // Expose the featured image URL directly on the REST response so the
@@ -113,6 +122,27 @@ add_action('rest_api_init', function () {
                 'orderby' => ['menu_order' => 'ASC', 'date' => 'DESC', 'ID' => 'DESC'],
                 'meta_query' => ['relation' => 'AND', [
                     'key' => 'featured_home',
+                    'value' => '1',
+                    'compare' => '=',
+                ], nexus_home_product_categories()],
+            ]);
+
+            return array_map('nexus_home_product_response', $products);
+        },
+    ]);
+
+    register_rest_route('nexus/v1', '/products/pinned', [
+        'methods' => 'GET',
+        'permission_callback' => '__return_true',
+        'callback' => function (WP_REST_Request $request) {
+            $limit = max(1, min(24, (int) $request->get_param('limit') ?: 6));
+            $products = get_posts([
+                'post_type' => 'product',
+                'post_status' => 'publish',
+                'numberposts' => $limit,
+                'orderby' => ['menu_order' => 'ASC', 'date' => 'DESC', 'ID' => 'DESC'],
+                'meta_query' => ['relation' => 'AND', [
+                    'key' => 'pinned_home',
                     'value' => '1',
                     'compare' => '=',
                 ], nexus_home_product_categories()],
@@ -207,6 +237,7 @@ function nexus_render_product_meta_box(WP_Post $post) {
     $store_name = get_post_meta($post->ID, 'store_name', true);
     $unit = get_post_meta($post->ID, 'unit', true);
     $featured = get_post_meta($post->ID, 'featured_home', true);
+    $pinned = get_post_meta($post->ID, 'pinned_home', true);
     $categories = ['streaming', 'gaming', 'software', 'services', 'vouchers'];
     ?>
     <table class="form-table">
@@ -236,6 +267,10 @@ function nexus_render_product_meta_box(WP_Post $post) {
             <th><label for="nexus_featured_home">ปักหมุดสินค้าแนะนำหน้าแรก</label></th>
             <td><input type="checkbox" name="nexus_featured_home" id="nexus_featured_home" value="1" <?php checked($featured, '1'); ?> /></td>
         </tr>
+        <tr>
+            <th><label for="nexus_pinned_home">ปักหมุดสินค้ายอดนิยม</label></th>
+            <td><input type="checkbox" name="nexus_pinned_home" id="nexus_pinned_home" value="1" <?php checked($pinned, '1'); ?> /></td>
+        </tr>
     </table>
     <?php
 }
@@ -261,4 +296,5 @@ add_action('save_post_product', function ($post_id) {
         update_post_meta($post_id, 'unit', sanitize_text_field($_POST['nexus_unit']));
     }
     update_post_meta($post_id, 'featured_home', isset($_POST['nexus_featured_home']) ? '1' : '');
+    update_post_meta($post_id, 'pinned_home', isset($_POST['nexus_pinned_home']) ? '1' : '');
 });

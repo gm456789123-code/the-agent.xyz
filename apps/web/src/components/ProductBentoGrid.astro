@@ -30,7 +30,7 @@ const visibleProducts = products;
       <p class="text-xs sm:text-sm text-slate-300 mt-1.5 font-medium">{isServices ? "เลือกบริการออนไลน์และบูสต์แรงค์จากร้านค้าพันธมิตร" : "เลือกซื้อแอปสตรีมมิ่ง เกม ซอฟต์แวร์ และบัตรดิจิทัล"}</p>
     </div>
 
-    {!isServices && <ProductTagFilter tags={tags} gridId={`${kind}-grid`} countId={`${kind}-count`} emptyId={`${kind}-empty`} syncUrl />}
+    {!isServices && <ProductTagFilter tags={tags} gridId={`${kind}-grid`} countId={`${kind}-count`} emptyId={`${kind}-empty`} syncUrl searchInputIds={["global-search-input-desktop", "global-search-input-mobile"]} />}
   </div>
 
     <p id={`${kind}-empty`} hidden={visibleProducts.length > 0} class="aurora-glass rounded-2xl p-8 text-center text-slate-300">ยังไม่มีรายการในหมวดนี้</p>
@@ -39,7 +39,7 @@ const visibleProducts = products;
   <div id={`${kind}-grid`} class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 w-full max-w-full min-w-0">
     {
       visibleProducts.map((item) => (
-        <div data-product-tag-ids={(item.tagIds || []).join(" ")} class="min-w-0"><ProductCard item={item} /></div>
+        <div data-product-tag-ids={(item.tagIds || []).join(" ")} data-product-title={item.title} class="min-w-0"><ProductCard item={item} /></div>
       ))
     }
   </div>

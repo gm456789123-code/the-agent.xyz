@@ -31,13 +31,15 @@ const isActive = (href: string) => pathname === href || (href === "/articles" &&
 
       <!-- Quick Search Bar (Desktop Wide) -->
       <div class="hidden lg:flex flex-1 max-w-xs xl:max-w-lg 2xl:max-w-xl mx-3 lg:mx-4 xl:mx-6">
-        <div class="relative w-full">
+        <form action="/products" method="get" class="relative w-full">
           <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-pink-300">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
           <input
+            id="global-search-input-desktop"
+            name="search"
             type="text"
             placeholder="ค้นหาดีล, สตรีมมิ่ง, เติมเกม หรือซอฟต์แวร์..."
             class="w-full pl-10 pr-12 py-2 text-sm bg-surface-card border border-pink-400/30 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all shadow-inner font-bold"
@@ -45,7 +47,7 @@ const isActive = (href: string) => pathname === href || (href === "/articles" &&
           <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
             <kbd class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-mono text-pink-300 font-bold bg-pink-500/20 border border-pink-500/40 rounded-md">⌘K</kbd>
           </div>
-        </div>
+        </form>
       </div>
 
       <!-- Desktop Navigation Links -->
@@ -137,18 +139,20 @@ const isActive = (href: string) => pathname === href || (href === "/articles" &&
     </div>
 
     <!-- Mobile Search Input -->
-    <div class="relative w-full">
+    <form action="/products" method="get" class="relative w-full">
       <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-purple-300/70">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
       </div>
       <input
+        id="global-search-input-mobile"
+        name="search"
         type="text"
         placeholder="ค้นหาดีล, สตรีมมิ่ง, เติมเกม..."
         class="w-full pl-10 pr-4 py-3 text-xs sm:text-sm bg-surface-card border border-white/15 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-sky-400"
       />
-    </div>
+    </form>
 
     <!-- Mobile Nav Links -->
     <nav class="flex flex-col space-y-1 pt-1">

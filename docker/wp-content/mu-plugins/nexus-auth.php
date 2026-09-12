@@ -6,6 +6,8 @@
 
 require_once __DIR__ . '/nexus-security.php';
 
+const NEXUS_FRONTEND_URL = 'https://lime-oryx-922373.hostingersite.com';
+
 add_action('rest_api_init', function () {
     register_rest_route('nexus/v1', '/register', [
         'methods' => 'POST',
@@ -66,6 +68,11 @@ add_action('rest_api_init', function () {
 
             $user = get_user_by('id', $user_id);
             $user->set_role('subscriber');
+
+            $verify_token = bin2hex(random_bytes(32));
+            update_user_meta($user_id, 'nexus_email_verify_token', hash('sha256', $verify_token));
+            update_user_meta($user_id, 'nexus_email_verify_token_created', time());
+            nexus_send_verification_email($user_id, $email, $verify_token);
 
             return rest_ensure_response([
                 'success' => true,
@@ -130,6 +137,7 @@ add_action('rest_api_init', function () {
                 'username' => $user->user_login,
                 'email' => $user->user_email,
                 'phone' => get_user_meta($user->ID, 'nexus_phone', true),
+                'email_verified' => (bool) get_user_meta($user->ID, 'user_email_verified', true),
             ]);
         },
     ]);
@@ -146,9 +154,139 @@ add_action('rest_api_init', function () {
             return rest_ensure_response(['success' => true]);
         },
     ]);
+
+    register_rest_route('nexus/v1', '/forgot-password', [
+        'methods' => 'POST',
+        'permission_callback' => '__return_true',
+        'args' => [
+            'login' => ['required' => true, 'type' => 'string'],
+        ],
+        'callback' => function (WP_REST_Request $request) {
+            if (!nexus_check_rate_limit('auth_forgot_password', 5, 300)) {
+                return new WP_Error('rate_limit_exceeded', 'คุณส่งคำขอบ่อยเกินไป กรุณารอ 5 นาทีแล้วลองใหม่อีกครั้ง', ['status' => 429]);
+            }
+
+            $login = sanitize_text_field($request->get_param('login'));
+            $user = is_email($login) ? get_user_by('email', $login) : get_user_by('login', $login);
+
+            if ($user) {
+                $key = get_password_reset_key($user);
+                if (!is_wp_error($key)) {
+                    $link = NEXUS_FRONTEND_URL . '/reset-password?login=' . rawurlencode($user->user_login) . '&key=' . rawurlencode($key);
+                    wp_mail(
+                        $user->user_email,
+                        'รีเซ็ตรหัสผ่าน NEXUS.DEALS',
+                        "คลิกลิงก์ด้านล่างเพื่อตั้งรหัสผ่านใหม่ (ลิงก์นี้ใช้ได้ครั้งเดียว):\n\n{$link}\n\nหากคุณไม่ได้ร้องขอ กรุณาเพิกเฉยต่ออีเมลนี้"
+                    );
+                }
+            }
+
+            // Always return the same generic response, whether or not the account exists,
+            // and regardless of mail delivery outcome, to avoid leaking account existence.
+            return rest_ensure_response([
+                'success' => true,
+                'message' => 'หากอีเมลนี้มีอยู่ในระบบ เราได้ส่งลิงก์รีเซ็ตรหัสผ่านไปแล้ว',
+            ]);
+        },
+    ]);
+
+    register_rest_route('nexus/v1', '/reset-password', [
+        'methods' => 'POST',
+        'permission_callback' => '__return_true',
+        'args' => [
+            'login' => ['required' => true, 'type' => 'string'],
+            'key' => ['required' => true, 'type' => 'string'],
+            'new_password' => ['required' => true, 'type' => 'string'],
+        ],
+        'callback' => function (WP_REST_Request $request) {
+            if (!nexus_check_rate_limit('auth_reset_password', 5, 300)) {
+                return new WP_Error('rate_limit_exceeded', 'คุณลองรีเซ็ตรหัสผ่านบ่อยเกินไป กรุณารอ 5 นาทีแล้วลองใหม่อีกครั้ง', ['status' => 429]);
+            }
+
+            $login = sanitize_text_field($request->get_param('login'));
+            $key = sanitize_text_field($request->get_param('key'));
+            $new_password = $request->get_param('new_password');
+
+            if (strlen($new_password) < 8) {
+                return new WP_Error('weak_password', 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร', ['status' => 400]);
+            }
+
+            $user = check_password_reset_key($key, $login);
+            if (is_wp_error($user)) {
+                return new WP_Error('invalid_reset_key', 'ลิงก์รีเซ็ตรหัสผ่านไม่ถูกต้องหรือหมดอายุ กรุณาขอลิงก์ใหม่', ['status' => 400]);
+            }
+
+            reset_password($user, $new_password);
+
+            return rest_ensure_response([
+                'success' => true,
+                'message' => 'เปลี่ยนรหัสผ่านสำเร็จ กรุณาเข้าสู่ระบบใหม่',
+            ]);
+        },
+    ]);
+
+    register_rest_route('nexus/v1', '/verify-email', [
+        'methods' => 'POST',
+        'permission_callback' => '__return_true',
+        'args' => [
+            'uid' => ['required' => true, 'type' => 'integer'],
+            'token' => ['required' => true, 'type' => 'string'],
+        ],
+        'callback' => function (WP_REST_Request $request) {
+            $uid = (int) $request->get_param('uid');
+            $token = sanitize_text_field($request->get_param('token'));
+
+            if (!preg_match('/^[a-f0-9]{64}$/D', $token)) {
+                return new WP_Error('invalid_token', 'ลิงก์ยืนยันอีเมลไม่ถูกต้องหรือหมดอายุ', ['status' => 400]);
+            }
+
+            $stored = get_user_meta($uid, 'nexus_email_verify_token', true);
+            $created = (int) get_user_meta($uid, 'nexus_email_verify_token_created', true);
+
+            if (!$stored || !hash_equals($stored, hash('sha256', $token)) || $created <= 0 || (time() - $created) > NEXUS_VERIFY_TOKEN_TTL_SECONDS) {
+                return new WP_Error('invalid_token', 'ลิงก์ยืนยันอีเมลไม่ถูกต้องหรือหมดอายุ', ['status' => 400]);
+            }
+
+            update_user_meta($uid, 'user_email_verified', '1');
+            delete_user_meta($uid, 'nexus_email_verify_token');
+            delete_user_meta($uid, 'nexus_email_verify_token_created');
+
+            return rest_ensure_response(['success' => true, 'message' => 'ยืนยันอีเมลสำเร็จ']);
+        },
+    ]);
+
+    register_rest_route('nexus/v1', '/resend-verification', [
+        'methods' => 'POST',
+        'permission_callback' => 'nexus_require_member',
+        'callback' => function (WP_REST_Request $request) {
+            if (!nexus_check_rate_limit('auth_resend_verification', 3, 300)) {
+                return new WP_Error('rate_limit_exceeded', 'คุณขอส่งอีเมลยืนยันบ่อยเกินไป กรุณารอสักครู่', ['status' => 429]);
+            }
+
+            $user = nexus_get_user_from_token($request);
+            if (!$user) return new WP_Error('authentication_required', 'กรุณาเข้าสู่ระบบ', ['status' => 401]);
+
+            $verify_token = bin2hex(random_bytes(32));
+            update_user_meta($user->ID, 'nexus_email_verify_token', hash('sha256', $verify_token));
+            update_user_meta($user->ID, 'nexus_email_verify_token_created', time());
+            nexus_send_verification_email($user->ID, $user->user_email, $verify_token);
+
+            return rest_ensure_response(['success' => true, 'message' => 'ส่งอีเมลยืนยันอีกครั้งแล้ว']);
+        },
+    ]);
 });
 
 const NEXUS_TOKEN_TTL_SECONDS = 30 * DAY_IN_SECONDS;
+const NEXUS_VERIFY_TOKEN_TTL_SECONDS = 48 * HOUR_IN_SECONDS;
+
+function nexus_send_verification_email(int $user_id, string $email, string $token): void {
+    $link = NEXUS_FRONTEND_URL . '/verify-email?uid=' . $user_id . '&token=' . rawurlencode($token);
+    wp_mail(
+        $email,
+        'ยืนยันอีเมลของคุณ - NEXUS.DEALS',
+        "คลิกลิงก์ด้านล่างเพื่อยืนยันอีเมลของคุณ:\n\n{$link}\n\nลิงก์นี้จะหมดอายุใน 48 ชั่วโมง"
+    );
+}
 
 function nexus_get_user_from_token(WP_REST_Request $request): ?WP_User {
     $token = $request->get_header('x-nexus-token');

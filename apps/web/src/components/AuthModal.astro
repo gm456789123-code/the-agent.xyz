@@ -3,7 +3,7 @@
   <div class="w-full max-w-md rounded-2xl sm:rounded-3xl aurora-glass p-6 sm:p-8 border border-purple-400/40 shadow-aurora relative max-h-[92vh] overflow-y-auto">
     <button type="button" id="auth-modal-close" class="absolute top-4 right-4 text-slate-300 hover:text-white text-2xl leading-none cursor-pointer">&times;</button>
 
-    <div class="flex gap-1.5 mb-6 p-1 rounded-xl bg-surface-card border border-white/10">
+    <div id="auth-tabs" class="flex gap-1.5 mb-6 p-1 rounded-xl bg-surface-card border border-white/10">
       <button type="button" id="auth-tab-login" class="flex-1 py-2 rounded-lg text-sm font-black transition-all">เข้าสู่ระบบ</button>
       <button type="button" id="auth-tab-register" class="flex-1 py-2 rounded-lg text-sm font-black transition-all">สมัครสมาชิก</button>
     </div>
@@ -24,7 +24,7 @@
         </div>
         <div class="flex flex-wrap items-center justify-between gap-3 text-sm">
           <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" name="rememberme" value="forever" class="h-4 w-4 accent-purple-400" />จดจำการเข้าสู่ระบบ</label>
-          <a href="https://line.me" target="_blank" rel="noopener noreferrer" class="text-pink-300 hover:text-white font-bold">ลืมรหัสผ่าน?</a>
+          <button type="button" data-auth-open="forgot-password" class="text-pink-300 hover:text-white font-bold cursor-pointer">ลืมรหัสผ่าน?</button>
         </div>
         <p id="auth-login-message" role="alert" class="hidden text-sm text-rose-300"></p>
         <button id="auth-login-submit" type="submit" class="w-full rounded-xl aurora-btn-gradient px-5 py-3.5 text-base font-black text-white disabled:opacity-50 disabled:cursor-wait">เข้าสู่ระบบ</button>
@@ -83,6 +83,41 @@
         มีบัญชีอยู่แล้ว? <button type="button" id="auth-goto-login" class="text-purple-300 hover:text-white font-bold cursor-pointer">เข้าสู่ระบบ →</button>
       </div>
     </div>
+
+    <!-- Forgot Password Panel -->
+    <div id="auth-panel-forgot-password" class="hidden">
+      <h3 class="font-display font-black text-lg text-white mb-1.5">ลืมรหัสผ่าน?</h3>
+      <p class="text-sm text-slate-400 mb-4">กรอกอีเมลหรือชื่อผู้ใช้ของคุณ เราจะส่งลิงก์สำหรับตั้งรหัสผ่านใหม่ไปให้</p>
+      <form id="auth-forgot-form" class="space-y-4">
+        <div>
+          <label for="auth-forgot-login" class="block text-sm font-bold text-slate-200 mb-1.5">อีเมลหรือชื่อผู้ใช้</label>
+          <input id="auth-forgot-login" name="login" type="text" autocomplete="username" required placeholder="อีเมลหรือชื่อผู้ใช้ของคุณ" class="w-full min-w-0 rounded-xl border border-white/20 bg-surface-card px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30" />
+        </div>
+        <p id="auth-forgot-message" role="status" class="hidden text-sm text-emerald-300"></p>
+        <button id="auth-forgot-submit" type="submit" class="w-full rounded-xl aurora-btn-gradient px-5 py-3.5 text-base font-black text-slate-950 hover:text-white transition-all shadow-glow disabled:opacity-50 disabled:cursor-wait">ส่งลิงก์รีเซ็ตรหัสผ่าน</button>
+      </form>
+      <div class="mt-5 text-center text-sm text-slate-300">
+        นึกออกแล้ว? <button type="button" id="auth-forgot-goto-login" class="text-purple-300 hover:text-white font-bold cursor-pointer">กลับไปเข้าสู่ระบบ</button>
+      </div>
+    </div>
+
+    <!-- Reset Password Panel -->
+    <div id="auth-panel-reset-password" class="hidden">
+      <h3 class="font-display font-black text-lg text-white mb-1.5">ตั้งรหัสผ่านใหม่</h3>
+      <form id="auth-reset-form" class="space-y-4">
+        <div>
+          <label for="auth-reset-password" class="block text-sm font-bold text-slate-200 mb-1.5">รหัสผ่านใหม่</label>
+          <input id="auth-reset-password" name="new_password" type="password" autocomplete="new-password" required minlength="8" placeholder="อย่างน้อย 8 ตัวอักษร" class="w-full min-w-0 rounded-xl border border-white/20 bg-surface-card px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30" />
+        </div>
+        <div>
+          <label for="auth-reset-confirm" class="block text-sm font-bold text-slate-200 mb-1.5">ยืนยันรหัสผ่านใหม่</label>
+          <input id="auth-reset-confirm" name="confirm" type="password" autocomplete="new-password" required placeholder="กรอกรหัสผ่านอีกครั้ง" class="w-full min-w-0 rounded-xl border border-white/20 bg-surface-card px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30" />
+        </div>
+        <p id="auth-reset-error" role="alert" class="hidden text-sm text-rose-300"></p>
+        <p id="auth-reset-success" role="status" class="hidden text-sm text-emerald-300"></p>
+        <button id="auth-reset-submit" type="submit" class="w-full rounded-xl aurora-btn-gradient px-5 py-3.5 text-base font-black text-slate-950 hover:text-white transition-all shadow-glow disabled:opacity-50 disabled:cursor-wait">ตั้งรหัสผ่านใหม่</button>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -99,28 +134,43 @@
 </style>
 
 <script>
-  type AuthMode = "login" | "register";
+  type AuthMode = "login" | "register" | "forgot-password" | "reset-password";
 
   function initAuthModal() {
     const modal = document.getElementById("auth-modal");
     const closeBtn = document.getElementById("auth-modal-close");
     const tabLogin = document.getElementById("auth-tab-login");
     const tabRegister = document.getElementById("auth-tab-register");
+    const authTabs = document.getElementById("auth-tabs");
     const panelLogin = document.getElementById("auth-panel-login");
     const panelRegister = document.getElementById("auth-panel-register");
+    const panelForgot = document.getElementById("auth-panel-forgot-password");
+    const panelReset = document.getElementById("auth-panel-reset-password");
     const gotoRegister = document.getElementById("auth-goto-register");
     const gotoLogin = document.getElementById("auth-goto-login");
+    const forgotGotoLogin = document.getElementById("auth-forgot-goto-login");
 
-    if (!modal || !tabLogin || !tabRegister || !panelLogin || !panelRegister) return;
+    if (!modal || !tabLogin || !tabRegister || !panelLogin || !panelRegister || !panelForgot || !panelReset) return;
+
+    const panels: Record<AuthMode, HTMLElement> = {
+      login: panelLogin,
+      register: panelRegister,
+      "forgot-password": panelForgot,
+      "reset-password": panelReset,
+    };
 
     let pendingRedirect: string | null = null;
+    let pendingReset: { login: string; key: string } | null = null;
 
     function setMode(mode: AuthMode) {
+      (Object.keys(panels) as AuthMode[]).forEach((key) => {
+        panels[key].classList.toggle("hidden", key !== mode);
+      });
       const isLogin = mode === "login";
-      panelLogin!.classList.toggle("hidden", !isLogin);
-      panelRegister!.classList.toggle("hidden", isLogin);
+      const isRegister = mode === "register";
+      authTabs!.classList.toggle("hidden", !isLogin && !isRegister);
       tabLogin!.classList.toggle("is-active", isLogin);
-      tabRegister!.classList.toggle("is-active", !isLogin);
+      tabRegister!.classList.toggle("is-active", isRegister);
     }
 
     function openModal(mode: AuthMode, redirect?: string | null) {
@@ -147,8 +197,9 @@
     tabRegister.addEventListener("click", () => setMode("register"));
     gotoRegister?.addEventListener("click", () => setMode("register"));
     gotoLogin?.addEventListener("click", () => setMode("login"));
+    forgotGotoLogin?.addEventListener("click", () => setMode("login"));
 
-    // Any element on the page can open this modal via data-auth-open="login|register"
+    // Any element on the page can open this modal via data-auth-open="login|register|forgot-password|reset-password"
     document.addEventListener("click", (e) => {
       const trigger = (e.target as HTMLElement)?.closest?.("[data-auth-open]") as HTMLElement | null;
       if (!trigger) return;
@@ -157,7 +208,10 @@
       openModal(mode, trigger.getAttribute("data-auth-redirect"));
     });
 
-    document.addEventListener("nexus:open-auth", ((e: CustomEvent<{ mode?: AuthMode; redirect?: string }>) => {
+    document.addEventListener("nexus:open-auth", ((e: CustomEvent<{ mode?: AuthMode; redirect?: string; login?: string; key?: string }>) => {
+      if (e.detail?.mode === "reset-password" && e.detail.login && e.detail.key) {
+        pendingReset = { login: e.detail.login, key: e.detail.key };
+      }
       openModal(e.detail?.mode ?? "login", e.detail?.redirect);
     }) as EventListener);
 
@@ -309,6 +363,90 @@
       } finally {
         regSubmit.disabled = false;
         regSubmit.textContent = "สร้างบัญชีสมาชิก";
+      }
+    });
+
+    // --- Forgot password form ---
+    const forgotForm = document.getElementById("auth-forgot-form") as HTMLFormElement;
+    const forgotMessage = document.getElementById("auth-forgot-message");
+    const forgotSubmit = document.getElementById("auth-forgot-submit") as HTMLButtonElement;
+
+    forgotForm?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const login = (document.getElementById("auth-forgot-login") as HTMLInputElement).value.trim();
+
+      forgotSubmit.disabled = true;
+      forgotSubmit.textContent = "กำลังส่ง...";
+      try {
+        if (WP_API_URL) {
+          await fetch(`${WP_API_URL}/nexus/v1/forgot-password`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ login }),
+          });
+        }
+      } finally {
+        // Always show the same generic message, regardless of outcome, to avoid leaking account existence.
+        if (forgotMessage) {
+          forgotMessage.textContent = "หากอีเมลนี้มีอยู่ในระบบ เราได้ส่งลิงก์รีเซ็ตรหัสผ่านไปแล้ว";
+          forgotMessage.classList.remove("hidden");
+        }
+        forgotForm.reset();
+        forgotSubmit.disabled = false;
+        forgotSubmit.textContent = "ส่งลิงก์รีเซ็ตรหัสผ่าน";
+      }
+    });
+
+    // --- Reset password form ---
+    const resetForm = document.getElementById("auth-reset-form") as HTMLFormElement;
+    const resetError = document.getElementById("auth-reset-error");
+    const resetSuccess = document.getElementById("auth-reset-success");
+    const resetSubmit = document.getElementById("auth-reset-submit") as HTMLButtonElement;
+
+    resetForm?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      resetError?.classList.add("hidden");
+      resetSuccess?.classList.add("hidden");
+
+      const newPassword = (document.getElementById("auth-reset-password") as HTMLInputElement).value;
+      const confirm = (document.getElementById("auth-reset-confirm") as HTMLInputElement).value;
+
+      if (newPassword !== confirm) {
+        if (resetError) { resetError.textContent = "รหัสผ่านไม่ตรงกัน กรุณากรอกใหม่"; resetError.classList.remove("hidden"); } return;
+      }
+      if (newPassword.length < 8) {
+        if (resetError) { resetError.textContent = "รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร"; resetError.classList.remove("hidden"); } return;
+      }
+      if (!pendingReset) {
+        if (resetError) { resetError.textContent = "ลิงก์รีเซ็ตรหัสผ่านไม่ถูกต้อง กรุณาขอลิงก์ใหม่"; resetError.classList.remove("hidden"); } return;
+      }
+
+      resetSubmit.disabled = true;
+      resetSubmit.textContent = "กำลังบันทึก...";
+      try {
+        const res = await fetch(`${WP_API_URL}/nexus/v1/reset-password`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ login: pendingReset.login, key: pendingReset.key, new_password: newPassword }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.message || "เปลี่ยนรหัสผ่านไม่สำเร็จ");
+
+        if (resetSuccess) {
+          resetSuccess.textContent = "เปลี่ยนรหัสผ่านสำเร็จ กรุณาเข้าสู่ระบบใหม่";
+          resetSuccess.classList.remove("hidden");
+        }
+        resetForm.reset();
+        pendingReset = null;
+        setTimeout(() => setMode("login"), 1400);
+      } catch (err) {
+        if (resetError) {
+          resetError.textContent = err instanceof Error ? err.message : "เกิดข้อผิดพลาด กรุณาลองใหม่";
+          resetError.classList.remove("hidden");
+        }
+      } finally {
+        resetSubmit.disabled = false;
+        resetSubmit.textContent = "ตั้งรหัสผ่านใหม่";
       }
     });
 

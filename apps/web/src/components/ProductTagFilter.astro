@@ -6,11 +6,12 @@ interface Props {
   countId: string;
   emptyId: string;
   syncUrl?: boolean;
+  searchInputIds?: string[];
 }
-const { tags, gridId, countId, emptyId, syncUrl = false } = Astro.props;
+const { tags, gridId, countId, emptyId, syncUrl = false, searchInputIds = [] } = Astro.props;
 ---
 
-<div data-product-tag-filter data-grid-id={gridId} data-count-id={countId} data-empty-id={emptyId} data-sync-url={String(syncUrl)} class="flex flex-wrap gap-2" role="group" aria-label="กรองตามแท็กสินค้า">
+<div data-product-tag-filter data-grid-id={gridId} data-count-id={countId} data-empty-id={emptyId} data-sync-url={String(syncUrl)} data-search-input-ids={searchInputIds.join(",")} class="flex flex-wrap gap-2" role="group" aria-label="กรองตามแท็กสินค้า">
   <button type="button" data-tag-id="all" data-tag-slug="all" aria-pressed="true" aria-controls={gridId} class="tag-button rounded-xl border border-white/15 px-4 py-2 text-sm font-bold text-slate-200 hover:border-pink-400/50">ทั้งหมด</button>
   {tags.map((tag) => (
     <button type="button" data-tag-id={tag.id} data-tag-slug={tag.slug} aria-pressed="false" aria-controls={gridId} class="tag-button rounded-xl border border-white/15 px-4 py-2 text-sm font-bold text-slate-200 hover:border-pink-400/50">{tag.name}</button>
@@ -27,19 +28,34 @@ const { tags, gridId, countId, emptyId, syncUrl = false } = Astro.props;
     const count = document.getElementById(filter.dataset.countId!);
     const empty = document.getElementById(filter.dataset.emptyId!);
     const buttons = [...filter.querySelectorAll<HTMLButtonElement>("[data-tag-id]")];
+    const searchInputs = (filter.dataset.searchInputIds || "")
+      .split(",")
+      .filter(Boolean)
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLInputElement => el instanceof HTMLInputElement);
     if (!grid || !count || !empty) return;
 
-    function selectTag(button: HTMLButtonElement) {
-      const id = button.dataset.tagId!;
+    let currentTagId = "all";
+    let currentSearch = "";
+
+    function applyFilters() {
       let visible = 0;
       grid!.querySelectorAll<HTMLElement>("[data-product-tag-ids]").forEach((card) => {
         const ids = (card.dataset.productTagIds || "").split(" ");
-        card.hidden = id !== "all" && !ids.includes(id);
+        const tagMatches = currentTagId === "all" || ids.includes(currentTagId);
+        const title = (card.dataset.productTitle || "").toLowerCase();
+        const searchMatches = !currentSearch || title.includes(currentSearch);
+        card.hidden = !(tagMatches && searchMatches);
         if (!card.hidden) visible++;
       });
-      buttons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+      buttons.forEach((item) => item.setAttribute("aria-pressed", String(item.dataset.tagId === currentTagId)));
       count!.textContent = `${visible} รายการ`;
       empty!.hidden = visible > 0;
+    }
+
+    function selectTag(button: HTMLButtonElement) {
+      currentTagId = button.dataset.tagId!;
+      applyFilters();
     }
 
     buttons.forEach((button) => button.addEventListener("click", () => {
@@ -53,14 +69,31 @@ const { tags, gridId, countId, emptyId, syncUrl = false } = Astro.props;
       }
     }));
 
+    searchInputs.forEach((input) => input.addEventListener("input", () => {
+      currentSearch = input.value.trim().toLowerCase();
+      searchInputs.forEach((other) => { if (other !== input) other.value = input.value; });
+      applyFilters();
+      if (filter.dataset.syncUrl === "true") {
+        const url = new URL(location.href);
+        if (currentSearch) url.searchParams.set("search", currentSearch);
+        else url.searchParams.delete("search");
+        history.replaceState(null, "", url);
+      }
+    }));
+
     if (filter.dataset.syncUrl === "true") {
       const fromUrl = () => {
         const query = new URLSearchParams(location.search);
         const slug = query.get("tag") || query.get("category");
-        selectTag(buttons.find((button) => button.dataset.tagSlug === slug) || buttons[0]);
+        currentTagId = (buttons.find((button) => button.dataset.tagSlug === slug) || buttons[0]).dataset.tagId!;
+        currentSearch = (query.get("search") || "").trim().toLowerCase();
+        searchInputs.forEach((input) => { input.value = query.get("search") || ""; });
+        applyFilters();
       };
       fromUrl();
       window.addEventListener("popstate", fromUrl);
+    } else {
+      applyFilters();
     }
   });
 </script>
