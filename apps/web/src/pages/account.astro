@@ -26,8 +26,6 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
     <div id="account-error" class="hidden rounded-2xl border border-rose-400/30 p-8 text-center text-rose-300"></div>
 
-    <p id="account-pay-error" class="hidden text-sm text-rose-300 font-bold"></p>
-
     <ul id="account-orders" class="hidden space-y-4"></ul>
   </main>
 </BaseLayout>
@@ -130,38 +128,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       }
     }
 
-    const payErrorEl = document.getElementById("account-pay-error");
-
-    listEl.addEventListener("click", async (e) => {
+    listEl.addEventListener("click", (e) => {
       const button = (e.target as HTMLElement)?.closest<HTMLButtonElement>(".js-pay-now");
       if (!button) return;
-
-      payErrorEl?.classList.add("hidden");
       const orderCode = button.dataset.orderCode;
-      const token = localStorage.getItem("nexus_token");
-      if (!token || !orderCode) return;
-
-      button.disabled = true;
-      const originalLabel = button.textContent;
-      button.textContent = "กำลังไปหน้าชำระเงิน...";
-
-      try {
-        const res = await fetch(`${WP_API_URL}/nexus/v1/checkout`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ order_code: orderCode }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data?.message || "ไม่สามารถเริ่มการชำระเงินได้");
-        window.location.href = data.checkout_url;
-      } catch (err) {
-        if (payErrorEl) {
-          payErrorEl.textContent = err instanceof Error ? err.message : "เกิดข้อผิดพลาด กรุณาลองใหม่";
-          payErrorEl.classList.remove("hidden");
-        }
-        button.disabled = false;
-        button.textContent = originalLabel;
-      }
+      if (!orderCode) return;
+      window.location.href = `/checkout?order=${encodeURIComponent(orderCode)}`;
     });
 
     document.addEventListener("nexus:auth-success", loadOrders);

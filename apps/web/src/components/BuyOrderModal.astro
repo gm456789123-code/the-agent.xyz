@@ -151,30 +151,9 @@
       }
     });
 
-    payNowBtn.addEventListener("click", async () => {
+    payNowBtn.addEventListener("click", () => {
       if (!activeOrderCode) return;
-      errorEl!.classList.add("hidden");
-      const token = localStorage.getItem("nexus_token");
-      if (!token) return;
-
-      payNowBtn.disabled = true;
-      payNowBtn.textContent = "กำลังไปหน้าชำระเงิน...";
-
-      try {
-        const res = await fetch(`${WP_API_URL}/nexus/v1/checkout`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ order_code: activeOrderCode }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data?.message || "ไม่สามารถเริ่มการชำระเงินได้");
-        window.location.href = data.checkout_url;
-      } catch (err) {
-        errorEl!.textContent = err instanceof Error ? err.message : "เกิดข้อผิดพลาด กรุณาลองใหม่";
-        errorEl!.classList.remove("hidden");
-        payNowBtn!.disabled = false;
-        payNowBtn!.textContent = "ชำระเงินตอนนี้";
-      }
+      window.location.href = `/checkout?order=${encodeURIComponent(activeOrderCode)}`;
     });
   }
 

@@ -1,0 +1,183 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="สรุปคำสั่งซื้อ — NEXUS.DEALS">
+  <main class="w-full max-w-2xl mx-auto px-4 sm:px-8 py-8 sm:py-12 pb-28 lg:pb-14 space-y-8">
+    <div>
+      <p class="text-pink-300 font-bold text-sm">NEXUS.DEALS / ชำระเงิน</p>
+      <h1 class="font-display font-black text-2xl sm:text-4xl mt-3">สรุป<span class="aurora-text">คำสั่งซื้อ</span></h1>
+    </div>
+
+    <div id="checkout-loading" class="rounded-2xl border border-white/10 p-8 text-center text-slate-300">
+      กำลังโหลดข้อมูล...
+    </div>
+
+    <div id="checkout-guest" class="hidden rounded-2xl border border-white/10 p-8 text-center text-slate-300 space-y-4">
+      <p>กรุณาเข้าสู่ระบบเพื่อดำเนินการชำระเงิน</p>
+      <button type="button" data-auth-open="login" class="inline-block px-6 py-3 rounded-xl font-black aurora-btn-gradient text-slate-950 hover:text-white transition-all cursor-pointer">
+        เข้าสู่ระบบ
+      </button>
+    </div>
+
+    <div id="checkout-error" class="hidden rounded-2xl border border-rose-400/30 p-8 text-center text-rose-300"></div>
+
+    <div id="checkout-summary" class="hidden aurora-glass rounded-2xl border border-white/10 p-6 sm:p-8 space-y-5">
+      <div>
+        <p class="text-sm text-slate-400">รหัสคำสั่งซื้อ</p>
+        <p id="checkout-order-code" class="font-display font-black text-white"></p>
+      </div>
+      <div class="pt-4 border-t border-white/10">
+        <p class="text-sm text-slate-400">สินค้า</p>
+        <p id="checkout-product-title" class="font-display font-black text-lg text-white"></p>
+      </div>
+      <div class="pt-4 border-t border-white/10 flex items-center justify-between">
+        <p class="text-sm text-slate-400">ยอดชำระ</p>
+        <p id="checkout-amount" class="font-display font-black text-2xl text-pink-300"></p>
+      </div>
+      <p id="checkout-submit-error" class="hidden text-sm text-rose-300 font-bold"></p>
+      <button
+        type="button"
+        id="checkout-confirm-btn"
+        class="w-full py-3.5 rounded-xl font-display font-black text-base aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow cursor-pointer"
+      >
+        ยืนยันชำระเงินผ่าน Stripe
+      </button>
+      <a href="/account" class="block text-center text-sm text-slate-400 hover:text-white">← กลับไปหน้าประวัติการสั่งซื้อ</a>
+    </div>
+
+    <div id="checkout-not-payable" class="hidden rounded-2xl border border-white/10 p-8 text-center text-slate-300 space-y-4">
+      <p id="checkout-not-payable-message"></p>
+      <a href="/account" class="inline-block px-6 py-3 rounded-xl font-black aurora-btn-gradient text-slate-950 hover:text-white transition-all">
+        ไปหน้าประวัติการสั่งซื้อ
+      </a>
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  const WP_API_URL = import.meta.env.PUBLIC_WP_API_URL || "https://azure-bison-824750.hostingersite.com/wp-json";
+
+  const STATUS_LABELS: Record<string, string> = {
+    pending_payment: "รอชำระเงิน",
+    paid: "ชำระเงินแล้ว",
+    delivered: "จัดส่งสำเร็จ",
+    cancelled: "ยกเลิก",
+  };
+
+  interface OrderRow {
+    order_code: string;
+    product_title: string;
+    amount: string;
+    status: string;
+  }
+
+  function initCheckoutPage() {
+    const loadingEl = document.getElementById("checkout-loading");
+    const guestEl = document.getElementById("checkout-guest");
+    const errorEl = document.getElementById("checkout-error");
+    const summaryEl = document.getElementById("checkout-summary");
+    const notPayableEl = document.getElementById("checkout-not-payable");
+    const notPayableMessageEl = document.getElementById("checkout-not-payable-message");
+    const orderCodeEl = document.getElementById("checkout-order-code");
+    const productTitleEl = document.getElementById("checkout-product-title");
+    const amountEl = document.getElementById("checkout-amount");
+    const confirmBtn = document.getElementById("checkout-confirm-btn") as HTMLButtonElement | null;
+    const submitErrorEl = document.getElementById("checkout-submit-error");
+
+    if (!loadingEl || !guestEl || !errorEl || !summaryEl || !notPayableEl || !notPayableMessageEl || !orderCodeEl || !productTitleEl || !amountEl || !confirmBtn || !submitErrorEl) return;
+
+    function showOnly(el: HTMLElement) {
+      [loadingEl, guestEl, errorEl, summaryEl, notPayableEl].forEach((node) => node?.classList.add("hidden"));
+      el.classList.remove("hidden");
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const orderCode = params.get("order");
+
+    async function loadOrder() {
+      if (!orderCode) {
+        errorEl!.textContent = "ไม่พบรหัสคำสั่งซื้อ";
+        showOnly(errorEl!);
+        return;
+      }
+
+      const token = localStorage.getItem("nexus_token");
+      if (!token) {
+        showOnly(guestEl!);
+        return;
+      }
+
+      showOnly(loadingEl!);
+
+      try {
+        const res = await fetch(`${WP_API_URL}/nexus/v1/orders/track?query=${encodeURIComponent(orderCode)}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.status === 401) {
+          localStorage.removeItem("nexus_token");
+          localStorage.removeItem("nexus_user");
+          document.dispatchEvent(new CustomEvent("nexus:auth-changed"));
+          showOnly(guestEl!);
+          return;
+        }
+
+        if (!res.ok) throw new Error("ไม่พบคำสั่งซื้อนี้");
+
+        const orders: OrderRow[] = await res.json();
+        const order = Array.isArray(orders) ? orders[0] : null;
+        if (!order) throw new Error("ไม่พบคำสั่งซื้อนี้");
+
+        if (order.status !== "pending_payment") {
+          notPayableMessageEl!.textContent = `คำสั่งซื้อนี้อยู่ในสถานะ "${STATUS_LABELS[order.status] || order.status}" ไม่สามารถชำระเงินได้`;
+          showOnly(notPayableEl!);
+          return;
+        }
+
+        orderCodeEl!.textContent = order.order_code;
+        productTitleEl!.textContent = order.product_title;
+        amountEl!.textContent = `฿${order.amount}`;
+        showOnly(summaryEl!);
+      } catch (err) {
+        errorEl!.textContent = err instanceof Error ? err.message : "เกิดข้อผิดพลาด กรุณาลองใหม่ภายหลัง";
+        showOnly(errorEl!);
+      }
+    }
+
+    confirmBtn.addEventListener("click", async () => {
+      if (!orderCode) return;
+      submitErrorEl!.classList.add("hidden");
+      const token = localStorage.getItem("nexus_token");
+      if (!token) return;
+
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = "กำลังไปหน้าชำระเงิน...";
+
+      try {
+        const res = await fetch(`${WP_API_URL}/nexus/v1/checkout`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ order_code: orderCode }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.message || "ไม่สามารถเริ่มการชำระเงินได้");
+        window.location.href = data.checkout_url;
+      } catch (err) {
+        submitErrorEl!.textContent = err instanceof Error ? err.message : "เกิดข้อผิดพลาด กรุณาลองใหม่";
+        submitErrorEl!.classList.remove("hidden");
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = "ยืนยันชำระเงินผ่าน Stripe";
+      }
+    });
+
+    document.addEventListener("nexus:auth-success", loadOrder);
+    loadOrder();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initCheckoutPage);
+  } else {
+    initCheckoutPage();
+  }
+</script>
