@@ -8,9 +8,10 @@ import ProductTagFilter from "./ProductTagFilter.astro";
 interface Props {
   products?: ProductDeal[];
   kind: "products" | "services";
+  unavailable?: boolean;
 }
 
-const { products = [], kind } = Astro.props;
+const { products = [], kind, unavailable = false } = Astro.props;
 const isServices = kind === "services";
 const tags = isServices ? [] : await getProductTags();
 const visibleProducts = products;
@@ -33,7 +34,9 @@ const visibleProducts = products;
     {!isServices && <ProductTagFilter tags={tags} gridId={`${kind}-grid`} countId={`${kind}-count`} emptyId={`${kind}-empty`} syncUrl searchInputIds={["global-search-input-desktop", "global-search-input-mobile"]} />}
   </div>
 
-    <p id={`${kind}-empty`} hidden={visibleProducts.length > 0} class="aurora-glass rounded-2xl p-8 text-center text-slate-300">ยังไม่มีรายการในหมวดนี้</p>
+    <p id={`${kind}-empty`} hidden={visibleProducts.length > 0} class="aurora-glass rounded-2xl p-8 text-center text-slate-300">
+      {unavailable ? "ไม่สามารถโหลดรายการได้ กรุณาลองใหม่ภายหลัง" : "ยังไม่มีรายการในหมวดนี้"}
+    </p>
 
   <!-- Products Grid: Responsive Cards (1 Column on Mobile, 2 on Tablet, 3 on Laptop, 4 on 1920px Ultra-Wide Desktop) -->
   <div id={`${kind}-grid`} class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 w-full max-w-full min-w-0">

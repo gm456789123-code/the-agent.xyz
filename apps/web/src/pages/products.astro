@@ -3,7 +3,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import ProductBentoGrid from "../components/ProductBentoGrid.astro";
 import { getProducts } from "../lib/wp";
 
-const products = (await getProducts()).filter((item) => item.category !== "services");
+const { products: allProducts, unavailable } = await getProducts();
+const products = allProducts.filter((item) => item.category !== "services");
 ---
 
 <BaseLayout title="สินค้า — NEXUS.DEALS">
@@ -13,6 +14,6 @@ const products = (await getProducts()).filter((item) => item.category !== "servi
       <h1 class="font-display font-black text-3xl sm:text-5xl mt-3">เลือกซื้อ<span class="aurora-text">สินค้า</span></h1>
       <a href="/services" class="inline-block mt-4 text-pink-300 hover:text-white">กำลังมองหาบริการออนไลน์? ดูบริการทั้งหมด →</a>
     </div>
-    <ProductBentoGrid products={products} kind="products" />
+    <ProductBentoGrid products={products} kind="products" unavailable={unavailable} />
   </main>
 </BaseLayout>

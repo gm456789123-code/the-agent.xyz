@@ -53,29 +53,29 @@ function mapWpProduct(product: WpProduct, index: number): ProductDeal {
     storeRating: 4.8,
     price: typeof price === "number" ? `฿${price.toLocaleString()}` : "฿299",
     unit: product.meta?.unit || stripHtml(product.excerpt.rendered) || "แพ็กเกจมาตรฐาน",
-    deliverySpeed: "ส่งออโต้ทันที",
+    deliverySpeed: "ส่งออโต้ทันทีcost",
     image: product.featured_image_url || fallbackImage,
     color: CATEGORY_COLORS[category],
     description: product.content?.rendered,
   };
 }
 
-export async function getProducts(): Promise<ProductDeal[]> {
-  if (!WP_API_URL) return mockProducts;
+export async function getProducts(): Promise<{ products: ProductDeal[]; unavailable: boolean }> {
+  if (!WP_API_URL) return { products: [], unavailable: true };
 
   try {
     const res = await fetch(
       `${WP_API_URL}/wp/v2/product?_fields=id,title,excerpt,content,meta,featured_image_url,product-tags&orderby=id&order=desc&per_page=50`,
       { signal: AbortSignal.timeout(2000) }
     );
-    if (!res.ok) return mockProducts;
+    if (!res.ok) throw new Error("Products unavailable");
 
     const data = await res.json();
-    if (!Array.isArray(data) || data.length === 0) return mockProducts;
+    if (!Array.isArray(data)) throw new Error("Invalid products response");
 
-    return data.map(mapWpProduct);
+    return { products: data.map(mapWpProduct), unavailable: false };
   } catch {
-    return mockProducts;
+    return { products: [], unavailable: true };
   }
 }
 

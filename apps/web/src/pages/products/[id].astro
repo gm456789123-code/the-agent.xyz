@@ -6,7 +6,7 @@ import { getProducts } from "../../lib/wp";
 import type { ProductDeal } from "../../data/mock";
 
 export async function getStaticPaths() {
-  const products = await getProducts();
+  const { products } = await getProducts();
   return products.map((product) => ({ params: { id: product.id }, props: { product } }));
 }
 
