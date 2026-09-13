@@ -12,8 +12,11 @@ add_action('init', function () {
     $allowed_origins = [
         'https://lime-oryx-922373.hostingersite.com',
         'http://localhost:4321',
+        'http://127.0.0.1:4321',
         'http://localhost:3000',
+        'http://127.0.0.1:3000',
         'http://localhost:8080',
+        'http://127.0.0.1:8080',
     ];
 
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';

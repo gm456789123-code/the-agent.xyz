@@ -59,6 +59,12 @@ add_action('rest_api_init', function () {
             $user = nexus_get_user_from_token($request);
             if (!$user) return new WP_Error('authentication_required', 'กรุณาเข้าสู่ระบบ', ['status' => 401]);
 
+            // Save or update phone in user's profile if empty
+            $existing_phone = get_user_meta($user->ID, 'nexus_phone', true);
+            if (empty($existing_phone)) {
+                update_user_meta($user->ID, 'nexus_phone', $phone);
+            }
+
             $order_id = wp_insert_post([
                 'post_type' => 'nexus_order',
                 'post_title' => $order_code,
@@ -127,38 +133,6 @@ add_action('rest_api_init', function () {
             if (empty($orders)) {
                 return new WP_Error('not_found', 'ไม่พบคำสั่งซื้อที่ตรงกับข้อมูลนี้ กรุณาตรวจสอบรหัสออเดอร์อีกครั้ง', ['status' => 404]);
             }
-
-            return array_map(function ($order) {
-                return [
-                    'order_code' => get_post_meta($order->ID, 'order_code', true),
-                    'product_title' => get_post_meta($order->ID, 'product_title', true),
-                    'amount' => get_post_meta($order->ID, 'amount', true),
-                    'status' => get_post_meta($order->ID, 'status', true) ?: 'pending_payment',
-                    'created_at' => $order->post_date,
-                ];
-            }, $orders);
-        },
-    ]);
-
-    register_rest_route('nexus/v1', '/orders/mine', [
-        'methods' => 'GET',
-        'permission_callback' => 'nexus_require_member',
-        'callback' => function (WP_REST_Request $request) {
-            if (!nexus_check_rate_limit('order_mine', 20, 60)) {
-                return new WP_Error('rate_limit_exceeded', 'คุณทำรายการบ่อยเกินไป กรุณารอสักครู่', ['status' => 429]);
-            }
-
-            $user = nexus_get_user_from_token($request);
-            if (!$user) return new WP_Error('authentication_required', 'กรุณาเข้าสู่ระบบ', ['status' => 401]);
-
-            $orders = get_posts([
-                'post_type' => 'nexus_order',
-                'post_status' => 'publish',
-                'numberposts' => 50,
-                'meta_query' => [['key' => 'customer_user_id', 'value' => $user->ID, 'compare' => '=']],
-                'orderby' => 'date',
-                'order' => 'DESC',
-            ]);
 
             return array_map(function ($order) {
                 return [
