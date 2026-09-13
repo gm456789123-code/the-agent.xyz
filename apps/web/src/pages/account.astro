@@ -9,12 +9,53 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       <h1 class="font-display font-black text-2xl sm:text-4xl mt-3">ประวัติ<span class="aurora-text">การสั่งซื้อ</span></h1>
     </div>
 
+    <!-- Profile Card (Allows customer to view & update their saved phone number) -->
+    <div id="account-profile-card" class="hidden aurora-glass rounded-2xl sm:rounded-3xl border border-white/10 p-6 sm:p-8 space-y-6">
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
+        <div>
+          <h2 class="font-display font-black text-xl text-white">ข้อมูลส่วนตัวของฉัน</h2>
+          <p class="text-xs text-slate-400 mt-1">จัดการข้อมูลเบอร์โทรศัพท์สำหรับรับสินค้าและติดตามคำสั่งซื้อ</p>
+        </div>
+        <span id="account-profile-username" class="px-3 py-1 rounded-full text-xs font-bold border border-purple-400/30 bg-purple-500/10 text-purple-300"></span>
+      </div>
+
+      <form id="account-profile-form" class="space-y-4 max-w-md">
+        <div>
+          <label for="account-profile-phone" class="block text-sm font-bold text-slate-200 mb-1.5">
+            เบอร์โทรศัพท์ที่บันทึกไว้
+            <span class="text-xs text-slate-400 font-normal ml-2">(จะใช้สั่งซื้อครั้งต่อไปอัตโนมัติ)</span>
+          </label>
+          <div class="flex gap-2">
+            <input
+              id="account-profile-phone"
+              type="tel"
+              required
+              placeholder="08xxxxxxxx"
+              class="flex-1 px-4 py-2.5 bg-surface-card border border-white/20 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-500/30 font-bold"
+            />
+            <button
+              id="account-profile-save-btn"
+              type="submit"
+              class="px-5 py-2.5 rounded-xl font-display font-black text-sm aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow cursor-pointer disabled:opacity-50"
+            >
+              บันทึก
+            </button>
+          </div>
+        </div>
+        <p id="account-profile-msg" class="hidden text-xs font-bold"></p>
+      </form>
+    </div>
+
+    <div>
+      <h2 class="font-display font-black text-xl sm:text-2xl mt-4">รายการ<span class="aurora-text">คำสั่งซื้อ</span></h2>
+    </div>
+
     <div id="account-loading" class="rounded-2xl border border-white/10 p-8 text-center text-slate-300">
       กำลังโหลดข้อมูล...
     </div>
 
     <div id="account-guest" class="hidden rounded-2xl border border-white/10 p-8 text-center text-slate-300 space-y-4">
-      <p>กรุณาเข้าสู่ระบบเพื่อดูประวัติการสั่งซื้อของคุณ</p>
+      <p>กรุณาเข้าสู่ระบบเพื่อดูโปรไฟล์และประวัติการสั่งซื้อของคุณ</p>
       <button type="button" data-auth-open="login" class="inline-block px-6 py-3 rounded-xl font-black aurora-btn-gradient text-slate-950 hover:text-white transition-all cursor-pointer">
         เข้าสู่ระบบ
       </button>
@@ -136,7 +177,77 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       window.location.href = `/checkout?order=${encodeURIComponent(orderCode)}`;
     });
 
-    document.addEventListener("nexus:auth-success", loadOrders);
+    const profileCard = document.getElementById("account-profile-card");
+    const profileUsername = document.getElementById("account-profile-username");
+    const profilePhoneInput = document.getElementById("account-profile-phone") as HTMLInputElement | null;
+    const profileForm = document.getElementById("account-profile-form") as HTMLFormElement | null;
+    const profileMsg = document.getElementById("account-profile-msg");
+    const profileSaveBtn = document.getElementById("account-profile-save-btn") as HTMLButtonElement | null;
+
+    function initProfile() {
+      const raw = localStorage.getItem("nexus_user");
+      if (!raw || !profileCard || !profileUsername || !profilePhoneInput) {
+        profileCard?.classList.add("hidden");
+        return;
+      }
+      try {
+        const user = JSON.parse(raw);
+        profileUsername.textContent = `@${user.username || "user"}`;
+        if (user.phone) profilePhoneInput.value = user.phone;
+        profileCard.classList.remove("hidden");
+      } catch {
+        profileCard?.classList.add("hidden");
+      }
+    }
+
+    profileForm?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!profilePhoneInput || !profileMsg || !profileSaveBtn) return;
+      profileMsg.classList.add("hidden");
+
+      const phone = profilePhoneInput.value.trim();
+      const token = localStorage.getItem("nexus_token");
+      if (!token) return;
+
+      profileSaveBtn.disabled = true;
+      profileSaveBtn.textContent = "กำลังบันทึก...";
+
+      try {
+        const res = await fetch(`${WP_API_URL}/nexus/v1/profile`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ phone }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.message || "บันทึกเบอร์โทรศัพท์ไม่สำเร็จ");
+
+        // Update local storage
+        const raw = localStorage.getItem("nexus_user");
+        if (raw) {
+          const user = JSON.parse(raw);
+          user.phone = phone;
+          localStorage.setItem("nexus_user", JSON.stringify(user));
+        }
+
+        profileMsg.textContent = "✓ บันทึกเบอร์โทรศัพท์เรียบร้อยแล้ว";
+        profileMsg.className = "text-xs font-bold text-emerald-400";
+        profileMsg.classList.remove("hidden");
+      } catch (err) {
+        profileMsg.textContent = err instanceof Error ? err.message : "เกิดข้อผิดพลาด กรุณาลองใหม่";
+        profileMsg.className = "text-xs font-bold text-rose-400";
+        profileMsg.classList.remove("hidden");
+      } finally {
+        profileSaveBtn.disabled = false;
+        profileSaveBtn.textContent = "บันทึก";
+      }
+    });
+
+    document.addEventListener("nexus:auth-success", () => {
+      initProfile();
+      loadOrders();
+    });
+
+    initProfile();
     loadOrders();
   }
 

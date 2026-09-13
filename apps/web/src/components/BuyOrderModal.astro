@@ -9,7 +9,10 @@
 
     <form id="buy-modal-form" class="space-y-4">
       <div>
-        <label class="text-xs sm:text-sm text-slate-300 font-bold" for="buy-modal-phone">เบอร์โทรศัพท์ (สำหรับติดตามออเดอร์)</label>
+        <div class="flex items-center justify-between">
+          <label class="text-xs sm:text-sm text-slate-300 font-bold" for="buy-modal-phone">เบอร์โทรศัพท์ (สำหรับรับ/ติดตามออเดอร์)</label>
+          <span id="buy-modal-phone-saved-tag" class="hidden text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">เบอร์ที่บันทึกไว้</span>
+        </div>
         <input
           id="buy-modal-phone"
           type="tel"
@@ -17,6 +20,7 @@
           placeholder="08xxxxxxxx"
           class="mt-1.5 w-full px-4 py-3 bg-surface-card border border-pink-400/35 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 font-bold"
         />
+        <p id="buy-modal-phone-hint" class="mt-1 text-xs text-slate-400">ระบบจะจำเบอร์นี้ไว้สั่งซื้อครั้งต่อไปอัตโนมัติ (แก้ไขได้ในหน้าโปรไฟล์)</p>
       </div>
       <p id="buy-modal-error" class="hidden text-xs sm:text-sm text-rose-400 font-bold"></p>
       <p id="buy-modal-success" class="hidden text-xs sm:text-sm text-emerald-400 font-bold"></p>
@@ -57,6 +61,18 @@
     let activeProductId = "";
     let activeOrderCode = "";
 
+    const savedTag = document.getElementById("buy-modal-phone-saved-tag");
+    const hintEl = document.getElementById("buy-modal-phone-hint");
+
+    function getSavedUser(): { id?: number; username?: string; phone?: string } | null {
+      try {
+        const raw = localStorage.getItem("nexus_user");
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    }
+
     function openModal(productId: string, productTitle: string) {
       activeProductId = productId;
       activeOrderCode = "";
@@ -67,6 +83,18 @@
       form!.reset();
       form!.classList.remove("hidden");
       submitBtn!.disabled = false;
+
+      // Auto-prefill saved phone if available
+      const user = getSavedUser();
+      if (user && user.phone) {
+        phoneInput!.value = user.phone;
+        savedTag?.classList.remove("hidden");
+        if (hintEl) hintEl.textContent = "ใช้เบอร์เดิมจากโปรไฟล์ของคุณ (แก้ไขได้ในหน้าบัญชีของฉัน)";
+      } else {
+        savedTag?.classList.add("hidden");
+        if (hintEl) hintEl.textContent = "ระบบจะจำเบอร์นี้ไว้สั่งซื้อครั้งต่อไปอัตโนมัติ (แก้ไขได้ในหน้าโปรไฟล์)";
+      }
+
       modal!.classList.remove("hidden");
       modal!.classList.add("flex");
     }
@@ -120,10 +148,11 @@
       try {
         const token = localStorage.getItem("nexus_token");
         if (!token) throw new Error("กรุณาเข้าสู่ระบบก่อนสร้างคำสั่งซื้อ");
+        const enteredPhone = phoneInput!.value.trim();
         const res = await fetch(`${WP_API_URL}/nexus/v1/orders`, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ product_id: Number(activeProductId), phone: phoneInput!.value.trim() }),
+          body: JSON.stringify({ product_id: Number(activeProductId), phone: enteredPhone }),
         });
         const data = await res.json();
 
@@ -136,6 +165,13 @@
             document.dispatchEvent(new CustomEvent("nexus:open-auth", { detail: { mode: "login" } }));
           }
           throw new Error(data?.message || "สร้างคำสั่งซื้อไม่สำเร็จ");
+        }
+
+        // Persist phone into local user object if not yet present
+        const u = getSavedUser();
+        if (u) {
+          u.phone = enteredPhone;
+          localStorage.setItem("nexus_user", JSON.stringify(u));
         }
 
         activeOrderCode = data.order_code;
