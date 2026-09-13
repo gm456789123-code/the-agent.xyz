@@ -5,40 +5,87 @@
       <h3 class="font-display font-black text-lg sm:text-2xl text-white">ยืนยันคำสั่งซื้อ</h3>
       <button type="button" id="buy-modal-close" class="text-slate-300 hover:text-white text-2xl leading-none cursor-pointer">&times;</button>
     </div>
-    <p id="buy-modal-product" class="text-sm sm:text-base text-pink-300 font-bold mb-4"></p>
-
-    <form id="buy-modal-form" class="space-y-4">
-      <div>
-        <div class="flex items-center justify-between">
-          <label class="text-xs sm:text-sm text-slate-300 font-bold" for="buy-modal-phone">เบอร์โทรศัพท์ (สำหรับรับ/ติดตามออเดอร์)</label>
-          <span id="buy-modal-phone-saved-tag" class="hidden text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">เบอร์ที่บันทึกไว้</span>
-        </div>
-        <input
-          id="buy-modal-phone"
-          type="tel"
-          required
-          placeholder="08xxxxxxxx"
-          class="mt-1.5 w-full px-4 py-3 bg-surface-card border border-pink-400/35 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 font-bold"
-        />
-        <p id="buy-modal-phone-hint" class="mt-1 text-xs text-slate-400">ระบบจะจำเบอร์นี้ไว้สั่งซื้อครั้งต่อไปอัตโนมัติ (แก้ไขได้ในหน้าโปรไฟล์)</p>
+    <div class="border-b border-white/10 pb-3 mb-4">
+      <p id="buy-modal-product" class="text-base sm:text-lg text-white font-black truncate"></p>
+      <div class="flex items-center justify-between mt-2">
+        <span class="text-xs sm:text-sm text-slate-400">ยอดที่ต้องชำระ:</span>
+        <span id="buy-modal-price" class="font-display font-black text-2xl text-pink-300"></span>
       </div>
-      <p id="buy-modal-error" class="hidden text-xs sm:text-sm text-rose-400 font-bold"></p>
-      <p id="buy-modal-success" class="hidden text-xs sm:text-sm text-emerald-400 font-bold"></p>
+    </div>
+
+    <!-- Phone input container (Only shown if customer does NOT have a saved phone yet) -->
+    <div id="buy-modal-phone-container" class="space-y-2 mb-4">
+      <label class="text-xs sm:text-sm text-slate-300 font-bold" for="buy-modal-phone">เบอร์โทรศัพท์ (สำหรับรับ/ติดตามออเดอร์)</label>
+      <input
+        id="buy-modal-phone"
+        type="tel"
+        placeholder="08xxxxxxxx"
+        class="w-full px-4 py-3 bg-surface-card border border-pink-400/35 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 font-bold"
+      />
+      <p class="text-[11px] text-slate-400">กรอกครั้งเดียว ระบบจะจำเบอร์นี้ไว้สั่งซื้อครั้งต่อไปอัตโนมัติ</p>
+    </div>
+
+    <!-- Saved Phone Info Badge (Shown when customer already has a remembered phone) -->
+    <div id="buy-modal-saved-phone-box" class="hidden flex items-center justify-between p-3 rounded-xl bg-purple-500/10 border border-purple-400/30 mb-4">
+      <div class="flex items-center gap-2">
+        <span class="text-emerald-400 text-sm">✓</span>
+        <span class="text-xs text-slate-300">เบอร์ผู้รับ: <strong id="buy-modal-saved-phone-display" class="text-white font-mono"></strong></span>
+      </div>
+      <a href="/account" class="text-[11px] text-purple-300 hover:text-white underline">เปลี่ยนเบอร์</a>
+    </div>
+
+    <!-- Payment Methods Selection (PromptPay QR & Stripe) -->
+    <div id="buy-modal-payment-section" class="space-y-3 mb-4">
+      <label class="text-xs sm:text-sm text-slate-300 font-bold">เลือกช่องทางการชำระเงิน</label>
+      <div class="grid grid-cols-2 gap-2.5">
+        <label class="relative flex flex-col items-center justify-center p-3 rounded-xl border border-pink-400/50 bg-pink-500/10 cursor-pointer transition-all hover:border-pink-300 has-[:checked]:border-pink-400 has-[:checked]:bg-pink-500/20 has-[:checked]:shadow-[0_0_15px_rgba(244,114,182,0.3)]">
+          <input type="radio" name="payment_method" value="promptpay" checked class="sr-only" />
+          <div class="flex items-center gap-1.5 font-display font-black text-xs sm:text-sm text-white">
+            <span>📱 PromptPay QR</span>
+          </div>
+          <span class="text-[10px] text-pink-300 mt-0.5">สแกนจ่ายทันที</span>
+        </label>
+        <label class="relative flex flex-col items-center justify-center p-3 rounded-xl border border-white/10 bg-surface-card cursor-pointer transition-all hover:border-white/20 has-[:checked]:border-purple-400 has-[:checked]:bg-purple-500/20 has-[:checked]:shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+          <input type="radio" name="payment_method" value="stripe" class="sr-only" />
+          <div class="flex items-center gap-1.5 font-display font-black text-xs sm:text-sm text-white">
+            <span>💳 บัตร / Stripe</span>
+          </div>
+          <span class="text-[10px] text-purple-300 mt-0.5">บัตรเครดิต/เดบิต</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- QR Code Display Box (Rendered when PromptPay QR is active after placing order) -->
+    <div id="buy-modal-qr-box" class="hidden text-center p-4 rounded-2xl bg-white/5 border border-pink-400/40 space-y-3 mb-4">
+      <div class="inline-block p-3 bg-white rounded-xl shadow-lg">
+        <img id="buy-modal-qr-img" src="" alt="PromptPay QR Code" class="w-48 h-48 mx-auto object-contain" />
+      </div>
+      <p class="text-xs text-slate-300">สแกน QR Code ด้วยแอปธนาคารใดก็ได้เพื่อชำระเงิน</p>
+      <div class="flex items-center justify-center gap-2 text-xs text-amber-300 font-bold">
+        <span>⏱ ยืนยันยอดอัตโนมัติภายใน 5-10 วินาที</span>
+      </div>
+    </div>
+
+    <p id="buy-modal-error" class="hidden text-xs sm:text-sm text-rose-400 font-bold mb-3"></p>
+    <p id="buy-modal-success" class="hidden text-xs sm:text-sm text-emerald-400 font-bold mb-3"></p>
+
+    <div class="space-y-2">
       <button
         type="button"
-        id="buy-modal-pay-now"
-        class="hidden w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-display font-black text-sm sm:text-base aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow cursor-pointer"
-      >
-        ชำระเงินตอนนี้
-      </button>
-      <button
-        type="submit"
         id="buy-modal-submit"
-        class="w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-display font-black text-sm sm:text-base aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow"
+        class="w-full py-3.5 rounded-xl font-display font-black text-sm sm:text-base aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow cursor-pointer disabled:opacity-50"
       >
-        สร้างคำสั่งซื้อ
+        ยืนยันการสั่งซื้อ & ชำระเงิน
       </button>
-    </form>
+
+      <button
+        type="button"
+        id="buy-modal-track-btn"
+        class="hidden w-full py-2.5 rounded-xl font-display font-bold text-xs sm:text-sm border border-white/20 text-slate-200 hover:text-white hover:border-pink-400 transition-all cursor-pointer"
+      >
+        ตรวจสอบสถานะออเดอร์นี้ →
+      </button>
+    </div>
   </div>
 </div>
 
@@ -48,21 +95,25 @@
   function initBuyModal() {
     const modal = document.getElementById("buy-modal");
     const closeBtn = document.getElementById("buy-modal-close");
-    const form = document.getElementById("buy-modal-form") as HTMLFormElement | null;
     const phoneInput = document.getElementById("buy-modal-phone") as HTMLInputElement | null;
+    const phoneContainer = document.getElementById("buy-modal-phone-container");
+    const savedPhoneBox = document.getElementById("buy-modal-saved-phone-box");
+    const savedPhoneDisplay = document.getElementById("buy-modal-saved-phone-display");
     const productLabel = document.getElementById("buy-modal-product");
+    const priceLabel = document.getElementById("buy-modal-price");
+    const paymentSection = document.getElementById("buy-modal-payment-section");
+    const qrBox = document.getElementById("buy-modal-qr-box");
+    const qrImg = document.getElementById("buy-modal-qr-img") as HTMLImageElement | null;
     const errorEl = document.getElementById("buy-modal-error");
     const successEl = document.getElementById("buy-modal-success");
     const submitBtn = document.getElementById("buy-modal-submit") as HTMLButtonElement | null;
-    const payNowBtn = document.getElementById("buy-modal-pay-now") as HTMLButtonElement | null;
+    const trackBtn = document.getElementById("buy-modal-track-btn") as HTMLButtonElement | null;
 
-    if (!modal || !form || !phoneInput || !productLabel || !errorEl || !successEl || !submitBtn || !payNowBtn) return;
+    if (!modal || !phoneInput || !productLabel || !priceLabel || !submitBtn || !trackBtn) return;
 
     let activeProductId = "";
+    let activeProductPrice = "";
     let activeOrderCode = "";
-
-    const savedTag = document.getElementById("buy-modal-phone-saved-tag");
-    const hintEl = document.getElementById("buy-modal-phone-hint");
 
     function getSavedUser(): { id?: number; username?: string; phone?: string } | null {
       try {
@@ -73,26 +124,35 @@
       }
     }
 
-    function openModal(productId: string, productTitle: string) {
+    function openModal(productId: string, productTitle: string, productPrice?: string) {
       activeProductId = productId;
+      activeProductPrice = productPrice || "฿299";
       activeOrderCode = "";
+
       productLabel!.textContent = productTitle;
+      priceLabel!.textContent = activeProductPrice;
+
       errorEl!.classList.add("hidden");
       successEl!.classList.add("hidden");
-      payNowBtn!.classList.add("hidden");
-      form!.reset();
-      form!.classList.remove("hidden");
-      submitBtn!.disabled = false;
+      qrBox!.classList.add("hidden");
+      trackBtn!.classList.add("hidden");
+      paymentSection!.classList.remove("hidden");
 
-      // Auto-prefill saved phone if available
+      submitBtn!.disabled = false;
+      submitBtn!.textContent = "ยืนยันการสั่งซื้อ & ชำระเงิน";
+      submitBtn!.classList.remove("hidden");
+
+      // Check if customer already has a saved phone
       const user = getSavedUser();
       if (user && user.phone) {
         phoneInput!.value = user.phone;
-        savedTag?.classList.remove("hidden");
-        if (hintEl) hintEl.textContent = "ใช้เบอร์เดิมจากโปรไฟล์ของคุณ (แก้ไขได้ในหน้าบัญชีของฉัน)";
+        phoneContainer?.classList.add("hidden");
+        if (savedPhoneDisplay) savedPhoneDisplay.textContent = user.phone;
+        savedPhoneBox?.classList.remove("hidden");
       } else {
-        savedTag?.classList.add("hidden");
-        if (hintEl) hintEl.textContent = "ระบบจะจำเบอร์นี้ไว้สั่งซื้อครั้งต่อไปอัตโนมัติ (แก้ไขได้ในหน้าโปรไฟล์)";
+        phoneInput!.value = "";
+        phoneContainer?.classList.remove("hidden");
+        savedPhoneBox?.classList.add("hidden");
       }
 
       modal!.classList.remove("hidden");
@@ -104,25 +164,26 @@
       modal!.classList.remove("flex");
     }
 
-    let pendingBuy: { productId: string; productTitle: string } | null = null;
+    let pendingBuy: { productId: string; productTitle: string; productPrice?: string } | null = null;
 
     document.querySelectorAll(".js-buy-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const productId = btn.getAttribute("data-product-id") || "";
         const productTitle = btn.getAttribute("data-product-title") || "";
+        const productPrice = btn.getAttribute("data-product-price") || "";
 
         if (!localStorage.getItem("nexus_token")) {
-          pendingBuy = { productId, productTitle };
+          pendingBuy = { productId, productTitle, productPrice };
           document.dispatchEvent(new CustomEvent("nexus:open-auth", { detail: { mode: "login" } }));
           return;
         }
-        openModal(productId, productTitle);
+        openModal(productId, productTitle, productPrice);
       });
     });
 
     document.addEventListener("nexus:auth-success", () => {
       if (pendingBuy) {
-        openModal(pendingBuy.productId, pendingBuy.productTitle);
+        openModal(pendingBuy.productId, pendingBuy.productTitle, pendingBuy.productPrice);
         pendingBuy = null;
       }
     });
@@ -132,8 +193,7 @@
       if (e.target === modal) closeModal();
     });
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+    submitBtn.addEventListener("click", async () => {
       errorEl!.classList.add("hidden");
 
       if (!WP_API_URL) {
@@ -142,13 +202,30 @@
         return;
       }
 
-      submitBtn!.disabled = true;
-      submitBtn!.textContent = "กำลังส่งคำสั่งซื้อ...";
+      const token = localStorage.getItem("nexus_token");
+      if (!token) {
+        document.dispatchEvent(new CustomEvent("nexus:open-auth", { detail: { mode: "login" } }));
+        return;
+      }
+
+      const user = getSavedUser();
+      const enteredPhone = (user && user.phone ? user.phone : phoneInput!.value).trim();
+
+      if (!enteredPhone || !/^0[0-9]{8,9}$/.test(enteredPhone.replace(/[-\s]/g, ""))) {
+        errorEl!.textContent = "กรุณากรอกเบอร์โทรศัพท์ 10 หลักให้ถูกต้อง";
+        errorEl!.classList.remove("hidden");
+        phoneContainer?.classList.remove("hidden");
+        phoneInput?.focus();
+        return;
+      }
+
+      const selectedMethodEl = document.querySelector<HTMLInputElement>('input[name="payment_method"]:checked');
+      const paymentMethod = selectedMethodEl ? selectedMethodEl.value : "promptpay";
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "กำลังดำเนินการ...";
 
       try {
-        const token = localStorage.getItem("nexus_token");
-        if (!token) throw new Error("กรุณาเข้าสู่ระบบก่อนสร้างคำสั่งซื้อ");
-        const enteredPhone = phoneInput!.value.trim();
         const res = await fetch(`${WP_API_URL}/nexus/v1/orders`, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -167,29 +244,50 @@
           throw new Error(data?.message || "สร้างคำสั่งซื้อไม่สำเร็จ");
         }
 
-        // Persist phone into local user object if not yet present
-        const u = getSavedUser();
-        if (u) {
-          u.phone = enteredPhone;
-          localStorage.setItem("nexus_user", JSON.stringify(u));
+        // Save phone to local user
+        if (user) {
+          user.phone = enteredPhone;
+          localStorage.setItem("nexus_user", JSON.stringify(user));
         }
 
         activeOrderCode = data.order_code;
-        successEl!.textContent = `สั่งซื้อสำเร็จ! รหัสออเดอร์ของคุณคือ ${data.order_code} (ใช้เบอร์โทรหรือรหัสนี้ตรวจสอบสถานะได้ในหน้าติดตามคำสั่งซื้อ)`;
+
+        if (paymentMethod === "stripe") {
+          // Redirect to checkout / Stripe
+          window.location.href = `/checkout?order=${encodeURIComponent(activeOrderCode)}`;
+          return;
+        }
+
+        // PromptPay QR Flow: generate QR code via PromptPay payload
+        const rawAmount = String(data.amount || activeProductPrice).replace(/[^0-9.]/g, "");
+        const numericAmount = parseFloat(rawAmount) || 0;
+
+        // PromptPay demo recipient (or store setting PromptPay ID)
+        const promptpayTarget = "0812345678";
+        const qrUrl = `https://promptpay.io/${encodeURIComponent(promptpayTarget)}/${numericAmount > 0 ? numericAmount : ""}.png`;
+
+        if (qrImg) qrImg.src = qrUrl;
+        qrBox!.classList.remove("hidden");
+        paymentSection!.classList.add("hidden");
+        phoneContainer?.classList.add("hidden");
+        savedPhoneBox?.classList.add("hidden");
+
+        successEl!.textContent = `✓ สร้างคำสั่งซื้อ ${activeOrderCode} เรียบร้อยแล้ว (ยอดชำระ: ${activeProductPrice})`;
         successEl!.classList.remove("hidden");
-        payNowBtn!.classList.remove("hidden");
-        form!.classList.add("hidden");
+
+        submitBtn!.classList.add("hidden");
+        trackBtn!.classList.remove("hidden");
       } catch (err) {
         errorEl!.textContent = err instanceof Error ? err.message : "เกิดข้อผิดพลาด กรุณาลองใหม่";
         errorEl!.classList.remove("hidden");
-        submitBtn!.disabled = false;
-        submitBtn!.textContent = "สร้างคำสั่งซื้อ";
+        submitBtn.disabled = false;
+        submitBtn.textContent = "ยืนยันการสั่งซื้อ & ชำระเงิน";
       }
     });
 
-    payNowBtn.addEventListener("click", () => {
+    trackBtn.addEventListener("click", () => {
       if (!activeOrderCode) return;
-      window.location.href = `/checkout?order=${encodeURIComponent(activeOrderCode)}`;
+      window.location.href = `/account`;
     });
   }
 
