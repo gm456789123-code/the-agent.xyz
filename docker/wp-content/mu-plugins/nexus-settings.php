@@ -64,6 +64,12 @@ function nexus_default_settings(): array {
         ],
         'agents_online' => 8,
         'agents_total' => 10,
+        'social_links' => [
+            'facebook' => ['enabled' => false, 'url' => ''],
+            'line' => ['enabled' => false, 'url' => ''],
+            'discord' => ['enabled' => false, 'url' => ''],
+            'telegram' => ['enabled' => false, 'url' => ''],
+        ],
     ];
 }
 
@@ -73,7 +79,10 @@ function nexus_get_settings(): array {
         $stored = nexus_default_settings();
         update_option(NEXUS_SETTINGS_OPTION, $stored);
     }
-    return array_merge(nexus_default_settings(), $stored);
+    $settings = array_merge(nexus_default_settings(), $stored);
+    // Merge per-platform so a site saved before a new platform was added still gets its default.
+    $settings['social_links'] = array_merge(nexus_default_settings()['social_links'], $stored['social_links'] ?? []);
+    return $settings;
 }
 
 add_action('rest_api_init', function () {
@@ -124,6 +133,15 @@ function nexus_render_settings_page() {
         }
         if (!empty($system_status)) {
             $settings['system_status'] = $system_status;
+        }
+
+        $social_urls = $_POST['social_url'] ?? [];
+        $social_enabled = $_POST['social_enabled'] ?? [];
+        foreach (array_keys($settings['social_links']) as $platform) {
+            $settings['social_links'][$platform] = [
+                'enabled' => !empty($social_enabled[$platform]),
+                'url' => esc_url_raw(trim($social_urls[$platform] ?? '')),
+            ];
         }
 
         update_option(NEXUS_SETTINGS_OPTION, $settings);
@@ -201,6 +219,26 @@ function nexus_render_settings_page() {
                     </tr>
                 </tbody>
             </table>
+
+            <h2>ปุ่มติดต่อลอย (มุมขวาล่าง)</h2>
+            <table class="widefat">
+                <thead>
+                    <tr><th style="width:100px">แสดง</th><th style="width:150px">ช่องทาง</th><th>ลิงก์</th></tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $platform_labels = ['facebook' => 'Facebook', 'line' => 'LINE', 'discord' => 'Discord', 'telegram' => 'Telegram'];
+                    foreach ($platform_labels as $platform => $label): $link = $settings['social_links'][$platform];
+                    ?>
+                    <tr>
+                        <td><input type="checkbox" name="social_enabled[<?php echo esc_attr($platform); ?>]" value="1" <?php checked($link['enabled']); ?> /></td>
+                        <td><?php echo esc_html($label); ?></td>
+                        <td><input type="url" name="social_url[<?php echo esc_attr($platform); ?>]" value="<?php echo esc_attr($link['url']); ?>" class="large-text" placeholder="https://..." /></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+            <p class="description">ติ๊กแสดงช่องทางที่ต้องการให้ปรากฏเป็นปุ่มลอยมุมขวาล่างของเว็บ ต้องกรอกลิงก์ด้วยจึงจะแสดงผล</p>
 
             <?php submit_button('บันทึกการตั้งค่า'); ?>
         </form>

@@ -34,36 +34,18 @@
       <a href="/account" class="text-[11px] text-purple-300 hover:text-white underline">เปลี่ยนเบอร์</a>
     </div>
 
-    <!-- Payment Methods Selection (PromptPay QR & Stripe) -->
-    <div id="buy-modal-payment-section" class="space-y-3 mb-4">
-      <label class="text-xs sm:text-sm text-slate-300 font-bold">เลือกช่องทางการชำระเงิน</label>
-      <div class="grid grid-cols-2 gap-2.5">
-        <label class="relative flex flex-col items-center justify-center p-3 rounded-xl border border-pink-400/50 bg-pink-500/10 cursor-pointer transition-all hover:border-pink-300 has-[:checked]:border-pink-400 has-[:checked]:bg-pink-500/20 has-[:checked]:shadow-[0_0_15px_rgba(244,114,182,0.3)]">
-          <input type="radio" name="payment_method" value="promptpay" checked class="sr-only" />
-          <div class="flex items-center gap-1.5 font-display font-black text-xs sm:text-sm text-white">
-            <span>📱 PromptPay QR</span>
-          </div>
-          <span class="text-[10px] text-pink-300 mt-0.5">สแกนจ่ายทันที</span>
-        </label>
-        <label class="relative flex flex-col items-center justify-center p-3 rounded-xl border border-white/10 bg-surface-card cursor-pointer transition-all hover:border-white/20 has-[:checked]:border-purple-400 has-[:checked]:bg-purple-500/20 has-[:checked]:shadow-[0_0_15px_rgba(168,85,247,0.3)]">
-          <input type="radio" name="payment_method" value="stripe" class="sr-only" />
-          <div class="flex items-center gap-1.5 font-display font-black text-xs sm:text-sm text-white">
-            <span>💳 บัตร / Stripe</span>
-          </div>
-          <span class="text-[10px] text-purple-300 mt-0.5">บัตรเครดิต/เดบิต</span>
-        </label>
-      </div>
+    <!-- Credit Balance (Purchases are paid instantly from the wallet balance) -->
+    <div id="buy-modal-credit-box" class="flex items-center justify-between p-3 rounded-xl bg-purple-500/10 border border-purple-400/30 mb-4">
+      <span class="text-xs sm:text-sm text-slate-300">เครดิตคงเหลือ</span>
+      <span id="buy-modal-credit-balance" class="font-display font-black text-white">฿0.00</span>
     </div>
 
-    <!-- QR Code Display Box (Rendered when PromptPay QR is active after placing order) -->
-    <div id="buy-modal-qr-box" class="hidden text-center p-4 rounded-2xl bg-white/5 border border-pink-400/40 space-y-3 mb-4">
-      <div class="inline-block p-3 bg-white rounded-xl shadow-lg">
-        <img id="buy-modal-qr-img" src="" alt="PromptPay QR Code" class="w-48 h-48 mx-auto object-contain" />
-      </div>
-      <p class="text-xs text-slate-300">สแกน QR Code ด้วยแอปธนาคารใดก็ได้เพื่อชำระเงิน</p>
-      <div class="flex items-center justify-center gap-2 text-xs text-amber-300 font-bold">
-        <span>⏱ ยืนยันยอดอัตโนมัติภายใน 5-10 วินาที</span>
-      </div>
+    <!-- Insufficient Credit Notice -->
+    <div id="buy-modal-insufficient-box" class="hidden text-center p-4 rounded-2xl bg-rose-500/10 border border-rose-400/30 space-y-3 mb-4">
+      <p class="text-sm text-rose-300 font-bold">เครดิตของคุณไม่เพียงพอสำหรับสินค้านี้</p>
+      <a href="/account" class="inline-block px-5 py-2 rounded-xl font-display font-black text-xs sm:text-sm aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow">
+        เติมเครดิต →
+      </a>
     </div>
 
     <p id="buy-modal-error" class="hidden text-xs sm:text-sm text-rose-400 font-bold mb-3"></p>
@@ -75,7 +57,7 @@
         id="buy-modal-submit"
         class="w-full py-3.5 rounded-xl font-display font-black text-sm sm:text-base aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow cursor-pointer disabled:opacity-50"
       >
-        ยืนยันการสั่งซื้อ & ชำระเงิน
+        ยืนยันการสั่งซื้อ
       </button>
 
       <button
@@ -101,9 +83,9 @@
     const savedPhoneDisplay = document.getElementById("buy-modal-saved-phone-display");
     const productLabel = document.getElementById("buy-modal-product");
     const priceLabel = document.getElementById("buy-modal-price");
-    const paymentSection = document.getElementById("buy-modal-payment-section");
-    const qrBox = document.getElementById("buy-modal-qr-box");
-    const qrImg = document.getElementById("buy-modal-qr-img") as HTMLImageElement | null;
+    const creditBox = document.getElementById("buy-modal-credit-box");
+    const creditBalanceEl = document.getElementById("buy-modal-credit-balance");
+    const insufficientBox = document.getElementById("buy-modal-insufficient-box");
     const errorEl = document.getElementById("buy-modal-error");
     const successEl = document.getElementById("buy-modal-success");
     const submitBtn = document.getElementById("buy-modal-submit") as HTMLButtonElement | null;
@@ -124,6 +106,30 @@
       }
     }
 
+    async function refreshCreditBalance(productPrice: number) {
+      const token = localStorage.getItem("nexus_token");
+      if (!token || !creditBalanceEl) return;
+      try {
+        const res = await fetch(`${WP_API_URL}/nexus/v1/credits/balance`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        const balance = Number(data.balance || 0);
+        creditBalanceEl.textContent = `฿${balance.toFixed(2)}`;
+
+        if (balance < productPrice) {
+          insufficientBox?.classList.remove("hidden");
+          submitBtn!.disabled = true;
+        } else {
+          insufficientBox?.classList.add("hidden");
+          submitBtn!.disabled = false;
+        }
+      } catch {
+        // Balance box just won't update; submit will still fail server-side if credit is short.
+      }
+    }
+
     function openModal(productId: string, productTitle: string, productPrice?: string) {
       activeProductId = productId;
       activeProductPrice = productPrice || "฿299";
@@ -134,12 +140,12 @@
 
       errorEl!.classList.add("hidden");
       successEl!.classList.add("hidden");
-      qrBox!.classList.add("hidden");
+      insufficientBox!.classList.add("hidden");
       trackBtn!.classList.add("hidden");
-      paymentSection!.classList.remove("hidden");
+      creditBox!.classList.remove("hidden");
 
       submitBtn!.disabled = false;
-      submitBtn!.textContent = "ยืนยันการสั่งซื้อ & ชำระเงิน";
+      submitBtn!.textContent = "ยืนยันการสั่งซื้อ";
       submitBtn!.classList.remove("hidden");
 
       // Check if customer already has a saved phone
@@ -154,6 +160,9 @@
         phoneContainer?.classList.remove("hidden");
         savedPhoneBox?.classList.add("hidden");
       }
+
+      const numericPrice = parseFloat(String(activeProductPrice).replace(/[^0-9.]/g, "")) || 0;
+      refreshCreditBalance(numericPrice);
 
       modal!.classList.remove("hidden");
       modal!.classList.add("flex");
@@ -219,9 +228,6 @@
         return;
       }
 
-      const selectedMethodEl = document.querySelector<HTMLInputElement>('input[name="payment_method"]:checked');
-      const paymentMethod = selectedMethodEl ? selectedMethodEl.value : "promptpay";
-
       submitBtn.disabled = true;
       submitBtn.textContent = "กำลังดำเนินการ...";
 
@@ -241,6 +247,9 @@
             closeModal();
             document.dispatchEvent(new CustomEvent("nexus:open-auth", { detail: { mode: "login" } }));
           }
+          if (res.status === 402) {
+            insufficientBox?.classList.remove("hidden");
+          }
           throw new Error(data?.message || "สร้างคำสั่งซื้อไม่สำเร็จ");
         }
 
@@ -252,27 +261,12 @@
 
         activeOrderCode = data.order_code;
 
-        if (paymentMethod === "stripe") {
-          // Redirect to checkout / Stripe
-          window.location.href = `/checkout?order=${encodeURIComponent(activeOrderCode)}`;
-          return;
-        }
-
-        // PromptPay QR Flow: generate QR code via PromptPay payload
-        const rawAmount = String(data.amount || activeProductPrice).replace(/[^0-9.]/g, "");
-        const numericAmount = parseFloat(rawAmount) || 0;
-
-        // PromptPay demo recipient (or store setting PromptPay ID)
-        const promptpayTarget = "0812345678";
-        const qrUrl = `https://promptpay.io/${encodeURIComponent(promptpayTarget)}/${numericAmount > 0 ? numericAmount : ""}.png`;
-
-        if (qrImg) qrImg.src = qrUrl;
-        qrBox!.classList.remove("hidden");
-        paymentSection!.classList.add("hidden");
+        creditBox!.classList.add("hidden");
+        insufficientBox!.classList.add("hidden");
         phoneContainer?.classList.add("hidden");
         savedPhoneBox?.classList.add("hidden");
 
-        successEl!.textContent = `✓ สร้างคำสั่งซื้อ ${activeOrderCode} เรียบร้อยแล้ว (ยอดชำระ: ${activeProductPrice})`;
+        successEl!.textContent = `✓ สั่งซื้อ ${activeOrderCode} สำเร็จ ตัดเครดิต ${activeProductPrice} เรียบร้อยแล้ว`;
         successEl!.classList.remove("hidden");
 
         submitBtn!.classList.add("hidden");
@@ -281,7 +275,7 @@
         errorEl!.textContent = err instanceof Error ? err.message : "เกิดข้อผิดพลาด กรุณาลองใหม่";
         errorEl!.classList.remove("hidden");
         submitBtn.disabled = false;
-        submitBtn.textContent = "ยืนยันการสั่งซื้อ & ชำระเงิน";
+        submitBtn.textContent = "ยืนยันการสั่งซื้อ";
       }
     });
 

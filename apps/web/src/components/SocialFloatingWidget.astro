@@ -1,0 +1,111 @@
+<!-- Floating Social Contact Widget (Bottom-Right). Links & visibility are set
+     from wp-admin (Settings -> Nexus -> ปุ่มติดต่อลอย) and fetched at runtime
+     so the site never needs a rebuild to change them. -->
+<div
+  id="social-floating-widget"
+  class="hidden fixed right-4 sm:right-6 bottom-24 lg:bottom-6 z-40 flex flex-col items-end gap-2.5"
+>
+  <div id="social-floating-list" class="flex flex-col items-end gap-2.5"></div>
+
+  <button
+    type="button"
+    id="social-floating-toggle"
+    aria-label="ติดต่อแอดมิน"
+    class="w-12 h-12 sm:w-14 sm:h-14 rounded-full aurora-btn-gradient text-slate-950 shadow-glow flex items-center justify-center transition-transform hover:scale-105 cursor-pointer"
+  >
+    <svg id="social-floating-icon-open" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+    </svg>
+    <svg id="social-floating-icon-close" class="hidden w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  </button>
+</div>
+
+<script>
+  const WP_API_URL = import.meta.env.PUBLIC_WP_API_URL || "https://azure-bison-824750.hostingersite.com/wp-json";
+
+  interface SocialLink {
+    enabled: boolean;
+    url: string;
+  }
+
+  const PLATFORMS: Record<string, { label: string; bg: string; icon: string }> = {
+    facebook: {
+      label: "Facebook",
+      bg: "bg-[#1877F2]",
+      icon: '<path d="M13.5 9H15V6.5h-1.75C11.6 6.5 10.5 7.7 10.5 9.5V11H9v2.5h1.5V19h2.5v-5.5h1.75L15 11h-2V9.75c0-.4.35-.75.5-.75z" fill="currentColor"/>',
+    },
+    line: {
+      label: "LINE",
+      bg: "bg-[#06C755]",
+      icon: '<path d="M12 4C7.03 4 3 7.14 3 11c0 3.46 3.21 6.35 7.55 6.91.29.06.69.2.79.45.09.23.06.58.03.81l-.13.8c-.04.23-.18.92.8.5.99-.42 5.32-3.13 7.26-5.36C20.66 13.52 21 12.29 21 11c0-3.86-4.03-7-9-7z" fill="currentColor"/>',
+    },
+    discord: {
+      label: "Discord",
+      bg: "bg-[#5865F2]",
+      icon: '<path d="M18.9 6.4a15.5 15.5 0 00-3.6-1.1l-.2.4c1.3.3 1.9.7 2.6 1.2-1.1-.5-2.2-.9-3.7-.9s-2.6.4-3.7.9c.7-.5 1.4-.9 2.6-1.2l-.2-.4a15.5 15.5 0 00-3.6 1.1C4.5 9.6 4 13.3 4.2 16.9a15.6 15.6 0 004.4 2.2l.6-1c-.7-.3-1.4-.6-2-1.1.2.1.4.2.6.3 1.4.6 2.8.9 4.2.9s2.8-.3 4.2-.9c.2-.1.4-.2.6-.3-.6.5-1.3.8-2 1.1l.6 1a15.6 15.6 0 004.4-2.2c.3-4.2-.7-7.9-2.9-10.5zM9.7 14.9c-.7 0-1.3-.7-1.3-1.5s.6-1.5 1.3-1.5 1.3.7 1.3 1.5-.6 1.5-1.3 1.5zm4.6 0c-.7 0-1.3-.7-1.3-1.5s.6-1.5 1.3-1.5 1.3.7 1.3 1.5-.6 1.5-1.3 1.5z" fill="currentColor"/>',
+    },
+    telegram: {
+      label: "Telegram",
+      bg: "bg-[#26A5E4]",
+      icon: '<path d="M21 4L3 11.5l6 2m12-9.5l-3.3 15L9 13.5m12-9.5L9 13.5m0 0v5.5l3-3.5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    },
+  };
+
+  async function initSocialFloatingWidget() {
+    const widget = document.getElementById("social-floating-widget");
+    const list = document.getElementById("social-floating-list");
+    const toggleBtn = document.getElementById("social-floating-toggle");
+    const iconOpen = document.getElementById("social-floating-icon-open");
+    const iconClose = document.getElementById("social-floating-icon-close");
+    if (!widget || !list || !toggleBtn || !iconOpen || !iconClose) return;
+
+    try {
+      const res = await fetch(`${WP_API_URL}/nexus/v1/settings`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const links: Record<string, SocialLink> = data?.social_links || {};
+
+      const enabledEntries = Object.entries(links).filter(([, link]) => link?.enabled && link?.url);
+      if (enabledEntries.length === 0) return;
+
+      enabledEntries.forEach(([platform, link]) => {
+        const meta = PLATFORMS[platform];
+        if (!meta) return;
+        const a = document.createElement("a");
+        a.href = link.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.setAttribute("aria-label", meta.label);
+        a.className = `w-11 h-11 sm:w-12 sm:h-12 rounded-full ${meta.bg} text-white shadow-lg flex items-center justify-center transition-transform hover:scale-105`;
+        a.innerHTML = `<svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24">${meta.icon}</svg>`;
+        list.appendChild(a);
+      });
+
+      let isOpen = false;
+      function render() {
+        list!.classList.toggle("hidden", !isOpen);
+        iconOpen!.classList.toggle("hidden", isOpen);
+        iconClose!.classList.toggle("hidden", !isOpen);
+      }
+      render();
+
+      toggleBtn.addEventListener("click", () => {
+        isOpen = !isOpen;
+        render();
+      });
+
+      widget.classList.remove("hidden");
+      widget.classList.add("flex");
+    } catch {
+      // Widget just stays hidden if settings can't be fetched.
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSocialFloatingWidget);
+  } else {
+    initSocialFloatingWidget();
+  }
+</script>

@@ -7,6 +7,7 @@
 - **Database Management:** MySQL via Docker (phpMyAdmin available for DB administration).
 - **Microservices:** Node.js backend for webhooks (payment slips/automation) and real-time events.
 
+
 ## Core Architectural Rules
 1. **Performance First (SEO Focus):** Ensure Astro renders pages efficiently (Zero-JS by default where possible) to maximize Core Web Vitals and SEO performance.
 2. **Separation of Concerns:** 

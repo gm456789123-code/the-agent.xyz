@@ -21,6 +21,7 @@ add_action('init', function () {
 });
 
 require_once __DIR__ . '/nexus-security.php';
+require_once __DIR__ . '/nexus-credits.php';
 
 function nexus_generate_order_code(): string {
     return 'NX-' . strtoupper(bin2hex(random_bytes(16)));
@@ -59,6 +60,12 @@ add_action('rest_api_init', function () {
             $user = nexus_get_user_from_token($request);
             if (!$user) return new WP_Error('authentication_required', 'กรุณาเข้าสู่ระบบ', ['status' => 401]);
 
+            // Debit credit first: an order only exists once it's paid for.
+            $new_balance = nexus_debit_credit((int) $user->ID, (float) $price, $order_code, 'ซื้อ: ' . $product->post_title);
+            if (is_wp_error($new_balance)) {
+                return $new_balance;
+            }
+
             // Save or update phone in user's profile if empty
             $existing_phone = get_user_meta($user->ID, 'nexus_phone', true);
             if (empty($existing_phone)) {
@@ -76,19 +83,23 @@ add_action('rest_api_init', function () {
                     'product_id' => $product_id,
                     'product_title' => $product->post_title,
                     'amount' => $price,
-                    'status' => 'pending_payment',
+                    'status' => 'paid',
                 ],
             ], true);
 
             if (is_wp_error($order_id)) {
+                // The credit was already spent; refund it since no order was recorded.
+                nexus_credit_log($user->ID, 'refund', (float) $price, $order_code, 'completed', null, 'คืนเครดิต: สร้างคำสั่งซื้อไม่สำเร็จ');
+                update_user_meta($user->ID, 'nexus_credit_balance', round(nexus_get_credit_balance($user->ID) + (float) $price, 2));
                 return new WP_Error('order_failed', 'สร้างคำสั่งซื้อไม่สำเร็จ กรุณาลองใหม่', ['status' => 500]);
             }
 
             return [
                 'order_code' => $order_code,
-                'status' => 'pending_payment',
+                'status' => 'paid',
                 'product_title' => $product->post_title,
                 'amount' => $price,
+                'credit_balance' => $new_balance,
             ];
         },
     ]);

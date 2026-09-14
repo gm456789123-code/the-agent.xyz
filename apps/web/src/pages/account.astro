@@ -9,6 +9,22 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       <h1 class="font-display font-black text-2xl sm:text-4xl mt-3">ประวัติ<span class="aurora-text">การสั่งซื้อ</span></h1>
     </div>
 
+    <!-- Credit Balance Card -->
+    <div id="account-credit-card" class="hidden aurora-glass rounded-2xl sm:rounded-3xl border border-pink-400/30 p-6 sm:p-8">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p class="text-xs text-slate-400 font-bold">เครดิตคงเหลือ</p>
+          <p id="account-credit-balance" class="font-display font-black text-3xl sm:text-4xl text-pink-300 mt-1">฿0.00</p>
+        </div>
+        <a
+          href="/topup"
+          class="px-6 py-3 rounded-xl font-display font-black text-sm aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow"
+        >
+          + เติมเครดิต
+        </a>
+      </div>
+    </div>
+
     <!-- Profile Card (Allows customer to view & update their saved phone number) -->
     <div id="account-profile-card" class="hidden aurora-glass rounded-2xl sm:rounded-3xl border border-white/10 p-6 sm:p-8 space-y-6">
       <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
@@ -129,7 +145,6 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           <div class="flex items-center gap-3 flex-shrink-0">
             <span class="text-pink-300 font-black">฿${order.amount}</span>
             <span class="text-xs font-bold px-3 py-1.5 rounded-full border ${statusColor}">${statusLabel}</span>
-            ${order.status === "pending_payment" ? `<button type="button" class="js-pay-now px-4 py-1.5 rounded-full text-xs font-black aurora-btn-gradient text-slate-950 hover:text-white transition-all cursor-pointer" data-order-code="${order.order_code}">ชำระเงิน</button>` : ""}
           </div>
         `;
         listEl!.appendChild(li);
@@ -169,13 +184,24 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       }
     }
 
-    listEl.addEventListener("click", (e) => {
-      const button = (e.target as HTMLElement)?.closest<HTMLButtonElement>(".js-pay-now");
-      if (!button) return;
-      const orderCode = button.dataset.orderCode;
-      if (!orderCode) return;
-      window.location.href = `/checkout?order=${encodeURIComponent(orderCode)}`;
-    });
+    const creditCard = document.getElementById("account-credit-card");
+    const creditBalanceEl = document.getElementById("account-credit-balance");
+
+    async function loadCreditBalance() {
+      const token = localStorage.getItem("nexus_token");
+      if (!token || !creditCard || !creditBalanceEl) return;
+      try {
+        const res = await fetch(`${WP_API_URL}/nexus/v1/credits/balance`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error("โหลดยอดเครดิตไม่สำเร็จ");
+        const data = await res.json();
+        creditBalanceEl.textContent = `฿${Number(data.balance || 0).toFixed(2)}`;
+        creditCard.classList.remove("hidden");
+      } catch {
+        creditCard.classList.add("hidden");
+      }
+    }
 
     const profileCard = document.getElementById("account-profile-card");
     const profileUsername = document.getElementById("account-profile-username");
@@ -245,10 +271,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     document.addEventListener("nexus:auth-success", () => {
       initProfile();
       loadOrders();
+      loadCreditBalance();
     });
 
     initProfile();
     loadOrders();
+    loadCreditBalance();
   }
 
   if (document.readyState === "loading") {
