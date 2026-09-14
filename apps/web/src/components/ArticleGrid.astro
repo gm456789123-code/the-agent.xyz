@@ -1,14 +1,14 @@
 ---
 import { articleDate, type Article } from "../lib/articles";
 import { safeArticleHtml } from "../lib/safe-html.mjs";
-interface Props { articles: Article[]; unavailable?: boolean }
-const { articles, unavailable = false } = Astro.props;
+interface Props { articles: Article[]; unavailable?: boolean; slider?: boolean }
+const { articles, unavailable = false, slider = false } = Astro.props;
 ---
 
 {articles.length ? (
-  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-7">
+  <div class:list={[slider ? "article-track" : "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-7"]} tabindex={slider ? 0 : undefined} role={slider ? "region" : undefined} aria-label={slider ? "บทความล่าสุด เลื่อนเพื่อดูรายการเพิ่มเติม" : undefined}>
     {articles.map((article) => (
-      <article class="aurora-glass aurora-glass-hover rounded-2xl border border-purple-400/30 p-5 sm:p-7 min-w-0 flex flex-col">
+      <article class:list={["aurora-glass aurora-glass-hover rounded-2xl border border-purple-400/30 p-5 sm:p-7 min-w-0 flex flex-col", slider && "article-item"]}>
         <div class="relative w-full h-40 sm:h-48 rounded-xl overflow-hidden mb-4 border border-white/10">
           {article.featured_image_url ? (
             <img src={article.featured_image_url} alt="" class="w-full h-full object-cover" loading="lazy" />
@@ -34,3 +34,10 @@ const { articles, unavailable = false } = Astro.props;
     {unavailable ? "ไม่สามารถโหลดบทความได้ในขณะนี้ กรุณาลองใหม่ภายหลัง" : "ยังไม่มีบทความที่เผยแพร่"}
   </p>
 )}
+
+<style>
+  .article-track { display: grid; grid-auto-flow: column; grid-auto-columns: 86%; gap: 1.25rem; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; padding-bottom: 1rem; }
+  .article-item { scroll-snap-align: start; }
+  @media (min-width: 768px) { .article-track { grid-auto-columns: calc((100% - 1.75rem) / 2); gap: 1.75rem; } }
+  @media (min-width: 1280px) { .article-track { grid-auto-columns: calc((100% - 3.5rem) / 3); } }
+</style>

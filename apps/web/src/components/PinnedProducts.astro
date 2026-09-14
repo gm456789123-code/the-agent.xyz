@@ -22,9 +22,9 @@ const { products, unavailable } = Astro.props;
         </div>
         <a href="/products" class="text-purple-300 hover:text-white font-bold text-sm">ดูสินค้าทั้งหมด →</a>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+      <div id="pinned-track" class="pinned-track" tabindex="0" role="region" aria-label="สินค้ายอดนิยม เลื่อนเพื่อดูรายการเพิ่มเติม">
         {products.map((item) => (
-          <div class="min-w-0">
+          <div class="pinned-item min-w-0">
             <ProductCard item={item} />
           </div>
         ))}
@@ -48,3 +48,11 @@ const { products, unavailable } = Astro.props;
     </section>
   )
 }
+
+<style>
+  .pinned-item :global(.group) { height: 100%; }
+  .pinned-track { display: grid; grid-auto-flow: column; grid-auto-columns: 86%; gap: 1rem; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; padding-bottom: 1rem; }
+  .pinned-item { scroll-snap-align: start; }
+  @media (min-width: 768px) { .pinned-track { grid-auto-columns: calc((100% - 1.5rem) / 2); gap: 1.5rem; } }
+  @media (min-width: 1280px) { .pinned-track { grid-auto-columns: calc((100% - 3rem) / 3); } }
+</style>

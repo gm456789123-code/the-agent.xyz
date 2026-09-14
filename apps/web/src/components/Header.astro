@@ -9,9 +9,24 @@ const pathname = Astro.url.pathname.replace(/\/$/, "") || "/";
 const isActive = (href: string) => pathname === href || (href === "/articles" && pathname.startsWith("/articles/"));
 ---
 
-<header class="w-full border-b border-white/10 bg-background/85 backdrop-blur-2xl sticky top-0 z-50 shadow-glass">
+<header class="w-full border-b border-white/10 bg-background/85 backdrop-blur-2xl fixed top-0 inset-x-0 z-50 shadow-glass">
   <div class="w-full max-w-[1920px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-14">
     <div class="flex items-center justify-between h-14 sm:h-16 lg:h-20 gap-2">
+
+      <!-- Mobile Hamburger Toggle Button (Mobile Only, placed before the logo) -->
+      <button
+        id="mobile-menu-toggle"
+        type="button"
+        aria-label="Toggle Mobile Navigation Menu"
+        class="lg:hidden flex-shrink-0 p-1.5 rounded-lg bg-surface-card border border-white/15 text-slate-300 hover:text-white hover:border-pink-400/50 transition-all"
+      >
+        <svg id="hamburger-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <svg id="close-icon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
 
       <!-- Brand Logo: Tri-Color Pastel Aurora Badge -->
       <a href="/" class="flex items-center gap-2 sm:gap-2.5 flex-shrink-0 group">
@@ -57,12 +72,64 @@ const isActive = (href: string) => pathname === href || (href === "/articles" &&
             <a
               href={link.href}
               aria-current={isActive(link.href) ? "page" : undefined}
-              class="text-sm font-bold text-slate-200 hover:text-pink-300 hover:drop-shadow-[0_0_15px_rgba(244,114,182,0.8)] transition-all whitespace-nowrap"
+              class:list={[
+                "text-sm font-bold text-slate-200 hover:text-pink-300 hover:drop-shadow-[0_0_15px_rgba(244,114,182,0.8)] transition-all whitespace-nowrap",
+                link.href === "/articles" && "js-nav-articles",
+              ]}
             >
               {link.label}
             </a>
           ))
         }
+        <!-- Credit Balance (replaces "บทความ" once logged in, hidden until JS confirms a session).
+             Links straight to /topup so the whole pill (including the trailing +) is a quick top-up shortcut. -->
+        <a
+          id="nav-credit-balance"
+          href="/topup"
+          class="hidden items-center gap-1.5 text-sm font-bold text-pink-300 hover:text-white hover:drop-shadow-[0_0_15px_rgba(244,114,182,0.8)] transition-all whitespace-nowrap"
+        >
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7a2 2 0 012-2h11a2 2 0 012 2v1h1a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h2" />
+          </svg>
+          <span id="nav-credit-balance-amount">฿0.00</span>
+          <span class="flex items-center justify-center w-4 h-4 rounded-full bg-pink-500/25 border border-pink-400/40 text-pink-200 text-[10px] font-black leading-none flex-shrink-0">+</span>
+        </a>
+        <!-- Profile Dropdown (placed right after the credit balance, hidden until JS confirms a session) -->
+        <div id="nav-auth-dropdown" class="hidden relative">
+          <button
+            type="button"
+            id="auth-dropdown-toggle"
+            aria-haspopup="menu"
+            aria-expanded="false"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black bg-surface-card border border-purple-400/40 text-purple-200 hover:text-white hover:border-pink-400/50 transition-all whitespace-nowrap cursor-pointer"
+          >
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <span id="auth-username-desktop"></span>
+            <svg id="auth-dropdown-chevron" class="w-3.5 h-3.5 flex-shrink-0 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+          <div
+            id="auth-dropdown-menu"
+            role="menu"
+            class="hidden absolute right-0 top-full mt-2 w-44 rounded-xl border border-white/10 bg-[#0b0f1a] shadow-2xl overflow-hidden z-50"
+          >
+            <a href="/account" role="menuitem" class="block px-4 py-2.5 text-xs font-bold text-slate-200 hover:bg-white/5 hover:text-white transition-colors">
+              โปรไฟล์
+            </a>
+            <button
+              type="button"
+              id="auth-logout-desktop"
+              role="menuitem"
+              class="w-full text-left px-4 py-2.5 text-xs font-bold text-rose-300 hover:bg-rose-500/10 transition-colors cursor-pointer"
+            >
+              ออกจากระบบ
+            </button>
+          </div>
+        </div>
       </nav>
 
       <!-- Right Actions: Status & Member -->
@@ -93,38 +160,14 @@ const isActive = (href: string) => pathname === href || (href === "/articles" &&
 
         <!-- Logged-in User Menu (Desktop, hidden until JS confirms a session) -->
         <div id="auth-user-desktop" class="hidden items-center gap-1.5 sm:gap-2.5">
+          <!-- Balance badge, mobile/tablet only — desktop already shows it in the nav -->
+          <a href="/topup" id="mobile-topbar-balance" class="lg:hidden inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-black bg-surface-card border border-pink-400/30 text-pink-300 whitespace-nowrap">
+            <span id="mobile-topbar-balance-amount">฿0.00</span>
+          </a>
           <a href="/topup" class="inline-flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs font-black aurora-btn-gradient text-slate-950 hover:text-white transition-all shadow-glow whitespace-nowrap">
             <span>+</span><span>เติมเงิน</span>
           </a>
-          <a href="/account" class="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black bg-surface-card border border-purple-400/40 text-purple-200 hover:text-white hover:border-pink-400/50 transition-all whitespace-nowrap">
-            <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <span id="auth-username-desktop"></span>
-          </a>
-          <button
-            type="button"
-            id="auth-logout-desktop"
-            class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs font-black bg-surface-card border border-white/15 text-white hover:border-pink-400/50 hover:text-pink-300 transition-all whitespace-nowrap cursor-pointer"
-          >
-            ออกจากระบบ
-          </button>
         </div>
-
-        <!-- Mobile Hamburger Toggle Button (Mobile Only) -->
-        <button
-          id="mobile-menu-toggle"
-          type="button"
-          aria-label="Toggle Mobile Navigation Menu"
-          class="lg:hidden p-1.5 rounded-lg bg-surface-card border border-white/15 text-slate-300 hover:text-white hover:border-pink-400/50 transition-all"
-        >
-          <svg id="hamburger-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-          <svg id="close-icon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
       </div>
 
     </div>
@@ -229,6 +272,30 @@ const isActive = (href: string) => pathname === href || (href === "/articles" &&
   </div>
 </header>
 
+<!-- Logout Confirmation Modal -->
+<div id="logout-confirm-modal" class="hidden fixed inset-0 z-[60] items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+  <div class="w-full max-w-sm rounded-2xl aurora-glass p-6 border border-pink-400/40 shadow-aurora text-center space-y-4">
+    <h3 class="font-display font-black text-lg text-white">ยืนยันการออกจากระบบ</h3>
+    <p class="text-sm text-slate-300">คุณต้องการออกจากระบบใช่หรือไม่?</p>
+    <div class="flex gap-3">
+      <button
+        type="button"
+        id="logout-confirm-cancel"
+        class="flex-1 py-2.5 rounded-xl text-sm font-bold bg-surface-card border border-white/15 text-white hover:border-pink-400/50 transition-all cursor-pointer"
+      >
+        ยกเลิก
+      </button>
+      <button
+        type="button"
+        id="logout-confirm-ok"
+        class="flex-1 py-2.5 rounded-xl text-sm font-bold bg-rose-500 text-white hover:bg-rose-600 transition-all cursor-pointer"
+      >
+        ออกจากระบบ
+      </button>
+    </div>
+  </div>
+</div>
+
 <style>
   nav a[aria-current="page"] { color: #f9a8d4; }
 </style>
@@ -288,6 +355,29 @@ const isActive = (href: string) => pathname === href || (href === "/articles" &&
     const usernameMobile = document.getElementById("auth-username-mobile");
     const logoutMobile = document.getElementById("auth-logout-mobile");
 
+    const navArticlesLinks = document.querySelectorAll<HTMLAnchorElement>(".js-nav-articles");
+    const navCreditBalance = document.getElementById("nav-credit-balance");
+    const navCreditBalanceAmount = document.getElementById("nav-credit-balance-amount");
+    const navAuthDropdown = document.getElementById("nav-auth-dropdown");
+    const mobileTopbarBalanceAmount = document.getElementById("mobile-topbar-balance-amount");
+
+    async function loadNavCreditBalance() {
+      const token = localStorage.getItem("nexus_token");
+      if (!token) return;
+      try {
+        const res = await fetch(`${WP_API_URL}/nexus/v1/credits/balance`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        const formatted = `฿${Number(data.balance || 0).toFixed(2)}`;
+        if (navCreditBalanceAmount) navCreditBalanceAmount.textContent = formatted;
+        if (mobileTopbarBalanceAmount) mobileTopbarBalanceAmount.textContent = formatted;
+      } catch {
+        // Nav balance just won't update; the account page remains the source of truth.
+      }
+    }
+
     function getStoredUser(): { username: string } | null {
       try {
         const raw = localStorage.getItem("nexus_user");
@@ -310,9 +400,15 @@ const isActive = (href: string) => pathname === href || (href === "/articles" &&
       userMobile?.classList.toggle("hidden", !isLoggedIn);
       userMobile?.classList.toggle("grid", isLoggedIn);
 
+      navArticlesLinks.forEach((link) => link.classList.toggle("hidden", isLoggedIn));
+      navCreditBalance?.classList.toggle("hidden", !isLoggedIn);
+      navCreditBalance?.classList.toggle("flex", isLoggedIn);
+      navAuthDropdown?.classList.toggle("hidden", !isLoggedIn);
+
       if (isLoggedIn && user) {
         if (usernameDesktop) usernameDesktop.textContent = user.username;
         if (usernameMobile) usernameMobile.textContent = user.username;
+        loadNavCreditBalance();
       }
     }
 
@@ -335,8 +431,59 @@ const isActive = (href: string) => pathname === href || (href === "/articles" &&
       window.location.href = "/";
     }
 
-    logoutDesktop?.addEventListener("click", logout);
-    logoutMobile?.addEventListener("click", logout);
+    // --- Profile dropdown (desktop) ---
+    const dropdownToggle = document.getElementById("auth-dropdown-toggle");
+    const dropdownMenu = document.getElementById("auth-dropdown-menu");
+    const dropdownChevron = document.getElementById("auth-dropdown-chevron");
+
+    function closeDropdown() {
+      dropdownMenu?.classList.add("hidden");
+      dropdownToggle?.setAttribute("aria-expanded", "false");
+      dropdownChevron?.classList.remove("rotate-180");
+    }
+
+    dropdownToggle?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = !dropdownMenu?.classList.contains("hidden");
+      if (isOpen) {
+        closeDropdown();
+      } else {
+        dropdownMenu?.classList.remove("hidden");
+        dropdownToggle.setAttribute("aria-expanded", "true");
+        dropdownChevron?.classList.add("rotate-180");
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      if (dropdownMenu && !dropdownMenu.classList.contains("hidden") && !dropdownMenu.contains(e.target as Node) && e.target !== dropdownToggle) {
+        closeDropdown();
+      }
+    });
+
+    // --- Logout confirmation ---
+    const logoutModal = document.getElementById("logout-confirm-modal");
+    const logoutCancelBtn = document.getElementById("logout-confirm-cancel");
+    const logoutOkBtn = document.getElementById("logout-confirm-ok");
+
+    function openLogoutConfirm() {
+      closeDropdown();
+      logoutModal?.classList.remove("hidden");
+      logoutModal?.classList.add("flex");
+    }
+
+    function closeLogoutConfirm() {
+      logoutModal?.classList.add("hidden");
+      logoutModal?.classList.remove("flex");
+    }
+
+    logoutDesktop?.addEventListener("click", openLogoutConfirm);
+    logoutMobile?.addEventListener("click", openLogoutConfirm);
+    logoutCancelBtn?.addEventListener("click", closeLogoutConfirm);
+    logoutOkBtn?.addEventListener("click", logout);
+    logoutModal?.addEventListener("click", (e) => {
+      if (e.target === logoutModal) closeLogoutConfirm();
+    });
+
     document.addEventListener("nexus:auth-changed", renderAuthState);
 
     renderAuthState();

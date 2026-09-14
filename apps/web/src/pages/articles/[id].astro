@@ -11,7 +11,7 @@ const { article } = Astro.props;
 ---
 
 <BaseLayout title={`${articleTitle(article)} — NEXUS.DEALS`}>
-  <main class="w-full max-w-4xl mx-auto px-4 sm:px-8 py-8 sm:py-12 pb-28 lg:pb-14">
+  <main class="w-full max-w-4xl mx-auto px-4 sm:px-8 py-8 sm:py-12 pb-28 md:pb-14">
     <a href="/articles" class="text-purple-300 hover:text-white text-sm font-bold">← บทความทั้งหมด</a>
       <article class="mt-6 aurora-glass rounded-2xl border border-purple-400/30 p-5 sm:p-10 min-w-0">
         {article.featured_image_url && (

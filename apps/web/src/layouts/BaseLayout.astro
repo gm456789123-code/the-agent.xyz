@@ -16,7 +16,7 @@ const { title } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="th" class="dark scroll-smooth overflow-x-hidden w-full">
+<html lang="th" class="dark scroll-smooth overflow-x-hidden w-full [scroll-padding-top:6rem]">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
@@ -51,6 +51,10 @@ const { title } = Astro.props;
     <!-- Main Container -->
     <div class="relative z-10 w-full max-w-full min-h-screen flex flex-col justify-between overflow-x-hidden">
       <Header />
+      <!-- Header is now fixed (position: fixed breaks less often than sticky when
+           an ancestor sets overflow, which html/body/this wrapper all do), so this
+           spacer reserves the space it used to take up in normal flow. -->
+      <div class="h-14 sm:h-16 lg:h-20 w-full flex-shrink-0" aria-hidden="true"></div>
       <slot />
       <MobileQuickDock />
       <Footer />

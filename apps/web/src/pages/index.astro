@@ -17,7 +17,7 @@ const [{ articles, unavailable }, { featured, latest }, pinnedData, recentOrders
 
 <BaseLayout title="NEXUS.DEALS — ศูนย์รวมดีลสินค้า & บริการออนไลน์ นายหน้าปลอดภัย 24 ชม.">
 
-  <main class="w-full max-w-[1920px] mx-auto px-3.5 sm:px-6 lg:px-10 xl:px-14 space-y-8 sm:space-y-16 py-3 sm:py-8 pb-28 lg:pb-14 overflow-hidden">
+  <main class="w-full max-w-[1920px] mx-auto px-3.5 sm:px-6 lg:px-10 xl:px-14 space-y-8 sm:space-y-16 py-3 sm:py-8 pb-28 md:pb-14 overflow-hidden">
 
     <!-- Giant Widescreen Panoramic Horizontal Hero Banner Section -->
     <section class="w-full max-w-full overflow-hidden">
@@ -64,7 +64,7 @@ const [{ articles, unavailable }, { featured, latest }, pinnedData, recentOrders
         </div>
         <a href="/articles" class="rounded-xl border border-purple-400/30 px-4 py-3 font-bold text-purple-300 hover:text-white hover:bg-white/10">ดูบทความทั้งหมด →</a>
       </div>
-      <ArticleGrid articles={articles} unavailable={unavailable} />
+      <ArticleGrid articles={articles} unavailable={unavailable} slider />
     </section>
   </main>
 

@@ -1,54 +1,192 @@
 ---
+const pathname = Astro.url.pathname.replace(/\/$/, "") || "/";
+const isActive = (href: string) => pathname === href;
 ---
 
 <!-- Mobile Bottom Navigation Dock (App-Like Touch Navigation for Smartphones) -->
-<div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 px-3 pb-3 pt-1 pointer-events-none">
-  <div class="max-w-md mx-auto aurora-glass rounded-2xl p-2 border border-sky-400/30 shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-2xl pointer-events-auto flex items-center justify-around">
-    
+<div class="md:hidden fixed bottom-0 left-0 right-0 z-40 px-3 pb-3 pt-1 pointer-events-none">
+  <div class="max-w-md mx-auto aurora-glass rounded-2xl p-1.5 border border-sky-400/30 shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-2xl pointer-events-auto grid grid-cols-5 gap-0.5">
+
     <!-- Home Item -->
     <a
       href="/"
-      class="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl text-sky-300 hover:text-white transition-all text-[10px] font-bold"
+      aria-label="หน้าแรก"
+      aria-current={isActive("/") ? "page" : undefined}
+      class:list={[
+        "flex items-center justify-center py-3 min-w-0 rounded-xl transition-all",
+        isActive("/") ? "bg-sky-500/15 border border-sky-400/30 text-sky-300" : "text-slate-300 hover:text-sky-300 border border-transparent",
+      ]}
     >
-      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg class="w-7 h-7 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
       </svg>
-      <span>หน้าแรก</span>
     </a>
 
     <!-- Products Item -->
     <a
       href="/products"
-      class="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl text-slate-300 hover:text-sky-300 transition-all text-[10px] font-bold"
+      aria-label="สินค้า"
+      aria-current={isActive("/products") ? "page" : undefined}
+      class:list={[
+        "flex items-center justify-center py-3 min-w-0 rounded-xl transition-all",
+        isActive("/products") ? "bg-sky-500/15 border border-sky-400/30 text-sky-300" : "text-slate-300 hover:text-sky-300 border border-transparent",
+      ]}
     >
-      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg class="w-7 h-7 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
       </svg>
-      <span>สินค้า</span>
     </a>
 
-<a href="/services" class="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl text-slate-300 hover:text-pink-300 transition-all text-[10px] font-bold"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m13 2-3 8H4l7 12 3-8h6L13 2z" /></svg><span>บริการ</span></a>
+    <!-- Services Item -->
     <a
-      href="#track" data-order-tracking aria-haspopup="dialog" aria-controls="order-tracking-modal"
-      class="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl text-slate-300 hover:text-purple-300 transition-all text-[10px] font-bold"
+      href="/services"
+      aria-label="บริการ"
+      aria-current={isActive("/services") ? "page" : undefined}
+      class:list={[
+        "flex items-center justify-center py-3 min-w-0 rounded-xl transition-all",
+        isActive("/services") ? "bg-pink-500/15 border border-pink-400/30 text-pink-300" : "text-slate-300 hover:text-pink-300 border border-transparent",
+      ]}
     >
-      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      <svg class="w-7 h-7 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m13 2-3 8H4l7 12 3-8h6L13 2z" />
       </svg>
-      <span>เช็คสลิป</span>
     </a>
 
-    <!-- LINE Support Item -->
+    <!-- Order History Item (was "เช็คสลิป" — no manual slip checks needed now that
+         purchases pay instantly from credit balance; this just points at order history) -->
     <a
-      href="https://line.me"
-      target="_blank"
-      class="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl text-emerald-300 hover:text-emerald-200 transition-all text-[10px] font-bold"
+      href="/account"
+      aria-label="ประวัติ"
+      aria-current={isActive("/account") ? "page" : undefined}
+      class:list={[
+        "flex items-center justify-center py-3 min-w-0 rounded-xl transition-all",
+        isActive("/account") ? "bg-purple-500/15 border border-purple-400/30 text-purple-300" : "text-slate-300 hover:text-purple-300 border border-transparent",
+      ]}
     >
-      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+      <svg class="w-7 h-7 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4h8a2 2 0 012 2v14l-2-1-2 1-2-1-2 1-2-1-2 1V6a2 2 0 012-2z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 8h6M9 12h6M9 16h4" />
       </svg>
-      <span>ทักไลน์</span>
     </a>
+
+    <!-- Contact Us Item (was "ทักไลน์" — opens a popup of whichever channels the
+         admin enabled in Settings -> Nexus -> ปุ่มติดต่อลอย, icons only) -->
+    <div class="relative min-w-0">
+      <button
+        type="button"
+        id="dock-contact-toggle"
+        aria-label="ติดต่อเรา"
+        aria-haspopup="menu"
+        aria-expanded="false"
+        class="w-full flex items-center justify-center py-3 min-w-0 rounded-xl text-slate-300 hover:text-emerald-300 transition-all border border-transparent cursor-pointer"
+      >
+        <svg class="w-7 h-7 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+      </button>
+      <div
+        id="dock-contact-menu"
+        role="menu"
+        class="hidden absolute bottom-full right-0 mb-2 flex items-center gap-2 p-2.5 rounded-xl border border-white/10 bg-[#0b0f1a] shadow-2xl whitespace-nowrap"
+      >
+        <span id="dock-contact-empty" class="hidden text-[11px] text-slate-400 px-1">ยังไม่ได้เปิดช่องทางติดต่อ</span>
+      </div>
+    </div>
 
   </div>
 </div>
+
+<script>
+  const WP_API_URL = import.meta.env.PUBLIC_WP_API_URL || "https://azure-bison-824750.hostingersite.com/wp-json";
+
+  interface SocialLink {
+    enabled: boolean;
+    url: string;
+  }
+
+  const PLATFORMS: Record<string, { label: string; bg: string; icon: string }> = {
+    facebook: {
+      label: "Facebook",
+      bg: "bg-[#1877F2]",
+      icon: '<path d="M13.5 9H15V6.5h-1.75C11.6 6.5 10.5 7.7 10.5 9.5V11H9v2.5h1.5V19h2.5v-5.5h1.75L15 11h-2V9.75c0-.4.35-.75.5-.75z" fill="currentColor"/>',
+    },
+    line: {
+      label: "LINE",
+      bg: "bg-[#06C755]",
+      icon: '<path d="M12 4C7.03 4 3 7.14 3 11c0 3.46 3.21 6.35 7.55 6.91.29.06.69.2.79.45.09.23.06.58.03.81l-.13.8c-.04.23-.18.92.8.5.99-.42 5.32-3.13 7.26-5.36C20.66 13.52 21 12.29 21 11c0-3.86-4.03-7-9-7z" fill="currentColor"/>',
+    },
+    discord: {
+      label: "Discord",
+      bg: "bg-[#5865F2]",
+      icon: '<path d="M18.9 6.4a15.5 15.5 0 00-3.6-1.1l-.2.4c1.3.3 1.9.7 2.6 1.2-1.1-.5-2.2-.9-3.7-.9s-2.6.4-3.7.9c.7-.5 1.4-.9 2.6-1.2l-.2-.4a15.5 15.5 0 00-3.6 1.1C4.5 9.6 4 13.3 4.2 16.9a15.6 15.6 0 004.4 2.2l.6-1c-.7-.3-1.4-.6-2-1.1.2.1.4.2.6.3 1.4.6 2.8.9 4.2.9s2.8-.3 4.2-.9c.2-.1.4-.2.6-.3-.6.5-1.3.8-2 1.1l.6 1a15.6 15.6 0 004.4-2.2c.3-4.2-.7-7.9-2.9-10.5zM9.7 14.9c-.7 0-1.3-.7-1.3-1.5s.6-1.5 1.3-1.5 1.3.7 1.3 1.5-.6 1.5-1.3 1.5zm4.6 0c-.7 0-1.3-.7-1.3-1.5s.6-1.5 1.3-1.5 1.3.7 1.3 1.5-.6 1.5-1.3 1.5z" fill="currentColor"/>',
+    },
+    telegram: {
+      label: "Telegram",
+      bg: "bg-[#26A5E4]",
+      icon: '<path d="M21 4L3 11.5l6 2m12-9.5l-3.3 15L9 13.5m12-9.5L9 13.5m0 0v5.5l3-3.5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    },
+  };
+
+  async function initDockContact() {
+    const toggleBtn = document.getElementById("dock-contact-toggle");
+    const menu = document.getElementById("dock-contact-menu");
+    const emptyEl = document.getElementById("dock-contact-empty");
+    if (!toggleBtn || !menu || !emptyEl) return;
+
+    function closeMenu() {
+      menu!.classList.add("hidden");
+      toggleBtn!.setAttribute("aria-expanded", "false");
+    }
+
+    toggleBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = !menu!.classList.contains("hidden");
+      if (isOpen) {
+        closeMenu();
+      } else {
+        menu!.classList.remove("hidden");
+        toggleBtn!.setAttribute("aria-expanded", "true");
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!menu!.classList.contains("hidden") && !menu!.contains(e.target as Node) && e.target !== toggleBtn) {
+        closeMenu();
+      }
+    });
+
+    try {
+      const res = await fetch(`${WP_API_URL}/nexus/v1/settings`);
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      const links: Record<string, SocialLink> = data?.social_links || {};
+      const enabledEntries = Object.entries(links).filter(([, link]) => link?.enabled && link?.url);
+
+      if (enabledEntries.length === 0) {
+        emptyEl.classList.remove("hidden");
+        return;
+      }
+
+      enabledEntries.forEach(([platform, link]) => {
+        const meta = PLATFORMS[platform];
+        if (!meta) return;
+        const a = document.createElement("a");
+        a.href = link.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.setAttribute("aria-label", meta.label);
+        a.className = `w-10 h-10 rounded-full ${meta.bg} text-white shadow-lg flex items-center justify-center transition-transform hover:scale-105 flex-shrink-0`;
+        a.innerHTML = `<svg class="w-5 h-5" viewBox="0 0 24 24">${meta.icon}</svg>`;
+        menu!.appendChild(a);
+      });
+    } catch {
+      emptyEl.classList.remove("hidden");
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initDockContact);
+  } else {
+    initDockContact();
+  }
+</script>

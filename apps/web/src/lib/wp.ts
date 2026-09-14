@@ -28,8 +28,23 @@ const CATEGORY_LABELS: Record<ProductDeal["category"], string> = {
   vouchers: "บัตรดิจิทัล",
 };
 
+const NAMED_ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
+
+// WP's REST API returns "rendered"/term-name fields already HTML-entity-encoded
+// (e.g. "&amp;"), so interpolating them as plain text double-escapes the markup
+// and the browser shows the literal "&amp;" instead of "&".
+function decodeEntities(text: string): string {
+  return text.replace(/&(#x?[0-9a-fA-F]+|[a-zA-Z]+);/g, (match, entity: string) => {
+    if (entity[0] === "#") {
+      const code = entity[1].toLowerCase() === "x" ? parseInt(entity.slice(2), 16) : parseInt(entity.slice(1), 10);
+      return Number.isFinite(code) ? String.fromCodePoint(code) : match;
+    }
+    return NAMED_ENTITIES[entity] ?? match;
+  });
+}
+
 function stripHtml(html: string): string {
-  return html.replace(/<[^>]+>/g, "").trim();
+  return decodeEntities(html.replace(/<[^>]+>/g, "")).trim();
 }
 
 function resolveCategory(raw?: string): ProductDeal["category"] {
@@ -53,7 +68,7 @@ function mapWpProduct(product: WpProduct, index: number): ProductDeal {
     storeRating: 4.8,
     price: typeof price === "number" ? `฿${price.toLocaleString()}` : "฿299",
     unit: product.meta?.unit || stripHtml(product.excerpt.rendered) || "แพ็กเกจมาตรฐาน",
-    deliverySpeed: "ส่งออโต้ทันทีcost",
+    deliverySpeed: "ส่งออโต้ทันที",
     image: product.featured_image_url || fallbackImage,
     color: CATEGORY_COLORS[category],
     description: product.content?.rendered,
@@ -184,7 +199,7 @@ export async function getProductTags(): Promise<ProductTag[]> {
       if (!response.ok) throw new Error("Product tags unavailable");
       const data = await response.json();
       if (!Array.isArray(data)) throw new Error("Invalid product tags");
-      tags.push(...data);
+      tags.push(...data.map((tag: ProductTag) => ({ ...tag, name: decodeEntities(tag.name) })));
       totalPages = Number(response.headers.get("X-WP-TotalPages")) || 1;
     }
     return tags;
